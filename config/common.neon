@@ -1,0 +1,18 @@
+parameters:
+
+
+application:
+	errorPresenter: Error
+	catchExceptions: false # will be set to true for release
+	mapping:
+		*: App\Presenters\*Presenter
+
+
+#session:
+#	expiration: 14 days
+
+
+di:
+	export:
+		parameters: no
+		tags: no

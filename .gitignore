@@ -1,0 +1,6 @@
+config/local.neon
+/!not-git
+/.vscode
+/vendor
+/log
+/temp
