@@ -1,6 +1,12 @@
 <nav class="navbar navbar-expand-sm navbar-light bg-warning">
   <div class="container">
-    <a class="navbar-brand" href="{plink Homepage:default}">Quixam</a>
+    <a class="navbar-brand" href="{plink Homepage:default}">
+      <span class="fa-stack fa-2xs">
+        <i class="fa-regular fa-square fa-stack-2x"></i>
+        <i class="fa-solid fa-bolt-lightning fa-stack-1x"></i>
+      </span>
+      Quixam
+    </a>
     
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav">
@@ -14,11 +20,21 @@
     </div>
 
     <ul class="navbar-nav">
+      {foreach ['en', 'cs'] as $locale}
+        {if $locale != $selectedLocale}
+          <li class="nav-item">
+              {var $localeCaption = 'locale.locales.' . $locale}
+              <a class="nav-link"n:href="ChangeLocale $locale">
+                <img src="styles/flags/{$locale}.png" alt="{$localeCaption|translate}" title="{_locale.menu.changeLocale} {$localeCaption|translate}" class="menu-lang-flag">
+              </a>
+          </li>
+        {/if}
+      {/foreach}
       <li class="nav-item">
         {if $userLoggedIn}
-          <a class="nav-link active" aria-current="page" href=""><i class="fa-solid fa-right-from-bracket fa-fw"></i> {_locale.menu.logout}</a>
+          <a class="nav-link" href="TODO"><i class="fa-solid fa-right-from-bracket fa-fw"></i> {_locale.menu.logout}</a>
         {else}
-          <a class="nav-link active" aria-current="page" href="{plink Login:default}"><i class="fa-regular fa-circle-user fa-fw"></i> {_locale.menu.signIn}</a>
+          <a class="nav-link" href="{plink Login:default}"><i class="fa-regular fa-circle-user fa-fw"></i> {_locale.menu.signIn}</a>
         {/if}
       </li>
     </ul>

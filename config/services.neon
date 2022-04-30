@@ -1,7 +1,7 @@
 services:
   router: App\Router\RouterFactory::createRouter
   security.passwords: Nette\Security\Passwords(::PASSWORD_BCRYPT, [cost: 12])
-
+  
 extensions:
   console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
   nettrine.annotations: Nettrine\Annotations\DI\AnnotationsExtension

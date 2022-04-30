@@ -1,4 +1,8 @@
+locales.en: "English"
+locales.cs: "Czech"
+
 menu.signIn: "Sign in"
 menu.logout: "Logout"
+menu.changeLocale: "Change language to"
 
 content: "The content!"
