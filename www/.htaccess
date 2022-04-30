@@ -19,12 +19,14 @@ Require all granted
 	#RewriteCond %{REQUEST_FILENAME} -f
 	#RewriteRule /\.|^\.(?!well-known/) - [F]
 
+	#RewriteRule .*/([^/]+)\.(pdf|js|mjs|ico|gif|jpg|jpeg|png|webp|svg|css|rar|zip|7z|tar\.gz|map|eot|ttf|otf|woff|woff2)$ $1.$2
+
 	# front controller
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteRule !\.(pdf|js|mjs|ico|gif|jpg|jpeg|png|webp|svg|css|rar|zip|7z|tar\.gz|map|eot|ttf|otf|woff|woff2)$ index.php [L]
 
-	RewriteRule .*/([^/]+)\.(pdf|js|mjs|ico|gif|jpg|jpeg|png|webp|svg|css|rar|zip|7z|tar\.gz|map|eot|ttf|otf|woff|woff2)$ $1.$2
+	#RewriteRule .*/([^/]+)\.(pdf|js|mjs|ico|gif|jpg|jpeg|png|webp|svg|css|rar|zip|7z|tar\.gz|map|eot|ttf|otf|woff|woff2)$ $1.$2
 </IfModule>
 
 # enable gzip compression

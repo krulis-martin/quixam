@@ -14,6 +14,8 @@ extensions:
   nettrine.orm.annotations: Nettrine\ORM\DI\OrmAnnotationsExtension
   nettrine.migrations: Nettrine\Migrations\DI\MigrationsExtension
   nettrine.extensions.atlantic18: Nettrine\Extensions\Atlantic18\DI\Atlantic18BehaviorExtension
+  translation: Contributte\Translation\DI\TranslationExtension
+
 
 nettrine.dbal:
   debug:
@@ -58,3 +60,16 @@ nettrine.migrations:
   directory: %appDir%/../migrations # directory, where all migrations are stored
   namespace: Migrations # namespace of migration classes
 
+
+translation:
+  locales:
+    whitelist: [en, cs]
+    default: en
+    fallback: [en]
+  dirs:
+    - %appDir%/lang
+  returnOriginalMessage: true # to not translate undefined messages, default is true
+  localeResolvers:
+    - Contributte\Translation\LocalesResolvers\Parameter
+    - Contributte\Translation\LocalesResolvers\Session
+    - Contributte\Translation\LocalesResolvers\Header

@@ -6,6 +6,6 @@ namespace App\Presenters;
 
 use Nette;
 
-final class HomepagePresenter extends BasePresenter
+final class LoginPresenter extends BasePresenter
 {
 }

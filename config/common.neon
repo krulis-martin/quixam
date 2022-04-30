@@ -8,8 +8,8 @@ application:
 		*: App\Presenters\*Presenter
 
 
-#session:
-#	expiration: 14 days
+session:
+	expiration: 14 days
 
 
 di:

@@ -26,7 +26,8 @@
 		"nettrine/extensions-atlantic18": "^0.6.0",
 		"contributte/console": "^0.9.2",
 		"firebase/php-jwt": "^6.1",
-        "dg/adminer-custom": "dev-master#4564b4e0a71d0d9d47568ddb97ae35407400fafd"
+        "dg/adminer-custom": "dev-master#4564b4e0a71d0d9d47568ddb97ae35407400fafd",
+		"contributte/translation": "^1.0"
 	},
 	"require-dev": {
 		"nette/tester": "^2.3",

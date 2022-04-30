@@ -3,24 +3,20 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="bootstrap.min.css" rel="stylesheet">
-    <title>{ifset title}{include title|stripHtml} | {/ifset}Quixam<</title>
+    <link href="styles/bootstrap.min.css" rel="stylesheet">
+    <link href="styles/fontawesome/css/all.min.css" rel="stylesheet">
+    <title>{ifset title}{include title|stripHtml} | {/ifset}Quixam</title>
   </head>
   <body>
-	<div class="container">
-	  <h1>Quixam</h1>
-	</div>
-	
-	<hr>
+    {control menu}
 
-	<div class="container">
+	<div class="container mt-3">
       <div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
-	  
 	  {include content}
 	</div>
 
 	{block scripts}
-    <script src="bootstrap.bundle.min.js"></script>
+    <script src="styles/bootstrap.bundle.min.js"></script>
 	{/block}
   </body>
 </html>
