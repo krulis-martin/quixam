@@ -1,6 +1,7 @@
 services:
   router: App\Router\RouterFactory::createRouter
   security.passwords: Nette\Security\Passwords(::PASSWORD_BCRYPT, [cost: 12])
+  authenticator: App\Security\Authenticator
 
   # DB repositories
   - App\Model\Repository\ExternalLogins

@@ -10,7 +10,7 @@ application:
 
 session:
 	expiration: 14 days
-
+	savePath: "%tempDir%"
 
 di:
 	export:

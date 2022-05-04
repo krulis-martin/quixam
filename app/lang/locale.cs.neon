@@ -4,5 +4,17 @@ locales.cs: "Čeština"
 menu.signIn: "Přihlásit"
 menu.logout: "Odhlásit"
 menu.changeLocale: "Změnit na jazyk"
+menu.user: "Uživatelské nastavení"
 
-content: "Náplň!"
+login.title: "Přihlásit lokálním účtem"
+login.login: "Přihlašovací jméno (email)"
+login.password: "Heslo"
+login.error.invalidCredentials: "Neplatné přihlašovací údaje."
+
+homepage.welcome: "Vítejte"
+homepage.welcomeTo: "v aplikaci Quixam"
+
+dashboard.title: "Celkový přehled"
+dashboard.student.noTests: "Nejsou zde pro vás žádné testy. Pokud jste již zapsán(a) na určitý test, kontaktujte vašeho vyučujícího."
+
+user.title: "Detail uživatele"

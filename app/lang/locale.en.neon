@@ -4,5 +4,17 @@ locales.cs: "Czech"
 menu.signIn: "Sign in"
 menu.logout: "Logout"
 menu.changeLocale: "Change language to"
+menu.user: "User settings"
 
-content: "The content!"
+login.title: "Sign in by local account"
+login.login: "Login (email address)"
+login.password: "Password"
+login.error.invalidCredentials: "Invalid user credentials."
+
+homepage.welcome: "Welcome"
+homepage.welcomeTo: "to Quixam Application"
+
+dashboard.title: "Dashboard"
+dashboard.student.noTests: "There are no tests for you yet. If you expect to be enrolled for particular test, contact the teacher."
+
+user.title: "User detail"

@@ -28,9 +28,19 @@ class MenuControl extends Control
         $this->redirect('this');
     }
 
+    public function handleLogout(): void
+    {
+        $this->getPresenter()->getUser()->logout();
+        $this->getPresenter()->finalizePost($this->link('this'));
+    }
+
     public function render(): void
     {
-        $this->template->userLoggedIn = false; // TODO
+        $loggedIn = $this->getPresenter()->getUser()->isLoggedIn();
+        $this->template->userLoggedIn = $loggedIn;
+        if ($loggedIn) {
+            $this->template->user = $this->getPresenter()->getUser()->getIdentity()->getUserData();
+        }
         $this->template->selectedLocale = $this->translator->getLocale();
         $this->template->render(__DIR__ . '/templates/menu.latte');
     }
