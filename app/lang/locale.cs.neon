@@ -1,6 +1,10 @@
 locales.en: "Angličtina"
 locales.cs: "Čeština"
 
+role.student: "Student"
+role.teacher: "Vyučující"
+role.admin: "Administrátor"
+
 menu.signIn: "Přihlásit"
 menu.logout: "Odhlásit"
 menu.changeLocale: "Změnit na jazyk"
@@ -9,7 +13,11 @@ menu.user: "Uživatelské nastavení"
 login.title: "Přihlásit lokálním účtem"
 login.login: "Přihlašovací jméno (email)"
 login.password: "Heslo"
+login.externalLink: "Přihlásit pomocí externí autentizace..."
 login.error.invalidCredentials: "Neplatné přihlašovací údaje."
+login.error.externalAuthFailed: "Externí autentizace selhala."
+login.error.externalCollision: "Externí autenitzace se podařila, ale již existuje lokální účet se stejnou mailovou adresou patřící jinému uživateli. Prosíme, kontaktujte administrátora."
+login.error.externalRegisterFails: "Externí autenitzace se podařila, ale v aplikaci neexistuje odpovídající účet a externí autentizátor nedodal potřebné údaje, aby bylo možné provést registraci."
 
 homepage.welcome: "Vítejte"
 homepage.welcomeTo: "v aplikaci Quixam"

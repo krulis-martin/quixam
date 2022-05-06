@@ -5,7 +5,28 @@
 .form-signin {
     width: 100%;
     max-width: 330px;
-    margin: calc(50vh - 180px) auto 0;
+    margin: 0 auto;
+    padding-top: calc(50vh - 180px); 
+}
+
+#flashes-container {
+    position: relative;
+    height: 0;
+    padding: 0;
+    top: 0;
+    overflow: visible;
+}
+
+#flashes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+}
+
+#flashes div.alert {
+    box-shadow: 2px 2px 10px #999;
 }
 
 /*

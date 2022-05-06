@@ -11,15 +11,22 @@
   <body>
     {control menu}
 
-	<div class="container mt-3">
-      <div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
-	  {include content}
-	</div>
+    <div id="flashes-container" class="container mt-3">
+      <div id="flashes">
+        <div n:foreach="$flashes as $flash" class="alert alert-{$flash->type} alert-dismissible fade show">
+          {$flash->message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
 
-	{block scripts}
-    <script src="{$basePath}/styles/bootstrap.bundle.min.js"></script>
-    <script src="{$basePath}/scripts/jquery-3.6.0.min.js"></script>
-    <script src="{$basePath}/scripts/main.js"></script>
-	{/block}
+    <div class="container mt-3">
+      {include content}
+    </div>
+
+    {block scripts}
+      <script src="{$basePath}/styles/bootstrap.bundle.min.js"></script>
+      <script src="{$basePath}/scripts/jquery-3.6.0.min.js"></script>
+      <script src="{$basePath}/scripts/main.js"></script>
+    {/block}
   </body>
 </html>

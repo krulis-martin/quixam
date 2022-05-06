@@ -16,8 +16,13 @@ class Users extends BaseSoftDeleteRepository
         parent::__construct($em, User::class);
     }
 
-    public function getByEmail(string $email): ?User
+    public function findByEmail(string $email): ?User
     {
         return $this->findOneBy(["email" => $email]);
+    }
+
+    public function findByExternalId(string $id): ?User
+    {
+        return $this->findOneBy(["externalId" => $id]);
     }
 }

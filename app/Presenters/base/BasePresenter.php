@@ -52,12 +52,14 @@ class BasePresenter extends Presenter
         }
     }
 
-    public function sendJsonError(string $msg, string $redirect = null): void
+    public function finalizePostError(string $msg): void
     {
-        $res = [ 'ok' => false, 'error' => $msg ];
-        if ($redirect) {
-            $res['redirect'] = $redirect;
+        if ($this->isAjax()) {
+            $res = [ 'ok' => false, 'error' => $msg ];
+            $this->sendJson($res);
+        } else {
+            $this->flashMessage($msg, "danger");
+            $this->redirect('this');
         }
-        $this->sendJson($res);
     }
 }

@@ -47,7 +47,7 @@ class SetPassword extends BaseCommand
 
         // get the user ...
         $email = $input->getArgument('email');
-        $user = $this->users->getByEmail($email);
+        $user = $this->users->findByEmail($email);
         if (!$user) {
             $output->writeln("No user $email exists.");
             return Command::FAILURE;

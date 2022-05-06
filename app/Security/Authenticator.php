@@ -29,7 +29,7 @@ class Authenticator implements SecurityAuthenticator, IdentityHandler
 
     public function authenticate(string $username, string $password): Identity
     {
-        $user = $this->users->getByEmail($username);
+        $user = $this->users->findByEmail($username);
 
         if (!$user || !$user->passwordsMatch($password, $this->passwords)) {
             throw new AuthenticationException('Invalid user credentials.');

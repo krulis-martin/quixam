@@ -2,9 +2,9 @@ services:
   router: App\Router\RouterFactory::createRouter
   security.passwords: Nette\Security\Passwords(::PASSWORD_BCRYPT, [cost: 12])
   authenticator: App\Security\Authenticator
+  - App\Security\CasAuthenticator(%casAuthenticator%)
 
   # DB repositories
-  - App\Model\Repository\ExternalLogins
   - App\Model\Repository\Users
 
   # Console commands
@@ -24,7 +24,7 @@ extensions:
   nettrine.migrations: Nettrine\Migrations\DI\MigrationsExtension
   nettrine.extensions.atlantic18: Nettrine\Extensions\Atlantic18\DI\Atlantic18BehaviorExtension
   translation: Contributte\Translation\DI\TranslationExtension
-
+  monolog: Contributte\Monolog\DI\MonologExtension
 
 nettrine.dbal:
   debug:
@@ -82,3 +82,9 @@ translation:
     - Contributte\Translation\LocalesResolvers\Parameter
     - Contributte\Translation\LocalesResolvers\Session
     - Contributte\Translation\LocalesResolvers\Header
+
+monolog:
+  channel:
+    default: # default channel is required
+      handlers:
+        - Monolog\Handler\StreamHandler(%appDir%/../log/user_actions.log, Monolog\Logger::DEBUG)

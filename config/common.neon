@@ -1,5 +1,10 @@
 parameters:
-
+	casAuthenticator:
+		server: ''
+		port: 443
+		uri: '/cas'
+		certificate: ''
+    
 
 application:
 	errorPresenter: Error

@@ -21,6 +21,16 @@ class User
     use CreateableEntity;
     use DeleteableEntity;
 
+    public const ROLE_STUDENT = 'student';
+    public const ROLE_TEACHER = 'teacher';
+    public const ROLE_ADMIN = 'admin';
+
+    public const ROLES = [
+        self::ROLE_STUDENT,
+        self::ROLE_TEACHER,
+        self::ROLE_ADMIN,
+    ];
+
     public function __construct(
         string $email,
         string $firstName,
@@ -65,7 +75,7 @@ class User
     }
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true)
      */
     protected $email;
 
@@ -95,63 +105,10 @@ class User
     protected $passwordHash = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="ExternalLogin", mappedBy="user", cascade={"all"})
+     * @ORM\Column(type="string", nullable=true)
      */
-    protected $externalLogins;
+    protected $externalId;
 
-
-    /**
-     * Returns true if the user entity is associated with a external login entity.
-     * @return bool
-     */
-    public function hasExternalAccounts(): bool
-    {
-        return !$this->externalLogins->isEmpty();
-    }
-
-    /**
-     * Return an associative array [ service => externalId ] for the user.
-     * If there are multiple IDs for the same service, they are concatenated in an array.
-     * If a filter is provided, only services specified on the filter list are yielded.
-     * @param array|null $filter A list of services to be included in the result. Null = all services.
-     * @return array
-     */
-    public function getConsolidatedExternalLogins(?array $filter = null)
-    {
-        if ($filter === []) {
-            return [];  // why should we bother...
-        }
-
-        // assemble the result structure [ service => ids ]
-        $res = [];
-        foreach ($this->externalLogins as $externalLogin) {
-            if (empty($res[$externalLogin->getAuthService()])) {
-                $res[$externalLogin->getAuthService()] = [];
-            }
-            $res[$externalLogin->getAuthService()][] = $externalLogin->getExternalId();
-        }
-
-        // single IDs (per service) are turned into scalars
-        foreach ($res as &$externalIds) {
-            if (count($externalIds) === 1) {
-                $externalIds = reset($externalIds);
-            }
-        }
-        unset($externalIds);  // make sure this reference is not accidentaly reused
-
-        // filter the list if necessary
-        if ($filter !== null) {
-            $resFiltered = [];
-            foreach ($filter as $service) {
-                if (!empty($res[$service])) {
-                    $resFiltered[$service] = $res[$service];
-                }
-            }
-            return $resFiltered;
-        }
-
-        return $res;
-    }
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -278,16 +235,24 @@ class User
 
     public function setRole(string $role): void
     {
+        if (!in_array($role, self::ROLES)) {
+            throw new InvalidArgumentException("Attempting to set an unknown role '$role'.");
+        }
         $this->role = $role;
-    }
-
-    public function getExternalLogins(): Collection
-    {
-        return $this->externalLogins;
     }
 
     public function getLastAuthenticationAt(): ?DateTime
     {
         return $this->lastAuthenticationAt;
+    }
+
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+    public function setExternalId(string $id = null): void
+    {
+        $this->externalId = $id;
     }
 }

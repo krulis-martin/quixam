@@ -1,6 +1,10 @@
 locales.en: "English"
 locales.cs: "Czech"
 
+role.student: "Student"
+role.teacher: "Teacher"
+role.admin: "Administrator"
+
 menu.signIn: "Sign in"
 menu.logout: "Logout"
 menu.changeLocale: "Change language to"
@@ -9,7 +13,11 @@ menu.user: "User settings"
 login.title: "Sign in by local account"
 login.login: "Login (email address)"
 login.password: "Password"
+login.externalLink: "Sign in by an external authenticator..."
 login.error.invalidCredentials: "Invalid user credentials."
+login.error.externalAuthFailed: "External authentication failed."
+login.error.externalCollision: "External authentication was successful, but an account with the same email of a different user already exists. Please contact the administrator."
+login.error.externalRegisterFails: "External authentication was successful, but no corresponding account exists and external authenticator did not provide enough information necessary for registration."
 
 homepage.welcome: "Welcome"
 homepage.welcomeTo: "to Quixam Application"
