@@ -1,3 +1,69 @@
 {block content}
 
 <h1>{block title}{_locale.user.title}{/block}</h1>
+
+<div class="bg-light border p-3 rounded">
+  <table class="table table-borderless m-0">
+    <tbody>
+      <tr>
+        <th class="text-nowrap">{_locale.user.firstName}:</th>
+        <td class="w-100">{$user->getFirstName()}</td>
+      </tr>
+      <tr>
+        <th class="text-nowrap">{_locale.user.lastName}:</th>
+        <td class="w-100">{$user->getLastName()}</td>
+      </tr>
+      <tr>
+        <th class="text-nowrap">{_locale.user.email}:</th>
+        <td class="w-100">
+          <a href="mailto:{$user->getEmail()}">{$user->getEmail()}</a>
+          {if $user->isVerified()}
+          <i class="fa-regular fa-circle-check fa-fw text-success" title="{_locale.user.emailVerified}"></i>
+          {else}
+          <i class="fa-solid fa-triangle-exclamation fa-fw text-warning" title="{_locale.user.emailNotVerified}"></i>
+          {/if}
+        </td>
+      </tr>
+      {if $user->getExternalId()}
+      <tr>
+        <th class="text-nowrap">{_locale.user.externalId}:</th>
+        <td class="w-100">
+          <a href="mailto:{$user->getEmail()}">{$user->getExternalId()}</a>
+        </td>
+      </tr>
+      {/if}
+      <tr>
+        <th class="text-nowrap">{_locale.user.role}:</th>
+        <td class="w-100">
+          {var $role = "locale.role." . $user->getRole()}
+          {$role|translate}
+        </td>
+      </tr>
+      <tr>
+        <th class="text-nowrap">{_locale.user.createdAt}:</th>
+        <td class="w-100">{$user->getCreatedAt()|date:'j. n. Y (H:i:s)'}</td>
+      </tr>
+      <tr>
+        <th class="text-nowrap">{_locale.user.authenticatedAt}:</th>
+        <td class="w-100">{$user->getLastAuthenticationAt()|ldate:'j. n. Y (H:i:s)'}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<h2 class="mt-3">{_locale.user.localAccountTitle}</h2>
+
+{if $user->isPasswordEmpty()}
+  <p>
+    {_locale.user.localAccountNotSet}
+  </p>
+  {control setPasswordForm}
+{else}
+  <p>
+    {_locale.user.changePassword}
+  </p>
+  {control changePasswordForm}
+{/if}
+
+

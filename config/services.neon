@@ -3,6 +3,10 @@ services:
   security.passwords: Nette\Security\Passwords(::PASSWORD_BCRYPT, [cost: 12])
   authenticator: App\Security\Authenticator
   - App\Security\CasAuthenticator(%casAuthenticator%)
+  - App\Helpers\LatteDateFilter
+  nette.latteFactory:
+    setup:
+      - addFilter(ldate, @App\Helpers\LatteDateFilter)
 
   # DB repositories
   - App\Model\Repository\Users

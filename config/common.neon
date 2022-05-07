@@ -5,7 +5,10 @@ parameters:
 		uri: '/cas'
 		certificate: ''
     
+php:
+	date.timezone: Europe/Prague
 
+	
 application:
 	errorPresenter: Error
 	catchExceptions: false # will be set to true for release
