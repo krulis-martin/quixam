@@ -114,9 +114,9 @@ class BaseSoftDeleteRepository extends BaseRepository
 
     /**
      * @param Criteria $params
-     * @return Collection<T>
+     * @return mixed A lazy collection or a selectable entity
      */
-    public function matching(Criteria $params): Collection
+    public function matching(Criteria $params)
     {
         $params->andWhere(Criteria::expr()->isNull($this->softDeleteColumn));
         return $this->repository->matching($params);

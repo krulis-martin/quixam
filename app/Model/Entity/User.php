@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\Criteria;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
+use InvalidArgumentException;
 
 /**
  * @ORM\Entity
@@ -43,10 +44,9 @@ class User
         $this->passwordHash = null;
         $this->isVerified = false;
         $this->createdAt = new DateTime();
-        $this->externalLogins = new ArrayCollection();
 
         if (empty($role)) {
-            $this->role = Roles::STUDENT_ROLE;
+            $this->role = self::ROLE_STUDENT;
         } else {
             $this->role = $role;
         }
@@ -107,7 +107,7 @@ class User
     /**
      * @ORM\Column(type="string", nullable=true)
      */
-    protected $externalId;
+    protected $externalId = null;
 
 
     /**

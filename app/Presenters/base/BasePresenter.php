@@ -9,6 +9,7 @@ use App\Exceptions\BadRequestException;
 use Nette\Application\UI\Presenter;
 use Nette\Localization\ITranslator;
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\Checkbox;
 use Contributte\Translation\LocalesResolvers\Session as TranslatorSessionResolver;
 
 /**
@@ -72,7 +73,7 @@ class BasePresenter extends Presenter
     public static function formForBootstrap(Form $form): void
     {
         $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['controls']['container'] = null; /** @phpstan-ignore-line */
         $renderer->wrappers['pair']['container'] = 'div class="form-group row"';
         $renderer->wrappers['pair']['.error'] = 'has-danger';
         $renderer->wrappers['control']['container'] = 'div class="col-sm-9 pb-2"';
@@ -93,7 +94,7 @@ class BasePresenter extends Presenter
             } elseif ($type === 'file') {
                 $control->getControlPrototype()->addClass('form-control-file');
             } elseif (in_array($type, ['checkbox', 'radio'], true)) {
-                if ($control instanceof Nette\Forms\Controls\Checkbox) {
+                if ($control instanceof Checkbox) {
                     $control->getLabelPrototype()->addClass('form-check-label');
                 } else {
                     $control->getItemLabelPrototype()->addClass('form-check-label');

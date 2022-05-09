@@ -158,9 +158,9 @@ class BaseRepository
 
     /**
      * @param Criteria $params
-     * @return Collection<T>
+     * @return mixed A lazy collection or a selectable entity
      */
-    public function matching(Criteria $params): Collection
+    public function matching(Criteria $params)
     {
         return $this->repository->matching($params);
     }

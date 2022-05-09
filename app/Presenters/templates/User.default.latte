@@ -1,6 +1,6 @@
 {block content}
 
-<h1>{block title}{_locale.user.title}{/block}</h1>
+<h1><i class="fa-solid fa-user-tie fa-fw text-muted"></i> {block title}{_locale.user.title}{/block}</h1>
 
 <div class="bg-light border p-3 rounded">
   <table class="table table-borderless m-0">
@@ -27,9 +27,7 @@
       {if $user->getExternalId()}
       <tr>
         <th class="text-nowrap">{_locale.user.externalId}:</th>
-        <td class="w-100">
-          <a href="mailto:{$user->getEmail()}">{$user->getExternalId()}</a>
-        </td>
+        <td class="w-100">{$user->getExternalId()}</td>
       </tr>
       {/if}
       <tr>

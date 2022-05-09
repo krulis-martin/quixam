@@ -107,6 +107,7 @@ class CasAuthenticator implements IExternalAuthenticator
 
     public function initialize(): void
     {
+        /** @phpstan-ignore-next-line */
         phpCAS::client(CAS_VERSION_3_0, $this->server, $this->port, $this->uri);
 
         if ($this->certificate) {
@@ -130,7 +131,7 @@ class CasAuthenticator implements IExternalAuthenticator
 
     public function isFresh(): bool
     {
-        $diff = $this->authenticated ? (new DateTime())->getTimestamp() - $this->authenticated->getTimestamp() : 0;
+        $diff = $this->authenticatedAt ? (new DateTime())->getTimestamp() - $this->authenticatedAt->getTimestamp() : 0;
         return $diff < 10; // less than 10s has passed
     }
 

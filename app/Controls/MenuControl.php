@@ -30,8 +30,10 @@ class MenuControl extends Control
 
     public function handleLogout(): void
     {
-        $this->getPresenter()->getUser()->logout();
-        $this->getPresenter()->finalizePost($this->link('this'));
+        /** @var \App\Presenters\BasePresenter */
+        $presenter = $this->getPresenter();
+        $presenter->getUser()->logout();
+        $presenter->finalizePost($this->link('this'));
     }
 
     public function render(): void
@@ -39,9 +41,13 @@ class MenuControl extends Control
         $loggedIn = $this->getPresenter()->getUser()->isLoggedIn();
         $this->template->userLoggedIn = $loggedIn;
         if ($loggedIn) {
-            $this->template->user = $this->getPresenter()->getUser()->getIdentity()->getUserData();
+            /** @var \App\Security\Identity */
+            $identity =  $this->getPresenter()->getUser()->getIdentity();
+            $this->template->user = $identity->getUserData();
         }
+        /** @phpstan-ignore-next-line */
         $this->template->selectedLocale = $this->translator->getLocale();
-        $this->template->render(__DIR__ . '/templates/menu.latte');
+        $this->template->setFile(__DIR__ . '/templates/menu.latte');
+        $this->template->render();
     }
 }

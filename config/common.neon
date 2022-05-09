@@ -8,7 +8,7 @@ parameters:
 php:
 	date.timezone: Europe/Prague
 
-	
+
 application:
 	errorPresenter: Error
 	catchExceptions: false # will be set to true for release
@@ -19,6 +19,12 @@ application:
 session:
 	expiration: 14 days
 	savePath: "%tempDir%"
+
+
+tracy:
+	bar:
+		- Nette\Bridges\HttpTracy\SessionPanel
+
 
 di:
 	export:

@@ -67,7 +67,9 @@ final class UserPresenter extends AuthenticatedPresenter
 
     public function passwordFormHandler(Form $form, $data): void
     {
-        $user = $this->getUser()->getIdentity()->getUserData();
+        /** @var \App\Security\Identity */
+        $identity = $this->getUser()->getIdentity();
+        $user = $identity->getUserData();
         if ($user->isPasswordEmpty() || $user->passwordsMatch($data['password'], $this->passwordsService)) {
             // everything checks out, lets change the password
             $user->changePassword($data['passwordNew'], $this->passwordsService);
@@ -88,12 +90,15 @@ final class UserPresenter extends AuthenticatedPresenter
                 $user->getLastName(),
                 $user->getEmail()
             ));
+            /** @phpstan-ignore-next-line */
             $form['password']->addError($this->translator->translate('locale.user.password.wrongOldPassword'));
         }
     }
 
     public function renderDefault(): void
     {
-        $this->template->user = $this->getUser()->getIdentity()->getUserData();
+        /** @var \App\Security\Identity */
+        $identity = $this->getUser()->getIdentity();
+        $this->template->user = $identity->getUserData();
     }
 }

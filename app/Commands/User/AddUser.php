@@ -45,6 +45,7 @@ class AddUser extends BaseCommand
 
         // make sure we have all the inputs
         $email = $input->getArgument('email');
+        $firstName = $lastName = $role = null; // just to satisfy phpstan
         foreach ([ 'firstName', 'lastName', 'role' ] as $key) {
             $$key = trim($input->getOption($key));
             if (empty($$key)) {
