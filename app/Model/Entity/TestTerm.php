@@ -67,6 +67,12 @@ class TestTerm
     protected $finishedAt = null;
 
     /**
+     * Time when the test was move to archive (students no longer see the results).
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $archivedAt = null;
+
+    /**
      * Address or room number that specifies location where the test is taken.
      * @ORM\Column(type="string")
      */
@@ -155,6 +161,16 @@ class TestTerm
     public function setFinishedAt(?DateTime $finishedAt): void
     {
         $this->finishedAt = $finishedAt;
+    }
+
+    public function getArchivedAt(): ?DateTime
+    {
+        return $this->archivedAt;
+    }
+
+    public function setArchivedAt(?DateTime $archivedAt): void
+    {
+        $this->archivedAt = $archivedAt;
     }
 
     public function getLocation(): string

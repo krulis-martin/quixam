@@ -30,12 +30,23 @@ class BaseRepository
      */
     protected $repository;
 
-    public function __construct(EntityManagerInterface $em, $entityType)
+    /**
+     * @var string
+     */
+    protected $entityType;
+
+    public function __construct(EntityManagerInterface $em, string $entityType)
     {
         $this->em = $em;
         /** @var EntityRepository $repository */
         $repository = $em->getRepository($entityType);
         $this->repository = $repository;
+        $this->entityType = $entityType;
+    }
+
+    public function getEntityType(): string
+    {
+        return $this->entityType;
     }
 
     /**

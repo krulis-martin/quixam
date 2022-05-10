@@ -39,7 +39,11 @@ class SetPassword extends BaseCommand
     protected function configure()
     {
         $this->setName(self::$defaultName)->setDescription('Set password of given user.');
-        $this->addArgument('email', InputArgument::REQUIRED, 'Email (login) of the user who needs the password (re)set.');
+        $this->addArgument(
+            'email',
+            InputArgument::REQUIRED,
+            'Email (login) of the user who needs the password (re)set.'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

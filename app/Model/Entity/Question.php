@@ -58,11 +58,11 @@ class Question
     protected $lastAnswer = null;
 
     /**
-     * An order in which the question groups are applied when a test is instantiated.
-     * (the lower order value, the sooner the questions will appear).
+     * An index by which the questions are ordered when shown to the user.
+     * This should form a continuous sequence (1..N) within one test.
      * @ORM\Column(type="integer")
      */
-    protected $order;
+    protected $ordering;
 
     /**
      * Type identifier (corresponds to the question processor class).
@@ -80,7 +80,7 @@ class Question
      * @param EnrolledUser $enrolledUser
      * @param TemplateQuestionsGroup $templateGroup
      * @param TemplateQuestion $templateQuestion
-     * @param int $order
+     * @param int $ordering
      * @param string $type
      * @param mixed $data (that will be serialized in JSON)
      */
@@ -88,7 +88,7 @@ class Question
         EnrolledUser $enrolledUser,
         TemplateQuestionsGroup $templateGroup,
         TemplateQuestion $templateQuestion,
-        int $order,
+        int $ordering,
         string $type,
         $data
     ) {
@@ -97,7 +97,7 @@ class Question
         $this->enrolledUser = $enrolledUser;
         $this->templateQuestionsGroup = $templateGroup;
         $this->templateQuestion = $templateQuestion;
-        $this->order = $order;
+        $this->ordering = $ordering;
         $this->type = $type;
         $this->data = ($data === null) ? '' : json_encode($data);
     }
@@ -136,9 +136,9 @@ class Question
         return $this->lastAnswer;
     }
 
-    public function getOrder(): int
+    public function getOrdering(): int
     {
-        return $this->order;
+        return $this->ordering;
     }
 
     public function getType(): string

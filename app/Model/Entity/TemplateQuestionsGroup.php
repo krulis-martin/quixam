@@ -45,17 +45,17 @@ class TemplateQuestionsGroup
     protected $questions;
 
     /**
-     * An order in which the question groups are applied when a test is instantiated.
-     * (the lower order value, the sooner the questions will appear).
+     * An index by which the question groups are ordered when a test is instantiated.
+     * (the lower ordering value, the sooner the questions will appear).
      * @ORM\Column(type="integer")
      */
-    protected $order;
+    protected $ordering;
 
     /**
      * How many questions should be selected from this group.
      * @ORM\Column(type="integer")
      */
-    protected $count;
+    protected $selectCount;
 
     /**
      * Points awarded for each question from this group.
@@ -71,23 +71,24 @@ class TemplateQuestionsGroup
 
     /**
      * @param TemplateTest $test in which this group will belong to
-     * @param int $count
+     * @param int $ordering
+     * @param int $selectCount
      * @param int $points
      * @param string|null $externalId
      * @param TemplateQuestionsGroup|null $createdFrom previous instance if new instance is a replacement
      */
     public function __construct(
         TemplateTest $test,
-        int $order,
-        int $count = 1,
+        int $ordering,
+        int $selectCount = 1,
         int $points = 1,
         ?string $externalId = null,
         ?TemplateQuestionsGroup $createdFrom = null
     ) {
         $this->createdAt = new DateTime();
         $this->test = $test;
-        $this->order = $order;
-        $this->count = $count;
+        $this->ordering = $ordering;
+        $this->selectCount = $selectCount;
         $this->points = $points;
         $this->externalId = $externalId;
         $this->createdFrom = $createdFrom;
@@ -113,14 +114,14 @@ class TemplateQuestionsGroup
         return $this->test;
     }
 
-    public function getOrder(): int
+    public function getOrdering(): int
     {
-        return $this->order;
+        return $this->ordering;
     }
 
-    public function getCount(): int
+    public function getSelectCount(): int
     {
-        return $this->count;
+        return $this->selectCount;
     }
 
     public function getPoints(): int

@@ -60,7 +60,10 @@ class AddUser extends BaseCommand
             }
         }
 
-        // TODO check role
+        if (!in_array($role, User::ROLES)) {
+            $output->writeln("Unknown role '$role'.");
+            return Command::FAILURE;
+        }
 
         // Create the user
         $user = new User($email, $firstName, $lastName, $role);
