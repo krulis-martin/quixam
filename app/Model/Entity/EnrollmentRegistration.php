@@ -30,7 +30,7 @@ class EnrollmentRegistration
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="TestTerm")
+     * @ORM\ManyToOne(targetEntity="TestTerm", inversedBy="registrations")
      */
     protected $test;
 

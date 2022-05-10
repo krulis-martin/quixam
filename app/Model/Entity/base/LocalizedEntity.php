@@ -26,7 +26,7 @@ trait LocalizedEntity
             return null;
         }
 
-        $json = json_decode($value);
+        $json = json_decode($value, true);
         if (!is_array($json) || !$json) {
             return null;
         }
@@ -51,7 +51,7 @@ trait LocalizedEntity
      */
     public function setLocalizedProperty(string $name, string $locale, string $value): void
     {
-        $json = json_decode($this->$name ?? '');
+        $json = json_decode($this->$name ?? '', true);
         if (!is_array($json)) {
             $json = [];
         }

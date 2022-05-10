@@ -67,18 +67,15 @@ final class UserPresenter extends AuthenticatedPresenter
 
     public function passwordFormHandler(Form $form, $data): void
     {
-        /** @var \App\Security\Identity */
-        $identity = $this->getUser()->getIdentity();
-        $user = $identity->getUserData();
-        if ($user->isPasswordEmpty() || $user->passwordsMatch($data['password'], $this->passwordsService)) {
+        if ($this->user->isPasswordEmpty() || $this->user->passwordsMatch($data['password'], $this->passwordsService)) {
             // everything checks out, lets change the password
-            $user->changePassword($data['passwordNew'], $this->passwordsService);
-            $this->users->persist($user);
+            $this->user->changePassword($data['passwordNew'], $this->passwordsService);
+            $this->users->persist($this->user);
             $this->logger->info(sprintf(
                 "User %s %s (%s) changed own password.",
-                $user->getFirstName(),
-                $user->getLastName(),
-                $user->getEmail()
+                $this->user->getFirstName(),
+                $this->user->getLastName(),
+                $this->user->getEmail()
             ));
 
             $this->flashMessage($this->translator->translate('locale.user.password.changeSuccess'), "success");
@@ -86,9 +83,9 @@ final class UserPresenter extends AuthenticatedPresenter
         } else {
             $this->logger->warning(sprintf(
                 "User %s %s (%s) attempted to change password but failed old password verification.",
-                $user->getFirstName(),
-                $user->getLastName(),
-                $user->getEmail()
+                $this->user->getFirstName(),
+                $this->user->getLastName(),
+                $this->user->getEmail()
             ));
             /** @phpstan-ignore-next-line */
             $form['password']->addError($this->translator->translate('locale.user.password.wrongOldPassword'));
@@ -97,8 +94,6 @@ final class UserPresenter extends AuthenticatedPresenter
 
     public function renderDefault(): void
     {
-        /** @var \App\Security\Identity */
-        $identity = $this->getUser()->getIdentity();
-        $this->template->user = $identity->getUserData();
+        $this->template->user = $this->user;
     }
 }

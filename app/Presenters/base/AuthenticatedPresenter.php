@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presenters;
 
+use App\Model\Entity\User;
 use Nette\Application\UI\Presenter;
 use Nette\Localization\ITranslator;
 use Contributte\Translation\LocalesResolvers\Session as TranslatorSessionResolver;
@@ -14,10 +15,13 @@ use App\Controls\MenuControl;
  */
 class AuthenticatedPresenter extends BasePresenter
 {
-    private function isUserLoggedAndValid(): bool
+    /** @var User|null */
+    protected $user = null;
+
+    private function getVerifiedLoggedUser(): ?User
     {
         if (!$this->getUser()->isLoggedIn()) {
-            return false;
+            return null;
         }
 
         /** @var \App\Security\Identity */
@@ -25,16 +29,17 @@ class AuthenticatedPresenter extends BasePresenter
         $user = $identity->getUserData();
         if (!$user) {
             $this->getUser()->logout();
-            return false;
+            return null;
         }
 
-        return true;
+        return $user;
     }
 
     protected function startup()
     {
         parent::startup();
-        if (!$this->isUserLoggedAndValid()) {
+        $this->user = $this->getVerifiedLoggedUser();
+        if (!$this->user) {
             $previousLink = base64_encode($this->link('this'));
             $url = $this->link('Login:default', [ 'previousLink' => $previousLink ]);
             $this->redirectUrl($url);

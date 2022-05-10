@@ -23,6 +23,16 @@ class BasePresenter extends Presenter
     /** @var TranslatorSessionResolver @inject */
     public $translatorSessionResolver;
 
+    /** @var string */
+    protected $selectedLocale = 'en';
+
+    protected function startup()
+    {
+        parent::startup();
+
+        /** @phpstan-ignore-next-line */
+        $this->selectedLocale = $this->translator->getLocale();
+    }
     /*
      * Component factories
      */

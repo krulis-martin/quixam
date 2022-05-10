@@ -147,6 +147,12 @@ class DbFill extends BaseCommand
                 $this->repositories[$class]->persist($obj);
             }
 
+            foreach ($this->entities as $id => $entity) {
+                $class = get_class($entity);
+                $eid = $entity->getId();
+                $output->writeln("$id: $class($eid)");
+            }
+
             return Command::SUCCESS;
         } catch (Exception $e) {
             $msg = $e->getMessage();

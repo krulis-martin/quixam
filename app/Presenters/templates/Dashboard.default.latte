@@ -2,6 +2,73 @@
 
 <h1><i class="fa-solid fa-binoculars fa-fw text-muted"></i> {block title}{_locale.dashboard.title}{/block}</h1>
 
+{if !$enrolledTests && !$registeredTests}
+
 <p class="text-muted">
   {_locale.dashboard.student.noTests}
 </p>
+
+{else}
+
+<table class="table table-hover my-3">
+  <thead>
+    <tr>
+      <th>{_locale.dashboard.table.test}</th>
+      <th>{_locale.dashboard.table.scheduledAt}</th>
+      <th>{_locale.dashboard.table.startedAt}</th>
+      <th>{_locale.dashboard.table.finishedAt}</th>
+      <th>{_locale.dashboard.table.location}</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr n:foreach="$enrolledTests as $test">
+      <td>
+        {$test->getCaption($locale)}
+        {if !$test->getSupervisors()->isEmpty()}
+          <small class="text-muted">
+            ({foreach $test->getSupervisors() as $supervisor}{$supervisor->getLastName()}{sep}, {/sep}{/foreach})
+          </small>
+        {/if}
+      </td>
+      <td>{$test->getScheduledAt()|ldate}</td>
+      <td>{$test->getStartedAt()|ldate}</td>
+      <td>{$test->getFinishedAt()|ldate}</td>
+      <td>{$test->getLocation()}</td>
+      <td>
+        {if $test->getFinishedAt()}
+        {_locale.dashboard.table.results}
+        {elseif $test->getStartedAt()}
+        {_locale.dashboard.table.enter}
+        {else}
+        <em>{_locale.dashboard.table.enrolled}</em>
+        <i class="fa-regular fa-clock fa-fw text-muted" title="{_locale.dashboard.table.waiting}"></i>
+        {/if}
+      </td>
+    </tr>
+    
+    <tr n:foreach="$registeredTests as $test">
+      <td>
+        {$test->getCaption($locale)}
+        {if !$test->getSupervisors()->isEmpty()}
+          <small class="text-muted">
+            ({foreach $test->getSupervisors() as $supervisor}{$supervisor->getLastName()}{sep}, {/sep}{/foreach})
+          </small>
+        {/if}
+      </td>
+      <td>{$test->getScheduledAt()|ldate}</td>
+      <td>{$test->getStartedAt()|ldate}</td>
+      <td>{$test->getFinishedAt()|ldate}</td>
+      <td>{$test->getLocation()}</td>
+      <td>
+        {if $test->getStartedAt()}
+        {_locale.dashboard.table.enroll}
+        {else}
+        <em>{_locale.dashboard.table.registered}</em>
+        <i class="fa-regular fa-clock fa-fw text-muted" title="{_locale.dashboard.table.waiting}"></i>
+        {/if}
+      </td>
+    </tr>
+  </tbody>
+</table>
+{/if}

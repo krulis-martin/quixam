@@ -49,6 +49,11 @@ class TestTerm
     protected $enrolledUsers;
 
     /**
+     * @ORM\OneToMany(targetEntity="EnrollmentRegistration", mappedBy="test")
+     */
+    protected $registrations;
+
+    /**
      * Time when the test is supposed to start.
      * @ORM\Column(type="datetime", nullable=true)
      */
@@ -100,6 +105,7 @@ class TestTerm
         $this->template = $template;
         $this->supervisors = new ArrayCollection();
         $this->enrolledUsers = new ArrayCollection();
+        $this->registrations = new ArrayCollection();
         $this->scheduledAt = $scheduledAt;
         $this->location = $location;
 
@@ -123,6 +129,21 @@ class TestTerm
         return $this->template;
     }
 
+    public function getCaption(string $locale, bool $strict = false): string
+    {
+        return $this->getTemplate()->getLocalizedProperty('caption', $locale, $strict);
+    }
+
+    public function getExternalId(): ?string
+    {
+        return $this->getTemplate()->getExternalId();
+    }
+
+    public function getCourseId(): ?string
+    {
+        return $this->getTemplate()->getCourseId();
+    }
+
     public function getSupervisors(): Collection
     {
         return $this->supervisors;
@@ -131,6 +152,11 @@ class TestTerm
     public function getEnrolledUsers(): Collection
     {
         return $this->enrolledUsers;
+    }
+
+    public function getRegistrations(): Collection
+    {
+        return $this->registrations;
     }
 
     public function getScheduledAt(): ?DateTime
@@ -196,5 +222,19 @@ class TestTerm
     public function overwriteNote(array $translations): void
     {
         $this->overwriteLocalizedProperty('note', $translations);
+    }
+
+    /*
+     * Other modifiers
+     */
+
+    public function addSupervisor(User $supervisor): void
+    {
+        $this->supervisors->add($supervisor);
+    }
+
+    public function removeSupervisor(User $supervisor): void
+    {
+        $this->supervisors->remove($supervisor);
     }
 }

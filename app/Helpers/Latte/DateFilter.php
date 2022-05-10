@@ -15,8 +15,12 @@ class LatteDateFilter
     /**
      *
      */
-    public function __invoke(DateTime $date, $format): string
+    public function __invoke(?DateTime $date, $format = 'j. n. Y (H:i)', $empty = '-'): string
     {
+        if (!$date) {
+            return $empty;
+        }
+
         $date = clone $date;
         $date->setTimezone(new DateTimeZone(date_default_timezone_get()));
         return $date->format($format);
