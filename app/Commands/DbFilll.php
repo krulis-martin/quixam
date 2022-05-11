@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 /**
  * A console command that creates a new user (without password).
@@ -79,6 +80,7 @@ class DbFill extends BaseCommand
                 if ($matches['class'] === 'User') {
                     $arg = $this->repositories[$class]->findByEmail($matches['id']);
                     if (!$arg) {
+                        $id = $matches['id'];
                         throw new RuntimeException("User '$id' not found.");
                     }
                 } else {
@@ -104,7 +106,7 @@ class DbFill extends BaseCommand
             // Process command batches in entire file..
             foreach ($yaml as $commands) {
                 if (!is_array($commands) || count($commands) !== 1) {
-                    throw new RuntimeException("Invalid command batch found '$command'.");
+                    throw new RuntimeException("Invalid command batch found '$commands'.");
                 }
                 $id = key($commands); // identifies entity object
                 $commands = reset($commands); // set of methods called on the object

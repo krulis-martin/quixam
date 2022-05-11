@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Nette\Security\Passwords;
 
 /**
@@ -51,38 +52,45 @@ class SetPassword extends BaseCommand
         $this->input = $input;
         $this->output = $output;
 
-        // get the user ...
-        $email = $input->getArgument('email');
-        $user = $this->users->findByEmail($email);
-        if (!$user) {
-            $output->writeln("No user $email exists.");
+        try {
+            // get the user ...
+            $email = $input->getArgument('email');
+            $user = $this->users->findByEmail($email);
+            if (!$user) {
+                $output->writeln("No user $email exists.");
+                return Command::FAILURE;
+            }
+
+            $output->writeln(sprintf(
+                "Changing password for user %s %s (%s).",
+                $user->getFirstName(),
+                $user->getLastName(),
+                $user->getId()
+            ));
+
+            // get the password from the input and verify it
+            $password = $this->prompt("New password: ", '', true); // true = hide input
+            $passwordCheck = $this->prompt("Verify password: ", '', true);
+            if ($password !== $passwordCheck) {
+                $output->writeln("Passwords do not match.");
+                return Command::FAILURE;
+            }
+
+            if (strlen($password) < 5) {
+                $output->writeln("Passwords is too short, at least 5 characters must be given.");
+                return Command::FAILURE;
+            }
+
+            // change the password and write to the database
+            $user->changePassword($password, $this->passwordsService);
+            $this->users->persist($user);
+            $output->writeln("Passwords was successfully modified.");
+            return Command::SUCCESS;
+        } catch (Exception $e) {
+            $msg = $e->getMessage();
+            $stderr = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+            $stderr->writeln("Error: $msg");
             return Command::FAILURE;
         }
-
-        $output->writeln(sprintf(
-            "Changing password for user %s %s (%s).",
-            $user->getFirstName(),
-            $user->getLastName(),
-            $user->getId()
-        ));
-
-        // get the password from the input and verify it
-        $password = $this->prompt("New password: ", '', true); // true = hide input
-        $passwordCheck = $this->prompt("Verify password: ", '', true);
-        if ($password !== $passwordCheck) {
-            $output->writeln("Passwords do not match.");
-            return Command::FAILURE;
-        }
-
-        if (strlen($password) < 5) {
-            $output->writeln("Passwords is too short, at least 5 characters must be given.");
-            return Command::FAILURE;
-        }
-
-        // change the password and write to the database
-        $user->changePassword($password, $this->passwordsService);
-        $this->users->persist($user);
-        $output->writeln("Passwords was successfully modified.");
-        return Command::SUCCESS;
     }
 }

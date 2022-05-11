@@ -18,6 +18,7 @@ use DateTime;
 class Question
 {
     use CreateableEntity;
+    use LocalizedEntity;
 
     /**
      * @ORM\Id
@@ -65,10 +66,23 @@ class Question
     protected $ordering;
 
     /**
+     * Points awarded for this question (copied from the template group).
+     * @ORM\Column(type="integer")
+     */
+    protected $points;
+
+    /**
      * Type identifier (corresponds to the question processor class).
      * @ORM\Column(type="string")
      */
     protected $type;
+
+    /**
+     * Localized caption (topic) of the quesion for making listings more memorable
+     * (copied from question template).
+     * @ORM\Column(type="string")
+     */
+    protected $caption;
 
     /**
      * JSON-encoded data of the question (data are type-specific).
@@ -81,7 +95,6 @@ class Question
      * @param TemplateQuestionsGroup $templateGroup
      * @param TemplateQuestion $templateQuestion
      * @param int $ordering
-     * @param string $type
      * @param mixed $data (that will be serialized in JSON)
      */
     public function __construct(
@@ -89,7 +102,6 @@ class Question
         TemplateQuestionsGroup $templateGroup,
         TemplateQuestion $templateQuestion,
         int $ordering,
-        string $type,
         $data
     ) {
         $this->createdAt = new DateTime();
@@ -98,7 +110,9 @@ class Question
         $this->templateQuestionsGroup = $templateGroup;
         $this->templateQuestion = $templateQuestion;
         $this->ordering = $ordering;
-        $this->type = $type;
+        $this->points = $templateGroup->getPoints();
+        $this->type = $templateQuestion->getType();
+        $this->caption = $templateQuestion->getCaptionRaw();
         $this->data = ($data === null) ? '' : json_encode($data);
     }
 
@@ -141,9 +155,19 @@ class Question
         return $this->ordering;
     }
 
+    public function getPoints(): int
+    {
+        return $this->points;
+    }
+
     public function getType(): string
     {
         return $this->type;
+    }
+
+    public function getCaption(string $locale, bool $strict = false): string
+    {
+        return $this->getLocalizedProperty('caption', $locale, $strict);
     }
 
     public function getData()

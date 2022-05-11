@@ -17,6 +17,7 @@ use DateTime;
 class TemplateQuestion
 {
     use CreateableEntity;
+    use LocalizedEntity;
 
     /**
      * @ORM\Id
@@ -54,6 +55,12 @@ class TemplateQuestion
     protected $type;
 
     /**
+     * Localized caption (topic) of the quesion for making listings more memorable.
+     * @ORM\Column(type="string")
+     */
+    protected $caption;
+
+    /**
      * JSON-encoded data of the question (data are type-specific).
      * @ORM\Column(type="text", length=65535)
      */
@@ -69,6 +76,7 @@ class TemplateQuestion
     public function __construct(
         TemplateQuestionsGroup $group,
         string $type,
+        $caption,
         $data,
         ?string $externalId = null,
         ?TemplateQuestion $createdFrom = null
@@ -80,6 +88,13 @@ class TemplateQuestion
         $this->data = ($data === null) ? '' : json_encode($data);
         $this->externalId = $externalId;
         $this->createdFrom = $createdFrom;
+
+        if ($caption) {
+            if (!is_array($caption)) {
+                $caption = [ 'en' => (string)$caption ];
+            }
+            $this->overwriteLocalizedProperty('caption', $caption);
+        }
     }
 
     /*
@@ -114,6 +129,16 @@ class TemplateQuestion
     public function getExternalId(): ?string
     {
         return $this->externalId;
+    }
+
+    public function getCaption(string $locale, bool $strict = false): string
+    {
+        return $this->getLocalizedProperty('caption', $locale, $strict);
+    }
+
+    public function getCaptionRaw(): string
+    {
+        return $this->caption;
     }
 
     public function getData()
