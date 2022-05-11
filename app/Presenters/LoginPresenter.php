@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Presenters;
 
 use App\Model\Repository\Users;
+use App\Model\Repository\EnrollmentRegistrations;
 use App\Model\Entity\User;
 use App\Security\IExternalAuthenticator;
 use App\Security\Identity;
@@ -18,6 +19,9 @@ final class LoginPresenter extends BasePresenter
 {
     /** @var Users @inject */
     public $users;
+
+    /** @var EnrollmentRegistrations @inject */
+    public $registrations;
 
     /** @var Passwords @inject */
     public $passwordsService;
@@ -132,6 +136,8 @@ final class LoginPresenter extends BasePresenter
             if ($user) {
                 $user->updateLastAuthenticationAt();
                 $this->users->persist($user);
+
+                $this->registrations->reassociateUser($user);
 
                 $this->getUser()->login(new Identity($user));
                 $this->redirectUrl($this->getRedirectUrl());

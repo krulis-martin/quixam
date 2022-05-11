@@ -158,7 +158,7 @@ class DbFill extends BaseCommand
             $msg = $e->getMessage();
             $stderr = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
             $stderr->writeln("Error: $msg");
-            throw $e;
+            return Command::FAILURE;
         }
     }
 }

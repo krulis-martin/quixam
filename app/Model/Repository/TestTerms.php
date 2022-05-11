@@ -26,8 +26,8 @@ class TestTerms extends BaseSoftDeleteRepository
      */
     public function getTermsUserIsEnrolledFor(User $user): array
     {
-        $qb = $this->em->createQueryBuilder();
-        $qb->select("tt")->from(TestTerm::class, "tt")->innerJoin("tt.enrolledUsers", "eu")
+        $qb = $this->createQueryBuilder("tt");
+        $qb->innerJoin("tt.enrolledUsers", "eu")
             ->where($qb->expr()->eq("eu.user", ":user"))
             ->andWhere($qb->expr()->isNull("tt.archivedAt"))
             ->orderBy('tt.finishedAt, tt.startedAt, tt.scheduledAt, tt.createdAt');
@@ -41,8 +41,8 @@ class TestTerms extends BaseSoftDeleteRepository
      */
     public function getTermsUserIsRegisteredFor(User $user): array
     {
-        $qb = $this->em->createQueryBuilder('tt');
-        $qb->select("tt")->from(TestTerm::class, "tt")->innerJoin("tt.registrations", "er")
+        $qb = $this->createQueryBuilder('tt');
+        $qb->innerJoin("tt.registrations", "er")
             ->where($qb->expr()->eq("er.user", ":user"))
             ->andWhere($qb->expr()->isNull("tt.archivedAt"))
             ->orderBy('tt.finishedAt, tt.startedAt, tt.scheduledAt, tt.createdAt');

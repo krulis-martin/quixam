@@ -6,6 +6,7 @@ namespace App\Console;
 
 use App\Model\Entity\User;
 use App\Model\Repository\Users;
+use App\Model\Repository\EnrollmentRegistrations;
 use DateTime;
 use DateInterval;
 use Exception;
@@ -25,10 +26,14 @@ class AddUser extends BaseCommand
     /** @var Users */
     private $users;
 
-    public function __construct(Users $users)
+    /** @var EnrollmentRegistrations */
+    private $registrations;
+
+    public function __construct(Users $users, EnrollmentRegistrations $registrations)
     {
         parent::__construct();
         $this->users = $users;
+        $this->registrations = $registrations;
     }
 
     protected function configure()
@@ -45,30 +50,40 @@ class AddUser extends BaseCommand
         $this->input = $input;
         $this->output = $output;
 
-        // make sure we have all the inputs
-        $email = $input->getArgument('email');
-        $firstName = $lastName = $role = null; // just to satisfy phpstan
-        foreach ([ 'firstName', 'lastName', 'role' ] as $key) {
-            $$key = trim($input->getOption($key));
-            if (empty($$key)) {
-                $$key = trim($this->prompt("$key: "));
+        try {
+            // make sure we have all the inputs
+            $email = $input->getArgument('email');
+            $firstName = $lastName = $role = null; // just to satisfy phpstan
+            foreach ([ 'firstName', 'lastName', 'role' ] as $key) {
+                $$key = trim($input->getOption($key));
+                if (empty($$key)) {
+                    $$key = trim($this->prompt("$key: "));
+                }
+
+                if (empty($$key)) {
+                    $output->writeln("Parameter '$key' must be set.");
+                    return Command::FAILURE;
+                }
             }
 
-            if (empty($$key)) {
-                $output->writeln("Parameter '$key' must be set.");
+            if (!in_array($role, User::ROLES)) {
+                $output->writeln("Unknown role '$role'.");
                 return Command::FAILURE;
             }
-        }
 
-        if (!in_array($role, User::ROLES)) {
-            $output->writeln("Unknown role '$role'.");
+            // Create the user
+            $user = new User($email, $firstName, $lastName, $role);
+            $user->setVerified();
+            $this->users->persist($user);
+
+            $this->registrations->reassociateUser($user);
+
+            return Command::SUCCESS;
+        } catch (Exception $e) {
+            $msg = $e->getMessage();
+            $stderr = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+            $stderr->writeln("Error: $msg");
             return Command::FAILURE;
         }
-
-        // Create the user
-        $user = new User($email, $firstName, $lastName, $role);
-        $user->setVerified();
-        $this->users->persist($user);
-        return Command::SUCCESS;
     }
 }

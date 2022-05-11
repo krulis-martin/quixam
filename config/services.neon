@@ -22,6 +22,7 @@ services:
   # Console commands
   - App\Console\AddUser
   - App\Console\SetPassword
+  - App\Console\RegisterUsers
   - App\Console\DbFill(@App\Model\Repository\Answers, @App\Model\Repository\EnrolledUsers, @App\Model\Repository\EnrollmentRegistrations, @App\Model\Repository\Questions, @App\Model\Repository\TemplateQuestions, @App\Model\Repository\TemplateQuestionsGroups, @App\Model\Repository\TemplateTests, @App\Model\Repository\TestTerms, @App\Model\Repository\Users)
 
 extensions:
