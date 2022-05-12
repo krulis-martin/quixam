@@ -40,6 +40,7 @@ class EnrolledUser
 
     /**
      * @ORM\OneToMany(targetEntity="Question", mappedBy="enrolledUser")
+     * @ORM\OrderBy({"ordering" = "ASC"})
      */
     protected $questions;
 

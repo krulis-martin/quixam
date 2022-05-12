@@ -37,16 +37,16 @@
       <td>{$test->getLocation()}</td>
       <td>
         {if $test->getFinishedAt()}
-        {_locale.dashboard.table.results}
+          {_locale.dashboard.table.results}
         {elseif $test->getStartedAt()}
-        {_locale.dashboard.table.enter}
+          <a n:href="Test:default $test->getId()">{_locale.dashboard.table.enter}</a>
         {else}
-        <em>{_locale.dashboard.table.enrolled}</em>
-        <i class="fa-regular fa-clock fa-fw text-muted" title="{_locale.dashboard.table.waiting}"></i>
+          <em>{_locale.dashboard.table.enrolled}</em>
+          <i class="fa-regular fa-clock fa-fw text-muted" title="{_locale.dashboard.table.waiting}"></i>
         {/if}
       </td>
     </tr>
-    
+
     <tr n:foreach="$registeredTests as $test">
       <td>
         {$test->getCaption($locale)}

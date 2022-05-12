@@ -179,6 +179,11 @@ class TestTerm
         $this->startedAt = $startedAt;
     }
 
+    public function startNow(): void
+    {
+        $this->setStartedAt(new DateTime());
+    }
+
     public function getFinishedAt(): ?DateTime
     {
         return $this->finishedAt;
@@ -187,6 +192,11 @@ class TestTerm
     public function setFinishedAt(?DateTime $finishedAt): void
     {
         $this->finishedAt = $finishedAt;
+    }
+
+    public function finishNow(): void
+    {
+        $this->setStartedAt(new DateTime());
     }
 
     public function getArchivedAt(): ?DateTime
