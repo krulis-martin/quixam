@@ -39,6 +39,7 @@ extensions:
   nettrine.extensions.atlantic18: Nettrine\Extensions\Atlantic18\DI\Atlantic18BehaviorExtension
   translation: Contributte\Translation\DI\TranslationExtension
   monolog: Contributte\Monolog\DI\MonologExtension
+  markdownLatteFilter: Baraja\Markdown\MarkdownLatteFilterExtension
 
 nettrine.dbal:
   debug:

@@ -4,8 +4,104 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1b03b06aac9b2dbe8a84b81d13f31d94",
+    "content-hash": "4ee9e2a105698d46c67b0e78a03438b7",
     "packages": [
+        {
+            "name": "baraja-core/markdown-latte-filter",
+            "version": "v2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/baraja-core/markdown-latte-filter.git",
+                "reference": "c8748e8c72c2a856d972576daff301467ac6abc7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/baraja-core/markdown-latte-filter/zipball/c8748e8c72c2a856d972576daff301467ac6abc7",
+                "reference": "c8748e8c72c2a856d972576daff301467ac6abc7",
+                "shasum": ""
+            },
+            "require": {
+                "baraja-core/url": "^1.0",
+                "latte/latte": "^2.9",
+                "league/commonmark": "^1.5",
+                "nette/application": "^3.1",
+                "nette/di": "^3.0",
+                "nette/utils": "^3.2",
+                "php": ">=7.4.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.12.18",
+                "phpstan/phpstan-nette": "^0.12.6",
+                "roave/security-advisories": "dev-master",
+                "spaze/phpstan-disallowed-calls": "^1.1",
+                "tracy/tracy": "^2.8"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Jan Barášek",
+                    "homepage": "https://baraja.cz"
+                }
+            ],
+            "description": "Tools for content rendering.",
+            "homepage": "https://github.com/baraja-core/markdown-latte-filter",
+            "support": {
+                "issues": "https://github.com/baraja-core/markdown-latte-filter/issues",
+                "source": "https://github.com/baraja-core/markdown-latte-filter/tree/v2.0.3"
+            },
+            "time": "2021-02-08T08:44:22+00:00"
+        },
+        {
+            "name": "baraja-core/url",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/baraja-core/url.git",
+                "reference": "84c0e9e9a067c8a341a955ec0d10496f67b07a68"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/baraja-core/url/zipball/84c0e9e9a067c8a341a955ec0d10496f67b07a68",
+                "reference": "84c0e9e9a067c8a341a955ec0d10496f67b07a68",
+                "shasum": ""
+            },
+            "require": {
+                "nette/http": "^3.1",
+                "php": ">=7.4.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.12.18",
+                "phpstan/phpstan-nette": "^0.12.6",
+                "roave/security-advisories": "dev-master",
+                "spaze/phpstan-disallowed-calls": "^1.1"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Jan Barášek",
+                    "homepage": "https://baraja.cz"
+                }
+            ],
+            "description": "Simple URL manager.",
+            "homepage": "https://github.com/baraja-core/url",
+            "support": {
+                "issues": "https://github.com/baraja-core/url/issues",
+                "source": "https://github.com/baraja-core/url/tree/v1.0.4"
+            },
+            "time": "2021-10-15T17:47:28+00:00"
+        },
         {
             "name": "behat/transliterator",
             "version": "v1.5.0",
@@ -1956,6 +2052,99 @@
                 "source": "https://github.com/nette/latte/tree/v2.11.2"
             },
             "time": "2022-04-20T00:12:51+00:00"
+        },
+        {
+            "name": "league/commonmark",
+            "version": "1.6.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/commonmark.git",
+                "reference": "2b8185c13bc9578367a5bf901881d1c1b5bbd09b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/2b8185c13bc9578367a5bf901881d1c1b5bbd09b",
+                "reference": "2b8185c13bc9578367a5bf901881d1c1b5bbd09b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": "^7.1 || ^8.0"
+            },
+            "conflict": {
+                "scrutinizer/ocular": "1.7.*"
+            },
+            "require-dev": {
+                "cebe/markdown": "~1.0",
+                "commonmark/commonmark.js": "0.29.2",
+                "erusev/parsedown": "~1.0",
+                "ext-json": "*",
+                "github/gfm": "0.29.0",
+                "michelf/php-markdown": "~1.4",
+                "mikehaertl/php-shellcommand": "^1.4",
+                "phpstan/phpstan": "^0.12.90",
+                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.2",
+                "scrutinizer/ocular": "^1.5",
+                "symfony/finder": "^4.2"
+            },
+            "bin": [
+                "bin/commonmark"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "League\\CommonMark\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Colin O'Dell",
+                    "email": "colinodell@gmail.com",
+                    "homepage": "https://www.colinodell.com",
+                    "role": "Lead Developer"
+                }
+            ],
+            "description": "Highly-extensible PHP Markdown parser which fully supports the CommonMark spec and Github-Flavored Markdown (GFM)",
+            "homepage": "https://commonmark.thephpleague.com",
+            "keywords": [
+                "commonmark",
+                "flavored",
+                "gfm",
+                "github",
+                "github-flavored",
+                "markdown",
+                "md",
+                "parser"
+            ],
+            "support": {
+                "docs": "https://commonmark.thephpleague.com/",
+                "issues": "https://github.com/thephpleague/commonmark/issues",
+                "rss": "https://github.com/thephpleague/commonmark/releases.atom",
+                "source": "https://github.com/thephpleague/commonmark"
+            },
+            "funding": [
+                {
+                    "url": "https://www.colinodell.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://www.paypal.me/colinpodell/10.00",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/colinodell",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/league/commonmark",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2022-01-13T17:18:13+00:00"
         },
         {
             "name": "monolog/monolog",
