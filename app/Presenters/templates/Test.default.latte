@@ -19,3 +19,6 @@
 
 <h2>Question #{$selectedQuestion->getOrdering()}: {$selectedQuestion->getCaption($locale)}</h2>
 
+{$questionData->getText($locale)|markdown}
+
+{$questionData->renderFormContent()|noescape}

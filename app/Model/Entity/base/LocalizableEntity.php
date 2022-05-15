@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Model\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
 /**
  * Adds methods for manipulation with localized properties.
  * At present, the implementation uses JSON-encoding of an array [ locale => translation ].
  */
-trait LocalizedEntity
+trait LocalizableEntity
 {
     /**
      * Retrieves localized value from a string property. If the translation does not exists, if fallbacks to defaults.

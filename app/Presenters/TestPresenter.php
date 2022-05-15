@@ -11,6 +11,7 @@ use App\Model\Repository\Answers;
 use App\Model\Entity\EnrolledUser;
 use App\Model\Entity\Question;
 use App\Model\Entity\User;
+use App\Helpers\QuestionFactory;
 use Nette;
 
 final class TestPresenter extends AuthenticatedPresenter
@@ -26,6 +27,9 @@ final class TestPresenter extends AuthenticatedPresenter
 
     /** @var Answers @inject */
     public $answers;
+
+    /** @var QuestionFactory @inject */
+    public $questionFactory;
 
     /** @persistent */
     public $question = null;
@@ -89,7 +93,8 @@ final class TestPresenter extends AuthenticatedPresenter
         $this->template->enrolledUser = $enrolledUser;
         $this->template->selectedQuestion = $selectedQuestion;
         if ($selectedQuestion) {
-            $this->template->selectedQuestionId = $selectedQuestion ? $selectedQuestion->getId() : null;
+            $this->template->selectedQuestionId = $selectedQuestion->getId();
+            $this->template->questionData = $selectedQuestion->getQuestion($this->questionFactory);
             //$this->template->showPrevious = $enrolledUser->getQuestions()->first()->getId() !== $selecteQuestion->getId();
             //$this->template->showNext = $enrolledUser->getQuestions()->last()->getId() !== $selecteQuestion->getId();
         }

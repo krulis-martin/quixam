@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Exceptions;
+namespace App\Helpers;
 
 use Nette\Http\IResponse;
+use App\Exceptions\BaseException;
 use Exception;
 
 /**
- * Used when requested resource was not found.
+ * Used whenever something goes wrong with questions (loading, processing, ...).
  */
-class NotFoundException extends BaseException
+class QuestionException extends BaseException
 {
     /**
      * Creates instance with further description.
@@ -18,12 +19,12 @@ class NotFoundException extends BaseException
      * @param Exception $previous Previous exception
      */
     public function __construct(
-        string $msg = 'The resource you requested was not found.',
+        string $msg = 'Internal error in question processing.',
         $previous = null
     ) {
         parent::__construct(
             "Not Found - $msg",
-            IResponse::S404_NOT_FOUND,
+            IResponse::S500_INTERNAL_SERVER_ERROR,
             $previous
         );
     }

@@ -8,6 +8,11 @@ services:
     setup:
       - addFilter(ldate, @App\Helpers\LatteDateFilter)
 
+  - App\Helpers\Questions\QuestionSingle
+  - App\Helpers\QuestionFactory([
+    single: App\Helpers\Questions\QuestionSingle,
+  ])
+
   # DB repositories
   - App\Model\Repository\Answers
   - App\Model\Repository\EnrolledUsers

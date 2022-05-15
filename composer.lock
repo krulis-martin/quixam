@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ee9e2a105698d46c67b0e78a03438b7",
+    "content-hash": "d84aa92f98de01c42a871024db93c238",
     "packages": [
         {
             "name": "baraja-core/markdown-latte-filter",

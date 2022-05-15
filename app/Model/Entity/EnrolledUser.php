@@ -45,6 +45,12 @@ class EnrolledUser
     protected $questions;
 
     /**
+     * A random seed used for the MT generator when the questions were instantiated.
+     * @ORM\Column(type="integer")
+     */
+    protected $seed;
+
+    /**
      * Total points scored in this test.
      * @ORM\Column(type="integer", nullable=true)
      */
@@ -66,6 +72,7 @@ class EnrolledUser
         $this->test = $test;
         $this->user = $user;
         $this->questions = new ArrayCollection();
+        $this->seed = random_int(0, PHP_INT_MAX);
     }
 
     /*

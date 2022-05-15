@@ -64,6 +64,6 @@ class Answer
 
     public function getAnswer()
     {
-        return json_decode($this->answer);
+        return json_decode($this->answer, true);
     }
 }

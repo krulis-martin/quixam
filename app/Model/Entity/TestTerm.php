@@ -23,7 +23,7 @@ class TestTerm
 {
     use CreateableEntity;
     use DeleteableEntity;
-    use LocalizedEntity;
+    use LocalizableEntity;
 
     /**
      * @ORM\Id

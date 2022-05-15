@@ -17,7 +17,7 @@ use DateTime;
 class TemplateQuestion
 {
     use CreateableEntity;
-    use LocalizedEntity;
+    use LocalizableEntity;
 
     /**
      * @ORM\Id
@@ -147,6 +147,6 @@ class TemplateQuestion
             return null;
         }
 
-        return json_decode($this->data);
+        return json_decode($this->data, true);
     }
 }

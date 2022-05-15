@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Model\Entity;
 
+use App\Helpers\IQuestion;
+use App\Helpers\QuestionFactory;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,7 +20,7 @@ use DateTime;
 class Question
 {
     use CreateableEntity;
-    use LocalizedEntity;
+    use LocalizableEntity;
 
     /**
      * @ORM\Id
@@ -176,6 +178,13 @@ class Question
             return null;
         }
 
-        return json_decode($this->data);
+        return json_decode($this->data, true);
+    }
+
+    public function getQuestion(QuestionFactory $factory): IQuestion
+    {
+        $question = $factory->create($this->getType());
+        $question->load($this->getData());
+        return $question;
     }
 }
