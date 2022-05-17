@@ -49,12 +49,19 @@ interface IQuestion extends JsonSerializable
     public function renderResultContent(Engine $latte, string $locale, $answer = null): string;
 
     /**
+     * Process data sent over from a form and create an answer structure.
+     * @param array $postData everything sent over in POST request
+     * @return mixed a structure representing an answer (does not have to be valid, if the post data are corrupted)
+     */
+    public function processAnswerSubmit(array $postData);
+
+    /**
      * Verify whether the answer is structurally correct.
      * This have nothing to do with the actual semantic correctness of the answer.
      * @param mixed $answer deserialized json structure sent over by the client
      * @return bool true if the structure is correct
      */
-    public function verifyAnswer($answer): bool;
+    public function isAnswerValid($answer): bool;
 
     /**
      * Check whether given answer is the correct answer for this particular question instance.

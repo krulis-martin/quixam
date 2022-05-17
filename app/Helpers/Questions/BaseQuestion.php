@@ -133,8 +133,4 @@ abstract class BaseQuestion implements IQuestion
     {
         return self::getLocalizedText($this->text, $locale);
     }
-
-    /*
-     * Extra methods that might be useful in descendant classes...
-     */
 }

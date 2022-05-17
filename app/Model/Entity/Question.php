@@ -68,7 +68,7 @@ class Question
     protected $ordering;
 
     /**
-     * Points awarded for this question (copied from the template group).
+     * Maximal points awarded for this question (copied from the template group).
      * @ORM\Column(type="integer")
      */
     protected $points;
@@ -150,6 +150,11 @@ class Question
     public function getLastAnswer(): ?Answer
     {
         return $this->lastAnswer;
+    }
+
+    public function setLastAnswer(Answer $answer): void
+    {
+        $this->lastAnswer = $answer;
     }
 
     public function getOrdering(): int

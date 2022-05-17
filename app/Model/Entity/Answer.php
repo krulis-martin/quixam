@@ -39,7 +39,18 @@ class Answer
      */
     protected $answer;
 
-    // TODO evaluation columns
+    /**
+     * Time when the answer was evaluated.
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $evaluatedAt = null;
+
+    /**
+     * Points awarded for this answer.
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected $points = null;
+
 
     public function __construct(Question $question, $answer)
     {
@@ -65,5 +76,26 @@ class Answer
     public function getAnswer()
     {
         return json_decode($this->answer, true);
+    }
+
+    public function isEvaluated(): bool
+    {
+        return $this->evaluatedAt !== null && $this->points !== null;
+    }
+
+    public function getEvaluatedAt(): ?DateTime
+    {
+        return $this->evaluatedAt;
+    }
+
+    public function getPoints(): ?int
+    {
+        return $this->points;
+    }
+
+    public function setPoints(int $points): void
+    {
+        $this->evaluatedAt = new DateTime();
+        $this->points = $points;
     }
 }

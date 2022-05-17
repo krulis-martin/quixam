@@ -73,7 +73,13 @@ final class QuestionSingle extends BaseChoiceQuestion
         return $this->renderSingleChoicesTeplate($latte, $locale, $answer, $params);
     }
 
-    public function verifyAnswer($answer): bool
+    public function processAnswerSubmit(array $postData)
+    {
+        return array_key_exists('answer', $postData) && is_numeric($postData['answer'])
+            ? (int)$postData['answer'] : null;
+    }
+
+    public function isAnswerValid($answer): bool
     {
         return $answer === null || (is_int($answer) && array_key_exists($answer, $this->answers));
     }

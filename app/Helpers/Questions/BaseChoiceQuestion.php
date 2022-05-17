@@ -16,7 +16,10 @@ use Exception;
  */
 abstract class BaseChoiceQuestion extends BaseQuestion
 {
+    /** @var array */
     protected $answers = [];
+
+    /** @var null|int|int[] */
     protected $correct = null;
 
     /**
@@ -57,7 +60,10 @@ abstract class BaseChoiceQuestion extends BaseQuestion
     }
 
     /**
-     *
+     * Helper function for descendant classes that solves instantiation of the answer options.
+     * @param mixed $templateJson deserialized template structure
+     * @param array $preselect which answers are pre-selected (e.g., to ensure correct answer is always present)
+     * @return array of selected answers (with keys, answers without keys are written into $this->answers)
      */
     protected function instantiateAnswers($templateJson, array $preselect = []): array
     {
@@ -112,7 +118,7 @@ abstract class BaseChoiceQuestion extends BaseQuestion
 
         $this->answers = $this->loadAnswers($json['answers'], 'Corrupted question data');
 
-        if (!array_key_exists('correct', $json) || !$this->verifyAnswer($json['correct'])) {
+        if (!array_key_exists('correct', $json) || !$this->isAnswerValid($json['correct'])) {
             throw new QuestionException("Corrupted question data, propery 'correct' is missing or has invalid value.");
         }
         $this->correct = $json['correct'];

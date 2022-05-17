@@ -37,8 +37,8 @@ $(() => {
   }
 
   /**
-   *
-   * @param {*} res
+   * Post-process AJAX response. Parse JSON body, handle error messages and redirects.
+   * @param {*} res response of the AJAX request
    */
   function postProcessAjax(res) {
     res.json().then((res) => {
@@ -46,6 +46,7 @@ $(() => {
         addAjaxError(res.error);
       }
       if (res.redirect) {
+        $("body").addClass("opacity-25");
         location.assign(res.redirect);
       }
     });

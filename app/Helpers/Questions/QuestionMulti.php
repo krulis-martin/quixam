@@ -78,7 +78,28 @@ final class QuestionMulti extends BaseChoiceQuestion
         return $this->renderMultiChoicesTeplate($latte, $locale, $answer, $params);
     }
 
-    public function verifyAnswer($answer): bool
+    public function processAnswerSubmit(array $postData)
+    {
+        if (!array_key_exists('answer', $postData)) {
+            return [];
+        }
+
+        if (!is_array($postData['answer'])) {
+            return null;
+        }
+
+        $answer = $postData['answer'];
+        foreach ($answer as &$idx) {
+            if (!is_numeric($idx)) {
+                return null;
+            }
+            $idx = (int)$idx;
+        }
+
+        return $answer;
+    }
+
+    public function isAnswerValid($answer): bool
     {
         if (!is_array($answer)) {
             return false;

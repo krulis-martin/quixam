@@ -2,7 +2,7 @@
 
 <h1>
   <i class="fa-solid fa-list-check fa-fw text-muted"></i>
-  {block title}{_locale.test.title}{/block}:
+  {_locale.test.title}:
   {$test->getCaption($locale)},
   {$test->getScheduledAt()|ldate}
 </h1>
@@ -15,10 +15,12 @@
   <span class="text-muted">{_locale.test.startedAt}:</span>
   {$test->getStartedAt()|ldate}
 </span>
+{if $test->getFinishedAt() !== null}
 <span class="d-inline-block me-4">
   <span class="text-muted">{_locale.test.finishedAt}:</span>
-  {$test->getStartedAt()|ldate}
+  {$test->getFinishedAt()|ldate}
 </span>
+{/if}
 
 {if $test->getStartedAt() !== null}
 
@@ -30,25 +32,35 @@
           >{_locale.test.previous}</a>
       </li>
       <li n:foreach="$questions as $idx => $question"
-        class="page-item {$idx === $selectedQuestionIdx ? 'active' : ''}">
-        <a class="page-link" n:href="this question => $question->getId()">{$question->getOrdering()}</a>
+        class="page-item {$idx === $selectedQuestionIdx ? 'active'}">
+        <a class="page-link {($idx !== $selectedQuestionIdx && $question->getLastAnswer() !== null) ? 'bg-success bg-opacity-25 text-success fw-bold'}"
+          n:href="this question => $question->getId()">{$question->getOrdering()}</a>
       </li>
       <li class="page-item {$selectedQuestionIdx >= count($questions)-1 ? 'disabled'}">
         <a class="page-link"
           n:href="this question => $selectedQuestionIdx < count($questions)-1 ? $questions[$selectedQuestionIdx+1]->getId()"
-          >{_locale.test.next}</a>
+          >{if $selectedQuestionIdx >= count($questions)}{_locale.test.end}{else}{_locale.test.next}{/if}</a>
       </li>
     </ul>
   </nav>
 
   <hr>
 
-  {if $selectedQuestionIdx < count($questions)}
-    <h3>
-      {_locale.test.question} #{$selectedQuestion->getOrdering()}:
-      {$selectedQuestion->getCaption($locale)}
+  <h3 class="mb-3">
+    {block title}
+      {if $selectedQuestionIdx < count($questions)}
+        {_locale.test.question} #{$selectedQuestion->getOrdering()}
+      {else}
+        {_locale.test.completed.title}
+      {/if}
+    {/block}
+    {if $selectedQuestionIdx < count($questions)}
+      &ndash; {$selectedQuestion->getCaption($locale)}
       <span class="badge bg-secondary float-end mt-1 fs-6">{$selectedQuestion->getPoints()} {_locale.test.points}</span>
-    </h3>
+    {/if}
+  </h3>
+
+  {if $selectedQuestionIdx < count($questions)}
 
     <div class="bg-light border p-3 my-3 rounded">{$questionText|markdown}</div>
 
@@ -58,11 +70,30 @@
 
       {$questionResult|noescape}
     {else}
-      <form action="" method="POST">
+      <form action="{link Save! question: $selectedQuestion->getId()}" method="POST" data-ajax data-ajax-button="saveButton">
         {$questionForm|noescape}
-        <button type="submit" class="btn btn-success btn-lg shadow mt-3"><i class="fa-solid fa-download fa-fw"></i> {_locale.test.saveAndContinue}</button>
+
+        {if $answer}
+        <div class="mt-4 mb-1">
+          <i class="fa-solid fa-circle-info fa-fw text-muted"></i>
+          {_locale.test.alreadyAnsweredInfo}
+        </div>
+        {/if}
+        <button id="saveButton" type="submit" class="btn btn-success btn-lg shadow mt-3">
+          <i class="fa-solid fa-download fa-fw"></i>
+          {_locale.test.saveAndContinue}
+        </button>
+
       </form>
     {/if}
+  {else}
+    <p>
+      {_locale.test.completed.message1}
+    </p>
+    <p>
+      {_locale.test.completed.message2}
+    </p>
+
   {/if}
 
 {else}

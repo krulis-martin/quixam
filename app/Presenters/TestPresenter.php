@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Presenters;
 
-use App\Model\Repository\TestTerms;
+use App\Model\Repository\Answers;
 use App\Model\Repository\EnrolledUsers;
 use App\Model\Repository\Questions;
-use App\Model\Repository\Answers;
+use App\Model\Repository\TestTerms;
+use App\Model\Entity\Answer;
 use App\Model\Entity\EnrolledUser;
 use App\Model\Entity\Question;
 use App\Model\Entity\User;
@@ -17,8 +18,8 @@ use Nette\Bridges\ApplicationLatte\LatteFactory;
 
 final class TestPresenter extends AuthenticatedPresenter
 {
-    /** @var TestTerms @inject */
-    public $testTerms;
+    /** @var Answers @inject */
+    public $answers;
 
     /** @var EnrolledUsers @inject */
     public $enrolledUsers;
@@ -26,11 +27,11 @@ final class TestPresenter extends AuthenticatedPresenter
     /** @var Questions @inject */
     public $questions;
 
-    /** @var Answers @inject */
-    public $answers;
-
     /** @var QuestionFactory @inject */
     public $questionFactory;
+
+    /** @var TestTerms @inject */
+    public $testTerms;
 
     /** @var LatteFactory @inject */
     public $latteFactory;
@@ -38,12 +39,23 @@ final class TestPresenter extends AuthenticatedPresenter
     /** @persistent */
     public $question = null;
 
-    private function getEnrolledUser($id): ?EnrolledUser
+    /**
+     * Return enrolled user entity based on the presenter's parameters.
+     * @param string $id test term ID
+     * @return ?EnrolledUser
+     */
+    private function getEnrolledUser(string $id): ?EnrolledUser
     {
         $enrolledUsers = $this->enrolledUsers->findBy([ 'test' => $id, 'user' => $this->user->getId() ]);
         return $enrolledUsers ? reset($enrolledUsers) : null;
     }
 
+    /**
+     * Get an index of "selected" question. If the question is selected explicitly by a query parameter,
+     * or the index of the first question that do not have an answer.
+     * @param array $questions all question of enrolled user for selected test
+     * @return int index of the selected question, count($questions) of no question is selected
+     */
     private function getSelectedQuestion(array $questions): int
     {
         $res = count($questions);
@@ -60,6 +72,10 @@ final class TestPresenter extends AuthenticatedPresenter
         return $res;
     }
 
+    /**
+     * Automatically invoked permissions check for the Default action.
+     * @return bool true if the user has access to display default view
+     */
     public function checkDefault(string $id): bool
     {
         if ($this->user->getRole() === User::ROLE_STUDENT) {
@@ -76,6 +92,36 @@ final class TestPresenter extends AuthenticatedPresenter
 
         return false;
     }
+
+    /**
+     * Signal handler for AJAX call that saves the question answer.
+     */
+    public function handleSave(string $id): void
+    {
+        // find the question to which the answer belongs to
+        if (!$this->question || !$this->questions->get($this->question)) {
+            $this->finalizePostError("Unable to save the answer when no question is selected.");
+        }
+        $question = $this->questions->get($this->question);
+        $questionData = $question->getQuestion($this->questionFactory);
+
+        // get the answer and validate it
+        $req = $this->getRequest();
+        $answer = $questionData->processAnswerSubmit($req->getPost());
+        if (!$questionData->isAnswerValid($answer)) {
+            $this->finalizePostError(json_encode($answer));
+        }
+
+        // save the answer
+        $answerEntity = new Answer($question, $answer);
+        $this->answers->persist($answerEntity);
+
+        $question->setLastAnswer($answerEntity);
+        $this->questions->persist($question);
+
+        $this->finalizePost($this->link('default', [ 'id' => $id, 'question' => null ]));
+    }
+
 
     public function renderDefault(string $id)
     {
@@ -107,6 +153,7 @@ final class TestPresenter extends AuthenticatedPresenter
 
                 $engine = $this->latteFactory->create();
                 $answer = $selectedQuestion->getLastAnswer() ? $selectedQuestion->getLastAnswer()->getAnswer() : null;
+                $this->template->answer = $answer;
                 if ($test->getFinishedAt() === null) {
                     // still open -> show form
                     $this->template->questionForm
