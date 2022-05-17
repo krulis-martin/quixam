@@ -14,7 +14,7 @@ use Exception;
 /**
  * Single best answer question.
  */
-final class QuestionSingle extends BaseChoiceQuestion
+final class QuestionMulti extends BaseChoiceQuestion
 {
     /*
      * Implementing the interface
@@ -30,23 +30,28 @@ final class QuestionSingle extends BaseChoiceQuestion
             throw new QuestionException("Invalid question template, answer text does not have valid format.", $e);
         }
 
-        $correct = $templateJson['correct'];
-        if (!is_int($correct)) {
+        if (!is_array($templateJson['correct'])) {
             throw new QuestionException("Invalid question template, correct answer has invalid format.");
         }
-        $answers = $this->instantiateAnswers($templateJson, [ $correct ]);
 
+        $answers = $this->instantiateAnswers($templateJson);
+
+        $this->answers = array_values($answers);
         $keysIndex = array_flip(array_keys($answers));
-        if (!array_key_exists($correct, $keysIndex)) {
-            throw new QuestionException(
-                "Internal error in the process of selecting random answers, invalid index of the correct answer."
-            );
+
+        $correct = [];
+        foreach ($templateJson['correct'] as $cKey) {
+            // include only sub-set of correct answers that were actually selected...
+            if (array_key_exists($cKey, $keysIndex)) {
+                $correct[$keysIndex[$cKey]] = true; // using it as key also deduplicates the correct answers
+            }
         }
-        $this->correct = $keysIndex[$correct];
+
+        $this->correct = array_keys($correct);
     }
 
     /**
-     * Helper wrapper function for rendering single-choice template. Prepares common paramters.
+     * Helper wrapper function for rendering multi-choice template. Prepares common paramters.
      * @param Engine $latte engine for rendering latte templates (separately from the presenters)
      * @param string $locale selected locale
      * @param mixed $answer deserialized json structure sent over by the client
@@ -54,32 +59,52 @@ final class QuestionSingle extends BaseChoiceQuestion
      * @param array $params common parameters for the template
      * @return string raw HTML fragment which is pasted without excaping into the output
      */
-    private function renderSingleChoicesTeplate(Engine $latte, string $locale, $answer, array $params = []): string
+    private function renderMultiChoicesTeplate(Engine $latte, string $locale, $answer, array $params = []): string
     {
-        $params['type'] = 'radio';
+        $params['type'] = 'checkbox';
         $params['locale'] = $locale;
-        $params['answers'] = $answer !== null ? [ $answer ] : [];
+        $params['answers'] = $answer !== null ? $answer : [];
         return $this->renderChoicesTeplate($latte, $params);
     }
 
     public function renderFormContent(Engine $latte, string $locale, $answer = null): string
     {
-        return $this->renderSingleChoicesTeplate($latte, $locale, $answer);
+        return $this->renderMultiChoicesTeplate($latte, $locale, $answer);
     }
 
     public function renderResultContent(Engine $latte, string $locale, $answer = null): string
     {
         $params = [ 'graded' => $this->isAnswerCorrect($answer) ? 'success' : 'danger' ];
-        return $this->renderSingleChoicesTeplate($latte, $locale, $answer, $params);
+        return $this->renderMultiChoicesTeplate($latte, $locale, $answer, $params);
     }
 
     public function verifyAnswer($answer): bool
     {
-        return $answer === null || (is_int($answer) && array_key_exists($answer, $this->answers));
+        if (!is_array($answer)) {
+            return false;
+        }
+
+        foreach ($answer as $key) {
+            if (!is_int($key) || !array_key_exists($key, $this->answers)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function isAnswerCorrect($answer): bool
     {
-        return $this->correct !== null && $this->correct === $answer;
+        if (!is_array($answer) || count($answer) !== count($this->correct)) {
+            return false;
+        }
+
+        foreach ($this->correct as $correct) {
+            if (!in_array($correct, $answer)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

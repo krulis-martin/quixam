@@ -13,6 +13,7 @@ use App\Model\Entity\Question;
 use App\Model\Entity\User;
 use App\Helpers\QuestionFactory;
 use Nette;
+use Nette\Bridges\ApplicationLatte\LatteFactory;
 
 final class TestPresenter extends AuthenticatedPresenter
 {
@@ -31,6 +32,9 @@ final class TestPresenter extends AuthenticatedPresenter
     /** @var QuestionFactory @inject */
     public $questionFactory;
 
+    /** @var LatteFactory @inject */
+    public $latteFactory;
+
     /** @persistent */
     public $question = null;
 
@@ -40,34 +44,28 @@ final class TestPresenter extends AuthenticatedPresenter
         return $enrolledUsers ? reset($enrolledUsers) : null;
     }
 
-    private function getSelectedQuestion(EnrolledUser $enrolledUser): ?Question
+    private function getSelectedQuestion(array $questions): int
     {
-        if ($this->question) {
-            // explicit selection by a parameter
-            $question = $this->questions->get($this->question);
-        }
+        $res = count($questions);
+        foreach ($questions as $idx => $question) {
+            if ($this->question && $this->question === $question->getId()) {
+                return $idx; // explicit selection by a parameter
+            }
 
-        if (empty($question)) {
-            // try to find the best default
-            $question = $enrolledUser->getQuestions()->first();
-
-            // try to find first question without answers
-            foreach ($enrolledUser->getQuestions()->toArray() as $q) {
-                if ($q->getLastAnswer() === null) {
-                    $question = $q;
-                    break;
-                }
+            if ($idx < $res && $question->getLastAnswer() === null) {
+                $res = $idx;
             }
         }
 
-        return $question;
+        return $res;
     }
 
     public function checkDefault(string $id): bool
     {
         if ($this->user->getRole() === User::ROLE_STUDENT) {
-            // a student must be enrolled to see the test
-            return $this->getEnrolledUser($id) !== null;
+            // a student must be enrolled to see the test, which has already started
+            $enrolled = $this->getEnrolledUser($id);
+            return $enrolled !== null && $enrolled->getTest()->getStartedAt() !== null;
         }
 
         if ($this->user->getRole() === User::ROLE_TEACHER) {
@@ -81,22 +79,44 @@ final class TestPresenter extends AuthenticatedPresenter
 
     public function renderDefault(string $id)
     {
+        $this->template->locale = $this->selectedLocale;
+
         $test = $this->testTerms->get($id);
         if (!$test) {
             $this->error("Test $id does not exist.", 404);
         }
-        $enrolledUser = $this->getEnrolledUser($id);
-        $selectedQuestion = $this->getSelectedQuestion($enrolledUser);
-
-        $this->template->locale = $this->selectedLocale;
         $this->template->test = $test;
+
+        $enrolledUser = $this->getEnrolledUser($id); // TODO in the future allow user selection for supervisors
+        if (!$enrolledUser) {
+            $this->error("Selected user is not enrolled for the test.", 404);
+        }
         $this->template->enrolledUser = $enrolledUser;
-        $this->template->selectedQuestion = $selectedQuestion;
-        if ($selectedQuestion) {
-            $this->template->selectedQuestionId = $selectedQuestion->getId();
-            $this->template->questionData = $selectedQuestion->getQuestion($this->questionFactory);
-            //$this->template->showPrevious = $enrolledUser->getQuestions()->first()->getId() !== $selecteQuestion->getId();
-            //$this->template->showNext = $enrolledUser->getQuestions()->last()->getId() !== $selecteQuestion->getId();
+
+        if ($test->getStartedAt() !== null) {
+            $questions = $enrolledUser->getQuestions()->toArray();
+            $selectedQuestionIdx = $this->getSelectedQuestion($questions);
+
+            $this->template->questions = $questions;
+            $this->template->selectedQuestionIdx = $selectedQuestionIdx;
+            if ($selectedQuestionIdx < count($questions)) {
+                $this->template->selectedQuestion = $selectedQuestion = $questions[$selectedQuestionIdx];
+                $this->template->selectedQuestionId = $selectedQuestion->getId();
+                $questionData = $selectedQuestion->getQuestion($this->questionFactory);
+                $this->template->questionText = $questionData->getText($this->selectedLocale);
+
+                $engine = $this->latteFactory->create();
+                $answer = $selectedQuestion->getLastAnswer() ? $selectedQuestion->getLastAnswer()->getAnswer() : null;
+                if ($test->getFinishedAt() === null) {
+                    // still open -> show form
+                    $this->template->questionForm
+                        = $questionData->renderFormContent($engine, $this->selectedLocale, $answer);
+                } else {
+                    // finished -> show the results
+                    $this->template->questionResult
+                        = $questionData->renderResultContent($engine, $this->selectedLocale, $answer);
+                }
+            }
         }
     }
 }

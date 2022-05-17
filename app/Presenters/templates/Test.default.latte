@@ -1,24 +1,70 @@
 {block content}
 
-<h1><i class="fa-solid fa-list-check fa-fw text-muted"></i> {block title}Test{/block}</h1>
+<h1>
+  <i class="fa-solid fa-list-check fa-fw text-muted"></i>
+  {block title}{_locale.test.title}{/block}:
+  {$test->getCaption($locale)},
+  {$test->getScheduledAt()|ldate}
+</h1>
 
-<nav>
-  <ul class="pagination">
-    <li class="page-item disabled">
-      <a class="page-link">Previous</a>
-    </li>
-    <li n:foreach="$enrolledUser->getQuestions() as $question"
-      class="page-item {$question->getId() === $selectedQuestionId ? 'active' : ''}">
-      <a class="page-link" n:href="this question => $question->getId()">{$question->getOrdering()}</a>
-    </li>
-    <li class="page-item">
-      <a class="page-link" href="#">Next</a>
-    </li>
-  </ul>
-</nav>
+<span class="d-inline-block me-4">
+  <span class="text-muted">{_locale.test.supervisors}:</span>
+  {foreach $test->getSupervisors() as $supervisor}{$supervisor->getFirstName()} {$supervisor->getLastName()}{sep}, {/sep}{/foreach}
+</span>
+<span class="d-inline-block me-4">
+  <span class="text-muted">{_locale.test.startedAt}:</span>
+  {$test->getStartedAt()|ldate}
+</span>
+<span class="d-inline-block me-4">
+  <span class="text-muted">{_locale.test.finishedAt}:</span>
+  {$test->getStartedAt()|ldate}
+</span>
 
-<h2>Question #{$selectedQuestion->getOrdering()}: {$selectedQuestion->getCaption($locale)}</h2>
+{if $test->getStartedAt() !== null}
 
-{$questionData->getText($locale)|markdown}
+  <nav class="my-3">
+    <ul class="pagination">
+      <li class="page-item {$selectedQuestionIdx === 0 ? 'disabled'}">
+        <a class="page-link"
+          n:href="this question => $selectedQuestionIdx > 0 ? $questions[$selectedQuestionIdx-1]->getId()"
+          >{_locale.test.previous}</a>
+      </li>
+      <li n:foreach="$questions as $idx => $question"
+        class="page-item {$idx === $selectedQuestionIdx ? 'active' : ''}">
+        <a class="page-link" n:href="this question => $question->getId()">{$question->getOrdering()}</a>
+      </li>
+      <li class="page-item {$selectedQuestionIdx >= count($questions)-1 ? 'disabled'}">
+        <a class="page-link"
+          n:href="this question => $selectedQuestionIdx < count($questions)-1 ? $questions[$selectedQuestionIdx+1]->getId()"
+          >{_locale.test.next}</a>
+      </li>
+    </ul>
+  </nav>
 
-{$questionData->renderFormContent()|noescape}
+  <hr>
+
+  {if $selectedQuestionIdx < count($questions)}
+    <h3>
+      {_locale.test.question} #{$selectedQuestion->getOrdering()}:
+      {$selectedQuestion->getCaption($locale)}
+      <span class="badge bg-secondary float-end mt-1 fs-6">{$selectedQuestion->getPoints()} {_locale.test.points}</span>
+    </h3>
+
+    <div class="bg-light border p-3 my-3 rounded">{$questionText|markdown}</div>
+
+    {if $test->getFinishedAt() !== null}
+      <div class="border rounded border-success text-success p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.correctAnswer}</div>
+      <div class="border rounded border-danger text-danger p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.wrongAnswer}</div>
+
+      {$questionResult|noescape}
+    {else}
+      <form action="" method="POST">
+        {$questionForm|noescape}
+        <button type="submit" class="btn btn-success btn-lg shadow mt-3"><i class="fa-solid fa-download fa-fw"></i> {_locale.test.saveAndContinue}</button>
+      </form>
+    {/if}
+  {/if}
+
+{else}
+  <p class="my-4"><i class="fa-solid fa-triangle-exclamation fa-fw text-warning"></i> {_locale.test.hasNotStartedYet}</div>
+{/if}

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
+use Latte\Engine;
 use JsonSerializable;
 
 interface IQuestion extends JsonSerializable
@@ -29,19 +30,23 @@ interface IQuestion extends JsonSerializable
 
     /**
      * Render internal content of the form where the user selectes the answer.
+     * @param Engine $latte engine for rendering latte templates (separately from the presenters)
+     * @param string $locale selected locale
      * @param mixed $answer deserialized json structure sent over by the client
      *                      if not null, it will be used to pre-fill the last selected answer
      * @return string raw HTML fragment which is pasted without excaping into the output
      */
-    public function renderFormContent($answer = null): string;
+    public function renderFormContent(Engine $latte, string $locale, $answer = null): string;
 
     /**
      * Render HTML content displayed instead of the form when the results are presented.
+     * @param Engine $latte engine for rendering latte templates (separately from the presenters)
+     * @param string $locale selected locale
      * @param mixed $answer deserialized json structure sent over by the client
      *                      the answer will be used for rendering (null = this question was not answered)
      * @return string raw HTML fragment which is pasted without excaping into the output
      */
-    public function renderResultContent($answer = null): string;
+    public function renderResultContent(Engine $latte, string $locale, $answer = null): string;
 
     /**
      * Verify whether the answer is structurally correct.

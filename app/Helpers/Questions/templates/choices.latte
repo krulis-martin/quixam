@@ -1,0 +1,20 @@
+<table class="table table-borderless table-hover align-middle">
+    <tbody>
+        <tr n:foreach="$options as $idx => $option">
+            <td class="p-2">
+                {if !empty($graded)}
+                    <span class="text-{$graded}">
+                    {if $type === "checkbox"}
+                        <i class="fa-regular {in_array($idx, $answers) ? 'fa-square-check' : 'fa-square'}  fa-fw"></i>
+                    {elseif $type === "radio"}
+                        <i class="fa-regular fa-fw {in_array($idx, $answers) ? 'fa-circle-dot' : 'fa-circle'}"></i>
+                    {/if}
+                    </span>
+                {else}
+                <input type="{$type}" name="answer[]" value="{$idx}" class="form-check-input" id="option_{$idx}" {in_array($idx, $answers) ? 'checked' : ''} />
+                {/if}
+            </td>
+            <td class="w-100"><label for="option_{$idx}">{$option|markdown}</label></td>
+        </tr>
+    </tbody>
+</table>

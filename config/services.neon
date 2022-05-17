@@ -10,8 +10,9 @@ services:
 
   - App\Helpers\Questions\QuestionSingle
   - App\Helpers\QuestionFactory([
-    single: App\Helpers\Questions\QuestionSingle,
-  ])
+      single: App\Helpers\Questions\QuestionSingle,
+      multi: App\Helpers\Questions\QuestionMulti,
+    ])
 
   # DB repositories
   - App\Model\Repository\Answers

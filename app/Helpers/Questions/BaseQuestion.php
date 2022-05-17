@@ -74,15 +74,14 @@ abstract class BaseQuestion implements IQuestion
     /**
      * Retrieves localized value from an internal property. The property must be a string or an array of strings,
      * where the keys are locales. If given locale is not found, fallback sequence is attempted.
-     * @param string $name of the property that holds localized data
+     * @param string $value of the property that holds localized data
      * @param string $locale identifier ('en', 'cs', ...)
      * @param bool $strict if true, only exact locale match is returned (null otherwise)
      *                     (this applies only on array properties; string properties match all locales)
      * @return string|null (null, if the translation does not exists)
      */
-    public function getLocalizedProperty(string $name, string $locale, bool $strict = false): ?string
+    public static function getLocalizedText($value, string $locale, bool $strict = false): ?string
     {
-        $value = $this->$name;
         if (is_string($value)) {
             return $value;
         }
@@ -104,7 +103,10 @@ abstract class BaseQuestion implements IQuestion
         if (array_key_exists('en', $value)) {
             return $value['en']; // fallback to English
         }
-        return reset($value); // fallback to the first translation
+
+        // fallback to the first translation
+        $key = array_key_first($value);
+        return $key !== null ? $value[$key] : null; /** @phpstan-ignore-line */
     }
 
     /*
@@ -129,33 +131,10 @@ abstract class BaseQuestion implements IQuestion
 
     public function getText(string $locale): string
     {
-        return $this->getLocalizedProperty('text', $locale);
+        return self::getLocalizedText($this->text, $locale);
     }
 
     /*
      * Extra methods that might be useful in descendant classes...
      */
-
-    /**
-     * Load a list of individual answers. Each has a numeric key and localized text as contents.
-     * @param array $answers structure to be loaded
-     * @param string $errorPrefix used as a prefix for exception message if something fails
-     * @return array of processed and verified answers
-     */
-    protected function loadAnswers(array $answers, $errorPrefix): array
-    {
-        try {
-            $result = [];
-            $schema = self::schemaOfLocaizedText();
-            foreach ($answers as $idx => $answer) {
-                if (!is_int($idx)) {
-                    throw new QuestionException("$errorPrefix, an answer does not have numeric key.");
-                }
-                $result[$idx] = self::normalize($schema, $answer);
-            }
-            return $result;
-        } catch (Exception $e) {
-            throw new QuestionException("$errorPrefix, answer text does not have valid format.", $e);
-        }
-    }
 }
