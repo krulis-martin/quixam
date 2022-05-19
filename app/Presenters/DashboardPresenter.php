@@ -89,11 +89,19 @@ final class DashboardPresenter extends AuthenticatedPresenter
         if (!$test->getStartedAt() || $test->getFinishedAt()) {
             $this->finalizePostError($this->translator->translate('locale.dashboard.error.invalidTestState'));
         }
-        $test->finishNow();
 
-        // TODO -- evaluate !!!
+        try {
+            $this->testTerms->beginTransaction();
+            $this->testOrchestrator->evlauate($test);
+            $test->finishNow();
+            $this->testTerms->persist($test);
+            $this->testTerms->commit();
+        } catch (Exception $e) {
+            $this->testTerms->rollback();
+            $this->logger->log($e, ILogger::EXCEPTION);
+            $this->finalizePostError($this->translator->translate('locale.dashboard.error.evaluationFailure'));
+        }
 
-        $this->testTerms->persist($test);
         $this->finalizePost($this->link('this'));
     }
 

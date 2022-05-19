@@ -53,18 +53,22 @@ final class TestPresenter extends AuthenticatedPresenter
      * Get an index of "selected" question. If the question is selected explicitly by a query parameter,
      * or the index of the first question that do not have an answer.
      * @param array $questions all question of enrolled user for selected test
+     * @param bool $testFinished if true, it targets first answered question instead (to better display results)
      * @return int index of the selected question, count($questions) of no question is selected
      */
-    private function getSelectedQuestion(array $questions): int
+    private function getSelectedQuestion(array $questions, bool $testFinished): int
     {
-        $res = count($questions);
+        $res = $testFinished ? 0 : count($questions);
         foreach ($questions as $idx => $question) {
             if ($this->question && $this->question === $question->getId()) {
                 return $idx; // explicit selection by a parameter
             }
 
-            if ($idx < $res && $question->getLastAnswer() === null) {
-                $res = $idx;
+            if ($testFinished && $question->getLastAnswer()) {
+                return $idx; // test finished -> looking for first answered question
+            }
+            if (!$testFinished && $idx < $res && $question->getLastAnswer() === null) {
+                $res = $idx; // not finished -> looking for first unanswered question
             }
         }
 
@@ -140,7 +144,7 @@ final class TestPresenter extends AuthenticatedPresenter
 
         if ($test->getStartedAt() !== null) {
             $questions = $enrolledUser->getQuestions()->toArray();
-            $selectedQuestionIdx = $this->getSelectedQuestion($questions);
+            $selectedQuestionIdx = $this->getSelectedQuestion($questions, $test->getFinishedAt() !== null);
 
             $this->template->questions = $questions;
             $this->template->selectedQuestionIdx = $selectedQuestionIdx;
@@ -151,16 +155,18 @@ final class TestPresenter extends AuthenticatedPresenter
                 $this->template->questionText = $questionData->getText($this->selectedLocale);
 
                 $engine = $this->latteFactory->create();
-                $answer = $selectedQuestion->getLastAnswer() ? $selectedQuestion->getLastAnswer()->getAnswer() : null;
+                $answer = $selectedQuestion->getLastAnswer();
+                $answerData = $answer ? $answer->getAnswer() : null;
                 $this->template->answer = $answer;
                 if ($test->getFinishedAt() === null) {
                     // still open -> show form
                     $this->template->questionForm
-                        = $questionData->renderFormContent($engine, $this->selectedLocale, $answer);
+                        = $questionData->renderFormContent($engine, $this->selectedLocale, $answerData);
                 } else {
                     // finished -> show the results
+                    $this->template->answerCorrect = $answerData ? $questionData->isAnswerCorrect($answerData) : null;
                     $this->template->questionResult
-                        = $questionData->renderResultContent($engine, $this->selectedLocale, $answer);
+                        = $questionData->renderResultContent($engine, $this->selectedLocale, $answerData);
                 }
             }
         }

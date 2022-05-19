@@ -33,7 +33,11 @@
       </li>
       <li n:foreach="$questions as $idx => $question"
         class="page-item {$idx === $selectedQuestionIdx ? 'active'}">
-        <a class="page-link {($idx !== $selectedQuestionIdx && $question->getLastAnswer() !== null) ? 'bg-success bg-opacity-25 text-success fw-bold'}"
+        {var $answerTmp = $idx !== $selectedQuestionIdx ? $question->getLastAnswer() : null}
+        <a n:class="page-link,
+          $answerTmp !== null ? 'bg-opacity-25 fw-bold',
+          $answerTmp !== null && (!$test->getFinishedAt() || $answerTmp->getPoints()) ? 'bg-success text-success',
+          $answerTmp !== null && $test->getFinishedAt() && !$answerTmp->getPoints() ? 'bg-danger text-danger'"
           n:href="this question => $question->getId()">{$question->getOrdering()}</a>
       </li>
       <li class="page-item {$selectedQuestionIdx >= count($questions)-1 ? 'disabled'}">
@@ -56,7 +60,14 @@
     {/block}
     {if $selectedQuestionIdx < count($questions)}
       &ndash; {$selectedQuestion->getCaption($locale)}
-      <span class="badge bg-secondary float-end mt-1 fs-6">{$selectedQuestion->getPoints()} {_locale.test.points}</span>
+
+      {if $test->getFinishedAt() !== null}
+        <span class="badge {$answer?->getPoints() ? 'bg-success' : 'bg-danger'} float-end mt-1 fs-6">
+          {_locale.test.points}: {(int)$answer?->getPoints()} {_locale.test.pointsOf} {$selectedQuestion->getPoints()}
+        </span>
+      {else}
+        <span class="badge bg-secondary float-end mt-1 fs-6">{_locale.test.points}: {$selectedQuestion->getPoints()}</span>
+      {/if}
     {/if}
   </h3>
 
@@ -65,8 +76,13 @@
     <div class="bg-light border p-3 my-3 rounded">{$questionText|markdown}</div>
 
     {if $test->getFinishedAt() !== null}
-      <div class="border rounded border-success text-success p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.correctAnswer}</div>
-      <div class="border rounded border-danger text-danger p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.wrongAnswer}</div>
+      {if !$answer}
+        <div class="border rounded border-secondary text-muted p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.missingAnswer}</div>
+      {elseif $answerCorrect}
+        <div class="border rounded border-success text-success p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.correctAnswer}</div>
+      {else}
+        <div class="border rounded border-danger text-danger p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.wrongAnswer}</div>
+      {/if}
 
       {$questionResult|noescape}
     {else}

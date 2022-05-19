@@ -69,7 +69,9 @@ final class QuestionSingle extends BaseChoiceQuestion
 
     public function renderResultContent(Engine $latte, string $locale, $answer = null): string
     {
-        $params = [ 'graded' => $this->isAnswerCorrect($answer) ? 'success' : 'danger' ];
+        $params = [ 'graded' => $answer === null ? 'muted'
+            : ($this->isAnswerCorrect($answer) ? 'success' : 'danger')
+        ];
         return $this->renderSingleChoicesTeplate($latte, $locale, $answer, $params);
     }
 

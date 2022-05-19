@@ -114,14 +114,18 @@ class EnrolledUser
         return $this->score !== null && $this->maxScore !== null;
     }
 
+    public function setScore(int $score): void
+    {
+        $this->score = $score;
+    }
+
     public function getMaxScore(): ?int
     {
         return $this->maxScore;
     }
 
-    public function setScore(int $score, int $maxScore)
+    public function setMaxScore(int $maxScore): void
     {
-        $this->score = $score;
         $this->maxScore = $maxScore;
     }
 }
