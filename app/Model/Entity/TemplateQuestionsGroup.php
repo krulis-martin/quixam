@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use Gedmo\Mapping\Annotation as Gedmo;
 use DateTime;
 
 /**
@@ -15,11 +16,15 @@ use DateTime;
  * This roughly corresponds to one topic or type of questions being tested.
  *
  * @ORM\Entity
- * @ORM\Table(uniqueConstraints={@ORM\UniqueConstraint(columns={"test_id", "external_id"})})
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
+ * @ORM\Table(indexes={
+ *   @ORM\Index(name="external_id", columns={"external_id"})
+ * })
  */
 class TemplateQuestionsGroup
 {
     use CreateableEntity;
+    use DeleteableEntity;
 
     /**
      * @ORM\Id
@@ -40,7 +45,7 @@ class TemplateQuestionsGroup
     protected $test;
 
     /**
-     * @ORM\OneToMany(targetEntity="TemplateQuestion", mappedBy="questionGroup")
+     * @ORM\OneToMany(targetEntity="TemplateQuestion", mappedBy="questionsGroup")
      */
     protected $questions;
 

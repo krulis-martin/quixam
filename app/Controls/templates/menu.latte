@@ -13,7 +13,7 @@
         <!--li class="nav-item">
           <a class="nav-link active" aria-current="page" href="">TODO</a>
         </li-->
-        {if $userLoggedIn}
+        {if $user}
         <li class="nav-item">
           <a class="nav-link" href="{plink Dashboard:default}">{_locale.dashboard.title}</a>
         </li>
@@ -33,10 +33,16 @@
         {/if}
       {/foreach}
 
-      {if $userLoggedIn}
+      {if $user}
         <li class="nav-item">
           <a class="nav-link" href="{plink User:default}" title="{_locale.menu.user}">
-            <i class="fa-solid fa-circle-user fa-fw"></i>
+            {if $user->getRole() === App\Model\Entity\User::ROLE_ADMIN}
+              <i class="fa-solid fa-user-tie fa-fw"></i>
+            {elseif $user->getRole() === App\Model\Entity\User::ROLE_TEACHER}
+              <i class="fa-solid fa-user-graduate fa-fw"></i>
+            {else}
+              <i class="fa-solid fa-circle-user fa-fw"></i>
+            {/if}
             {$user->getFirstName()} {$user->getLastName()}
           </a>
         </li>

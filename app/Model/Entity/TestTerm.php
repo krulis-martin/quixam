@@ -196,7 +196,7 @@ class TestTerm
 
     public function finishNow(): void
     {
-        $this->setStartedAt(new DateTime());
+        $this->setFinishedAt(new DateTime());
     }
 
     public function getArchivedAt(): ?DateTime

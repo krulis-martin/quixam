@@ -99,6 +99,11 @@ class EnrolledUser
         return $this->questions;
     }
 
+    public function getSeed(): int
+    {
+        return $this->seed;
+    }
+
     public function getScore(): ?int
     {
         return $this->score;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controls;
 
+use App\Model\Entity\User;
 use Nette\Application\UI\Control;
 use Nette\Localization\ITranslator;
 use Contributte\Translation\LocalesResolvers\Session as TranslatorSessionResolver;
@@ -38,13 +39,14 @@ class MenuControl extends Control
 
     public function render(): void
     {
-        $loggedIn = $this->getPresenter()->getUser()->isLoggedIn();
-        $this->template->userLoggedIn = $loggedIn;
-        if ($loggedIn) {
+        if ($this->getPresenter()->getUser()->isLoggedIn()) {
             /** @var \App\Security\Identity */
             $identity =  $this->getPresenter()->getUser()->getIdentity();
             $this->template->user = $identity->getUserData();
+        } else {
+            $this->template->user = null;
         }
+
         /** @phpstan-ignore-next-line */
         $this->template->selectedLocale = $this->translator->getLocale();
         $this->template->setFile(__DIR__ . '/templates/menu.latte');

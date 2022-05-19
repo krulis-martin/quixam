@@ -48,6 +48,10 @@ class Random
     private static function prepareMutexIndex(array $data, array $mutuallyExclusive): array
     {
         $index = [];
+        foreach ($data as $key => $_) {
+            $index[$key] = [];
+        }
+
         foreach ($mutuallyExclusive as $indices) {
             if (!is_array($indices) || count($indices) !== 2) {
                 throw new InvalidArgumentException("Mutually exclusive list is supposed to be a list of index pairs.");

@@ -97,7 +97,7 @@ class Question
      * @param TemplateQuestionsGroup $templateGroup
      * @param TemplateQuestion $templateQuestion
      * @param int $ordering
-     * @param mixed $data (that will be serialized in JSON)
+     * @param mixed $data (that will be serialized in JSON, typically an IQuestion object)
      */
     public function __construct(
         EnrolledUser $enrolledUser,

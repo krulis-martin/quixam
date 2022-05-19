@@ -49,4 +49,18 @@ class TestTerms extends BaseSoftDeleteRepository
         $qb->setParameters([ 'user' => $user->getId() ]);
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * Retrieve a list of terms which the user supervises.
+     * @return TestTerm[]
+     */
+    public function getTermsUserSupervises(User $user): array
+    {
+        $qb = $this->createQueryBuilder('tt');
+        $qb->where(':uid MEMBER OF tt.supervisors')
+            ->andWhere($qb->expr()->isNull("tt.archivedAt"))
+            ->orderBy('tt.finishedAt, tt.startedAt, tt.scheduledAt, tt.createdAt');
+        $qb->setParameters([ 'uid' => $user->getId()]);
+        return $qb->getQuery()->getResult();
+    }
 }

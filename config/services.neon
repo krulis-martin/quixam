@@ -8,7 +8,7 @@ services:
     setup:
       - addFilter(ldate, @App\Helpers\LatteDateFilter)
 
-  - App\Helpers\Questions\QuestionSingle
+  - App\Helpers\TestOrchestrator
   - App\Helpers\QuestionFactory([
       single: App\Helpers\Questions\QuestionSingle,
       multi: App\Helpers\Questions\QuestionMulti,

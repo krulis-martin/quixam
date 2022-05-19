@@ -59,9 +59,15 @@ $(() => {
     ev.preventDefault();
 
     if (!globalAjaxLock) {
-      globalAjaxLock = true;
-
       var form = $(this)[0];
+      if (
+        form.dataset.ajaxConfirm &&
+        !window.confirm(form.dataset.ajaxConfirm)
+      ) {
+        return;
+      }
+
+      globalAjaxLock = true;
 
       // block and animate submit button
       if (form.dataset.ajaxButton) {
@@ -94,9 +100,16 @@ $(() => {
     ev.preventDefault();
 
     if (!globalAjaxLock) {
+      var link = $(this)[0];
+      if (
+        link.dataset.ajaxConfirm &&
+        !window.confirm(link.dataset.ajaxConfirm)
+      ) {
+        return;
+      }
+
       globalAjaxLock = true;
 
-      var link = $(this)[0];
       fetch(link.href, {
         method: link.dataset.ajax,
         headers: { "X-Requested-With": "XMLHttpRequest" },

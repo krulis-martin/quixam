@@ -129,5 +129,6 @@ abstract class BaseChoiceQuestion extends BaseQuestion
         $json = parent::jsonSerialize();
         $json['answers'] = $this->answers;
         $json['correct'] = $this->correct;
+        return $json;
     }
 }

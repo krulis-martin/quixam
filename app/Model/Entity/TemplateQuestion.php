@@ -8,15 +8,20 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use Gedmo\Mapping\Annotation as Gedmo;
 use DateTime;
 
 /**
  * @ORM\Entity
- * @ORM\Table(uniqueConstraints={@ORM\UniqueConstraint(columns={"test_id", "external_id"})})
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
+ * @ORM\Table(indexes={
+ *   @ORM\Index(name="external_id", columns={"external_id"})
+ * })
  */
 class TemplateQuestion
 {
     use CreateableEntity;
+    use DeleteableEntity;
     use LocalizableEntity;
 
     /**

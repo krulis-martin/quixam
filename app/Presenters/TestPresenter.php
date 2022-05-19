@@ -46,8 +46,7 @@ final class TestPresenter extends AuthenticatedPresenter
      */
     private function getEnrolledUser(string $id): ?EnrolledUser
     {
-        $enrolledUsers = $this->enrolledUsers->findBy([ 'test' => $id, 'user' => $this->user->getId() ]);
-        return $enrolledUsers ? reset($enrolledUsers) : null;
+        return $this->enrolledUsers->findOneBy([ 'test' => $id, 'user' => $this->user->getId() ]);
     }
 
     /**

@@ -2,73 +2,92 @@
 
 <h1><i class="fa-solid fa-binoculars fa-fw text-muted"></i> {block title}{_locale.dashboard.title}{/block}</h1>
 
-{if !$enrolledTests && !$registeredTests}
+{if !$tests}
 
-<p class="text-muted">
-  {_locale.dashboard.student.noTests}
-</p>
+  {if !$isSupervisor}
+    <p class="text-muted">
+      {_locale.dashboard.student.noTests}
+    </p>
+  {/if}
 
 {else}
 
-<table class="table table-hover my-3">
-  <thead>
-    <tr>
-      <th>{_locale.dashboard.table.test}</th>
-      <th>{_locale.dashboard.table.scheduledAt}</th>
-      <th>{_locale.dashboard.table.startedAt}</th>
-      <th>{_locale.dashboard.table.finishedAt}</th>
-      <th>{_locale.dashboard.table.location}</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr n:foreach="$enrolledTests as $test">
-      <td>
-        {$test->getCaption($locale)}
-        {if !$test->getSupervisors()->isEmpty()}
-          <small class="text-muted">
-            ({foreach $test->getSupervisors() as $supervisor}{$supervisor->getLastName()}{sep}, {/sep}{/foreach})
-          </small>
-        {/if}
-      </td>
-      <td>{$test->getScheduledAt()|ldate}</td>
-      <td>{$test->getStartedAt()|ldate}</td>
-      <td>{$test->getFinishedAt()|ldate}</td>
-      <td>{$test->getLocation()}</td>
-      <td>
-        {if $test->getFinishedAt()}
-          {_locale.dashboard.table.results}
-        {elseif $test->getStartedAt()}
-          <a n:href="Test:default $test->getId()">{_locale.dashboard.table.enter}</a>
-        {else}
-          <em>{_locale.dashboard.table.enrolled}</em>
-          <i class="fa-regular fa-clock fa-fw text-muted" title="{_locale.dashboard.table.waiting}"></i>
-        {/if}
-      </td>
-    </tr>
+  <table class="table table-hover align-middle my-3">
+    <thead>
+      <tr>
+        <th>{_locale.dashboard.table.test}</th>
+        <th class="text-nowrap">{_locale.dashboard.table.scheduledAt}</th>
+        <th class="text-nowrap">{_locale.dashboard.table.startedAt}</th>
+        <th class="text-nowrap">{_locale.dashboard.table.finishedAt}</th>
+        <th class="text-nowrap">{_locale.dashboard.table.location}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr n:foreach="$tests as $tidx => [ $test, $relation ]" class="{$relation === 'enrolled' && !$test->getFinishedAt() ? 'bg-warning bg-opacity-25'}">
+        <td class="w-100">
+          {$test->getCaption($locale)}
+          {if !$test->getSupervisors()->isEmpty()}
+            <small class="text-muted">
+              ({foreach $test->getSupervisors() as $supervisor}<span class="{$supervisor->getId() === $user->getId() ? 'fw-bold text-success'}">{$supervisor->getLastName()}</span>{sep}, {/sep}{/foreach})
+            </small>
+          {/if}
+        </td>
+        <td class="text-nowrap">{$test->getScheduledAt()|ldate}</td>
+        <td class="text-nowrap">{$test->getStartedAt()|ldate}</td>
+        <td class="text-nowrap">{$test->getFinishedAt()|ldate}</td>
+        <td class="text-nowrap">{$test->getLocation()}</td>
+        <td class="text-nowrap text-end">
+          {if $relation === 'supervised'}
 
-    <tr n:foreach="$registeredTests as $test">
-      <td>
-        {$test->getCaption($locale)}
-        {if !$test->getSupervisors()->isEmpty()}
-          <small class="text-muted">
-            ({foreach $test->getSupervisors() as $supervisor}{$supervisor->getLastName()}{sep}, {/sep}{/foreach})
-          </small>
-        {/if}
-      </td>
-      <td>{$test->getScheduledAt()|ldate}</td>
-      <td>{$test->getStartedAt()|ldate}</td>
-      <td>{$test->getFinishedAt()|ldate}</td>
-      <td>{$test->getLocation()}</td>
-      <td>
-        {if $test->getStartedAt()}
-        {_locale.dashboard.table.enroll}
-        {else}
-        <em>{_locale.dashboard.table.registered}</em>
-        <i class="fa-regular fa-clock fa-fw text-muted" title="{_locale.dashboard.table.waiting}"></i>
-        {/if}
-      </td>
-    </tr>
-  </tbody>
-</table>
+            {if $test->getFinishedAt()}
+              <form method="POST" action="{link RevokeFinish! id: $test->getId()}" class="d-inline"
+                data-ajax data-ajax-button="revokeFinishButton{$tidx}" data-ajax-confirm="{_locale.dashboard.table.revokeFinishConfirm}"
+              >
+                <button id="revokeFinishButton{$tidx}" type="success" class="btn btn-sm btn-danger">{_locale.dashboard.table.revokeFinish}</button>
+              </form>
+            {elseif $test->getStartedAt()}
+              <form method="POST" action="{link RevokeStart! id: $test->getId()}" class="d-inline"
+                data-ajax data-ajax-button="revokeStartButton{$tidx}" data-ajax-confirm="{_locale.dashboard.table.revokeStartConfirm}"
+              >
+                <button id="revokeStartButton{$tidx}" type="success" class="btn btn-sm btn-warning">{_locale.dashboard.table.revokeStart}</button>
+              </form>
+              <form method="POST" action="{link Finish! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="finishButton{$tidx}">
+                <button id="finishButton{$tidx}" type="success" class="btn btn-sm btn-danger">{_locale.dashboard.table.finish}</button>
+              </form>
+            {else}
+              <form method="POST" action="{link Start! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="startButton{$tidx}">
+                <button id="startButton{$tidx}" type="success" class="btn btn-sm btn-success">{_locale.dashboard.table.start}</button>
+              </form>
+            {/if}
+          
+          {else}
+            {* student relations *}
+            {if $test->getStartedAt() && $relation === 'enrolled'}
+              <a n:href="Test:default $test->getId()">
+                {if $test->getFinishedAt()}{_locale.dashboard.table.results}{else}{_locale.dashboard.table.continue}{/if}
+              </a>
+            {elseif $test->getStartedAt()}
+              {if $test->getFinishedAt()}
+                <em>{_locale.dashboard.table.missed}</em>
+              {else}
+                <form method="POST" action="{link Enroll! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="enrollButton{$tidx}">
+                  <button id="enrollButton{$tidx}" type="success" class="btn btn-sm btn-primary">{_locale.dashboard.table.enroll}</button>
+                </form>
+              {/if}
+            {else}
+              {if $relation === 'enrolled'}
+                <em>{_locale.dashboard.table.waitingEnrolled}</em>
+              {else}
+                <em>{_locale.dashboard.table.waitingRegistered}</em>
+              {/if}
+              <i class="fa-regular fa-clock fa-fw text-muted" title="{_locale.dashboard.table.waiting}"></i>
+            {/if}
+
+          {/if}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
 {/if}

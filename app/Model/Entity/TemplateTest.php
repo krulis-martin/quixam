@@ -17,6 +17,9 @@ use DateTime;
  *
  * @ORM\Entity
  * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
+ * @ORM\Table(indexes={
+ *   @ORM\Index(name="external_id", columns={"external_id"})
+ * })
  */
 class TemplateTest
 {
@@ -33,6 +36,7 @@ class TemplateTest
 
     /**
      * @ORM\OneToMany(targetEntity="TemplateQuestionsGroup", mappedBy="test")
+     * @ORM\OrderBy({"ordering" = "ASC"})
      */
     protected $questionsGroups;
 
@@ -44,7 +48,7 @@ class TemplateTest
 
     /**
      * Optional external identification of this type of tests.
-     * @ORM\Column(type="string", nullable=true, unique=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $externalId;
 
