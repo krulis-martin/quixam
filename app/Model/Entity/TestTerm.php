@@ -146,7 +146,11 @@ class TestTerm
 
     public function getSupervisors(): Collection
     {
-        return $this->supervisors;
+        return $this->supervisors->filter(
+            function (User $user) {
+                return $user->getDeletedAt() === null;
+            }
+        );
     }
 
     public function getEnrolledUsers(): Collection

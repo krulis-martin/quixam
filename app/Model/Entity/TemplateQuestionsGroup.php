@@ -16,10 +16,10 @@ use DateTime;
  * This roughly corresponds to one topic or type of questions being tested.
  *
  * @ORM\Entity
- * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  * @ORM\Table(indexes={
  *   @ORM\Index(name="external_id", columns={"external_id"})
  * })
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  */
 class TemplateQuestionsGroup
 {
@@ -141,6 +141,10 @@ class TemplateQuestionsGroup
 
     public function getQuestions(): Collection
     {
-        return $this->questions;
+        return $this->questions->filter(
+            function (TemplateQuestion $question) {
+                return $question->getDeletedAt() === null;
+            }
+        );
     }
 }

@@ -89,7 +89,11 @@ class TemplateTest
 
     public function getQuestionGroups(): Collection
     {
-        return $this->questionsGroups;
+        return $this->questionsGroups->filter(
+            function (TemplateQuestionsGroup $group) {
+                return $group->getDeletedAt() === null;
+            }
+        );
     }
 
     public function getCaption(string $locale, bool $strict = false): string

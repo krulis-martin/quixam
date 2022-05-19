@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 /**
  * @extends BaseRepository<TemplateQuestionsGroup>
  */
-class TemplateQuestionsGroups extends BaseRepository
+class TemplateQuestionsGroups extends BaseSoftDeleteRepository
 {
     public function __construct(EntityManagerInterface $em)
     {

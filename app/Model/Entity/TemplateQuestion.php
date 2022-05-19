@@ -13,10 +13,10 @@ use DateTime;
 
 /**
  * @ORM\Entity
- * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  * @ORM\Table(indexes={
  *   @ORM\Index(name="external_id", columns={"external_id"})
  * })
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  */
 class TemplateQuestion
 {

@@ -24,4 +24,10 @@ trait DeleteableEntity
     {
         return $this->deletedAt !== null;
     }
+
+    // this is for special operations only, the deletedAt value is normally set by SoftDelete pluggin...
+    public function setDeleted()
+    {
+        $this->deletedAt = new DateTime();
+    }
 }
