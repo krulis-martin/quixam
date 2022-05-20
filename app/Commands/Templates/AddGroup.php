@@ -22,7 +22,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 /**
- * A console command that creates a new user (without password).
+ * A console command that creates or replaces template questions group.
  */
 class AddGroupTemplate extends BaseCommand
 {
@@ -51,7 +51,7 @@ class AddGroupTemplate extends BaseCommand
     protected function configure()
     {
         $this->setName(self::$defaultName)->setDescription('Add/update template questions group.');
-        $this->addArgument('test', InputArgument::REQUIRED, 'External ID of test template.');
+        $this->addArgument('test', InputArgument::REQUIRED, 'External ID of the test template.');
         $this->addArgument('externalId', InputArgument::REQUIRED, 'External ID of the template questions group.');
         $this->addOption(
             'points',

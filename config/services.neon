@@ -31,6 +31,9 @@ services:
   - App\Console\RegisterUsers
   - App\Console\AddGroupTemplate
   - App\Console\AddQuestionTemplate
+  - App\Console\ShowTemplateTest
+  - App\Console\DeleteGroupTemplate
+  - App\Console\DeleteQuestionTemplate
   - App\Console\DbFill(@App\Model\Repository\Answers, @App\Model\Repository\EnrolledUsers, @App\Model\Repository\EnrollmentRegistrations, @App\Model\Repository\Questions, @App\Model\Repository\TemplateQuestions, @App\Model\Repository\TemplateQuestionsGroups, @App\Model\Repository\TemplateTests, @App\Model\Repository\TestTerms, @App\Model\Repository\Users)
 
 extensions:

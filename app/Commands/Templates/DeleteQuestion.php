@@ -10,7 +10,6 @@ use App\Model\Entity\TemplateQuestionsGroup;
 use App\Model\Repository\TemplateTests;
 use App\Model\Repository\TemplateQuestions;
 use App\Model\Repository\TemplateQuestionsGroups;
-use App\Helpers\QuestionFactory;
 use DateTime;
 use DateInterval;
 use Exception;
@@ -23,11 +22,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 /**
- * A console command that creates or replaces template question.
+ * A console command that soft-deletes given template question.
  */
-class AddQuestionTemplate extends BaseCommand
+class DeleteQuestionTemplate extends BaseCommand
 {
-    protected static $defaultName = 'templates:addQuestion';
+    protected static $defaultName = 'templates:deleteQuestion';
 
     /** @var TemplateTests */
     private $templateTests;
@@ -38,32 +37,23 @@ class AddQuestionTemplate extends BaseCommand
     /** @var TemplateQuestionsGroups */
     private $templateQuestionsGroups;
 
-    /** @var QuestionFactory */
-    private $questionFactory;
-
     public function __construct(
         TemplateTests $templateTests,
         TemplateQuestions $templateQuestions,
-        TemplateQuestionsGroups $templateQuestionsGroups,
-        QuestionFactory $questionFactory
+        TemplateQuestionsGroups $templateQuestionsGroups
     ) {
         parent::__construct();
         $this->templateTests = $templateTests;
         $this->templateQuestions = $templateQuestions;
         $this->templateQuestionsGroups = $templateQuestionsGroups;
-        $this->questionFactory = $questionFactory;
     }
 
     protected function configure()
     {
-        $this->setName(self::$defaultName)->setDescription('Add/update template question.');
+        $this->setName(self::$defaultName)->setDescription('Soft-delete template question.');
         $this->addArgument('test', InputArgument::REQUIRED, 'External ID of the test template.');
         $this->addArgument('group', InputArgument::REQUIRED, 'External ID of the template questions group.');
         $this->addArgument('externalId', InputArgument::REQUIRED, 'External ID of the template questions.');
-        $this->addArgument('dataFile', InputArgument::REQUIRED, 'Path to JSON data file.');
-        $this->addOption('type', null, InputOption::VALUE_OPTIONAL, 'Question type');
-        $this->addOption('caption_en', null, InputOption::VALUE_OPTIONAL, 'English translation of the caption.');
-        $this->addOption('caption_cs', null, InputOption::VALUE_OPTIONAL, 'Czech translation of the caption.');
     }
 
     /**
@@ -94,38 +84,6 @@ class AddQuestionTemplate extends BaseCommand
         return $group;
     }
 
-    protected function getCaption(): array
-    {
-        if ($this->input->getOption('caption_en') === null) {
-            throw new RuntimeException("English caption must be present.");
-        }
-
-        $caption = [ 'en' => trim($this->input->getOption('caption_en')) ];
-        if ($this->input->getOption('caption_cs') !== null) {
-            $caption['cs'] = trim($this->input->getOption('caption_cs'));
-        }
-        return $caption;
-    }
-
-    protected function getQuestionData()
-    {
-        $filePath = $this->input->getArgument('dataFile');
-        if (!file_exists($filePath) || !is_file($filePath) || !is_readable($filePath)) {
-            throw new RuntimeException("File '$filePath' does not exist.");
-        }
-
-        $data = json_decode(file_get_contents($filePath));
-
-        $type = $this->input->getOption('type') ?? '';
-        $questionData = $this->questionFactory->create($type);
-
-        for ($seed = 0; $seed < 20; ++$seed) {
-            $questionData->instantiate($data, $seed); // throws on error
-        }
-
-        return $data;
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -142,30 +100,14 @@ class AddQuestionTemplate extends BaseCommand
                 'questionsGroup' => $group->getId()
             ]);
 
-            // prepare question data
-            $caption = $this->getCaption();
-            $captionJson = json_encode($caption);
-            $type = $input->getOption('type');
-            $data = $this->getQuestionData();
-            $dataJson = $data === null ? '' : json_encode($data);
-
-            if (
-                $question
-                && $question->getCaptionRaw() === $captionJson
-                && $question->getType() === $type
-                && $question->getDataRaw() === $dataJson
-            ) {
-                $output->writeln("Nothing changed in question '$questionId', ending without update.");
+            if (!$question) {
+                $output->writeln("Question '$questionId' does not exist.");
                 return Command::SUCCESS;
             }
 
-            $output->writeln("Creating '$questionId' template question ...");
-            $newQuestion = new TemplateQuestion($group, $type, $caption, $data, $questionId, $question);
-            $this->templateQuestions->persist($newQuestion);
-
-            if (!empty($question)) {
-                $this->templateQuestions->remove($question);
-            }
+            $this->templateQuestions->remove($question);
+            $this->templateQuestions->flush();
+            $output->writeln("Question '$questionId' was deleted.");
 
             return Command::SUCCESS;
         } catch (Exception $e) {
