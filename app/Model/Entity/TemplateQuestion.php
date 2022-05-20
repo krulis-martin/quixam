@@ -154,4 +154,9 @@ class TemplateQuestion
 
         return json_decode($this->data, true);
     }
+
+    public function getDataRaw(): string
+    {
+        return $this->data;
+    }
 }

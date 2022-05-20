@@ -9,7 +9,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * @extends BaseRepository<TemplateQuestionsGroup>
+ * @extends BaseSoftDeleteRepository<TemplateQuestionsGroup>
  */
 class TemplateQuestionsGroups extends BaseSoftDeleteRepository
 {
