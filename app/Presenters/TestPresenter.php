@@ -58,21 +58,21 @@ final class TestPresenter extends AuthenticatedPresenter
      */
     private function getSelectedQuestion(array $questions, bool $testFinished): int
     {
-        $res = $testFinished ? 0 : count($questions);
+        $res = count($questions);
         foreach ($questions as $idx => $question) {
             if ($this->question && $this->question === $question->getId()) {
                 return $idx; // explicit selection by a parameter
             }
 
-            if ($testFinished && $question->getLastAnswer()) {
-                return $idx; // test finished -> looking for first answered question
+            if ($testFinished && $idx < $res && $question->getLastAnswer()) {
+                $res = $idx; // test finished -> looking for first answered question
             }
             if (!$testFinished && $idx < $res && $question->getLastAnswer() === null) {
                 $res = $idx; // not finished -> looking for first unanswered question
             }
         }
 
-        return $res;
+        return ($testFinished && $res >= count($questions)) ? 0 : $res;
     }
 
     /**

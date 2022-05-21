@@ -114,7 +114,7 @@ class AddQuestionTemplate extends BaseCommand
             throw new RuntimeException("File '$filePath' does not exist.");
         }
 
-        $data = json_decode(file_get_contents($filePath));
+        $data = json_decode(file_get_contents($filePath), true);
 
         $type = $this->input->getOption('type') ?? '';
         $questionData = $this->questionFactory->create($type);

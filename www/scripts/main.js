@@ -120,4 +120,11 @@ $(() => {
         });
     }
   });
+
+  window.addEventListener("beforeunload", () => {
+    $("#blanket").show();
+  });
+
+  // finally remove the blanket
+  $("#blanket").hide();
 });
