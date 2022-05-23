@@ -21,6 +21,12 @@
   {$test->getFinishedAt()|ldate}
 </span>
 {/if}
+{if $enrolledUser->hasScore()}
+<strong class="d-inline-block float-lg-end">
+  <span class="text-muted">{_locale.test.awardedPoints}:</span>
+  {$enrolledUser->getScore()} {_locale.test.pointsOf} {$enrolledUser->getMaxScore()}
+</strong>
+{/if}
 
 {if $test->getStartedAt() !== null}
 
