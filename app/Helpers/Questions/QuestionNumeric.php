@@ -165,7 +165,7 @@ final class QuestionNumeric extends BaseQuestion
         $answer = [];
         foreach ($postData['answer'] as $strNum) {
             $strNum = trim($strNum);
-            if (!$strNum) {
+            if ($strNum === '') {
                 continue; // skip empty slots
             }
 

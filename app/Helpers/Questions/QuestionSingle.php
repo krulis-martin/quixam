@@ -83,7 +83,7 @@ final class QuestionSingle extends BaseChoiceQuestion
 
     public function isAnswerValid($answer): bool
     {
-        return $answer === null || (is_int($answer) && array_key_exists($answer, $this->answers));
+        return is_int($answer) && array_key_exists($answer, $this->answers);
     }
 
     public function isAnswerCorrect($answer): bool

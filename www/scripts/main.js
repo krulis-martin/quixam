@@ -19,6 +19,7 @@ $(() => {
       )
     );
     $("#flashes").append(msg);
+    msg[0].scrollIntoView();
   }
 
   /**

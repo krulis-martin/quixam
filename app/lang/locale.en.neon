@@ -98,3 +98,4 @@ test.alreadyAnsweredInfo: "This question was already answered, but you can chang
 test.completed.title: "Test completed!"
 test.completed.message1: "All the questions have been answered. You may revise your answers or simply wait for the results."
 test.completed.message2: "The results will become available after the test is switched to the finished state by the supervisor."
+test.error.invalidAnswer: "The submitted answer was not saved since it is not valid."

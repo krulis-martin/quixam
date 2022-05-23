@@ -24,7 +24,7 @@
 
 {if !$readonly}
 <script type="text/javascript">
-(() => {
+$(() => {
     // special handlers for add/remove buttons
     const template = $("#numeric-answers div");
     template.detach();
@@ -61,6 +61,28 @@
     });
 
 
+    // validation
+    const validate = () => {
+        var isValid = true;
+        var numbers = 0;
+        $("#numeric-answers input").removeClass('is-valid').removeClass('is-invalid');
+        $("#numeric-answers input").each(function() {
+            const value = $(this).val().trim();
+            if (value) {
+                if (value.match(/^(-?[0-9]+|0[xX][0-9a-fA-F]+|0[bB][01]+)$/)) {
+                    ++numbers;
+                } else {
+                    isValid = false;
+                    $(this).addClass('is-invalid');
+                }
+            }
+        });
+
+        $("#saveButton").prop('disabled', !isValid || numbers < minCount || numbers > maxCount);
+    };
+
+    template.find("input").on('input', validate);
+
     // initialize
     const values = $("#numeric-answers").data("values").toString();
     if (values) {
@@ -73,6 +95,7 @@
         $("#numeric-answers").append(template.clone(true));
     }
     checkButtonsVisibility();
-})();
+    validate();
+});
 </script>
 {/if}

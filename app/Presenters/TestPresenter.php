@@ -112,7 +112,7 @@ final class TestPresenter extends AuthenticatedPresenter
         $req = $this->getRequest();
         $answer = $questionData->processAnswerSubmit($req->getPost());
         if (!$questionData->isAnswerValid($answer)) {
-            $this->finalizePostError(json_encode($answer));
+            $this->finalizePostError($this->translator->translate('locale.test.error.invalidAnswer'));
         }
 
         // save the answer

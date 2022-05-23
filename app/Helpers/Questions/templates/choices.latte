@@ -25,3 +25,16 @@
         </tr>
     </tbody>
 </table>
+
+{if $type === "radio"}
+<script type="text/javascript">
+$(() => {
+    const validate = () => {
+        $("#saveButton").prop('disabled', $("input[name='answer']:checked").length !== 1);
+    }
+    
+    $("input[name='answer']").change(validate);
+    validate();
+});
+</script>
+{/if}

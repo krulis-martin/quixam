@@ -98,3 +98,4 @@ test.alreadyAnsweredInfo: "Tato otázka již byla zodpovězena, ale můžete va�
 test.completed.title: "Test dokončen!"
 test.completed.message1: "Všechny otázky byly zodpovězeny. Můžete ještě jednou zkontrolovat vaše odpovědi nebo počkat na vyhodnocení testu."
 test.completed.message2: "Vaše výsledky budou k dispozici až zkoušející ukončí test."
+test.error.invalidAnswer: "Zdaná odpověď není platná, a proto nebyla uložena."
