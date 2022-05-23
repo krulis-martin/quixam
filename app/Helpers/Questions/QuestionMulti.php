@@ -27,7 +27,7 @@ final class QuestionMulti extends BaseChoiceQuestion
         try {
             $templateJson = self::normalize(self::schemaOfTemplate(), $templateJson);
         } catch (Exception $e) {
-            throw new QuestionException("Invalid question template, answer text does not have valid format.", $e);
+            throw new QuestionException("Invalid question template, the data do not have a valid structure.", $e);
         }
 
         if (!is_array($templateJson['correct'])) {

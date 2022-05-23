@@ -1,6 +1,8 @@
 locales.en: "Angličtina"
 locales.cs: "Čeština"
 
+answer: "Odpověď"
+
 role.student: "Student"
 role.teacher: "Vyučující"
 role.admin: "Administrátor"

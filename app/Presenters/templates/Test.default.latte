@@ -62,11 +62,11 @@
       &ndash; {$selectedQuestion->getCaption($locale)}
 
       {if $test->getFinishedAt() !== null}
-        <span class="badge {$answer?->getPoints() ? 'bg-success' : 'bg-danger'} float-end mt-1 fs-6">
+        <span class="badge {$answer?->getPoints() ? 'bg-success' : 'bg-danger'} float-sm-end mt-1 ms-3 fs-6">
           {_locale.test.points}: {(int)$answer?->getPoints()} {_locale.test.pointsOf} {$selectedQuestion->getPoints()}
         </span>
       {else}
-        <span class="badge bg-secondary float-end mt-1 fs-6">{_locale.test.points}: {$selectedQuestion->getPoints()}</span>
+        <span class="badge bg-secondary float-sm-end mt-1 ms-3 fs-6">{_locale.test.points}: {$selectedQuestion->getPoints()}</span>
       {/if}
     {/if}
   </h3>

@@ -1,0 +1,78 @@
+<div class="container-fluid mt-4">
+<div class="row">
+    <div class="col col-auto mb-2 pt-1">
+        <strong>{_locale.answer}:</strong>
+    </div>
+
+    <div id="numeric-answers" class="col col-12 col-md-10 col-lg-8 col-xl-6 col-xxl-5" data-values="{join(' ', $answer)}" data-min-count="1" data-max-count="{$maxCount}">
+        {if $readonly}
+            <div class="input-group mb-2" n:foreach="($answer ? $answer : ['']) as $value">
+                <input type="text" class="form-control {$inputClass ?? ''}" value="{$value}" readonly>
+            </div>
+        {else}
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" name="answer[]"}>
+                {if $maxCount > 1}
+                <button class="btn btn-outline-danger" type="button" data-action="remove"><i class="fa-regular fa-circle-xmark"></i></button>
+                <button class="btn btn-outline-success" type="button" data-action="add"><i class="fa-solid fa-circle-plus"></i></button>
+                {/if}
+            </div>
+        {/if}
+    </div>
+</div>
+</div>
+
+{if !$readonly}
+<script type="text/javascript">
+(() => {
+    // special handlers for add/remove buttons
+    const template = $("#numeric-answers div");
+    template.detach();
+
+    const minCount = $("#numeric-answers").data("minCount") === undefined ? 1 : parseInt($("#numeric-answers").data("minCount"));
+    const maxCount = $("#numeric-answers").data("maxCount") === undefined ? 10 : parseInt($("#numeric-answers").data("maxCount"));
+
+    // show/hide add/remove buttons based on the number of present inputs
+    const checkButtonsVisibility = () => {
+        var count = $("#numeric-answers input").length;
+        $("#numeric-answers button[data-action='remove']").prop('disabled', count <= minCount);
+        $("#numeric-answers button[data-action='add']").prop('disabled', count >= maxCount);
+    }
+
+
+    // button handlers
+    template.find("button[data-action='remove']").click(function() {
+        var count = $("#numeric-answers input").length;
+        if (count > minCount) {
+            $(this).closest("div.input-group").slideUp(300, function() {
+                $(this).remove();
+                checkButtonsVisibility();
+            });
+        }
+    });
+
+    template.find("button[data-action='add']").click(function() {
+        var count = $("#numeric-answers input").length;
+        if (count < maxCount) {
+            var newInput = template.clone(true);
+            newInput.hide().insertAfter($(this).closest("div.input-group")).slideDown(300);
+            checkButtonsVisibility();
+        }
+    });
+
+
+    // initialize
+    const values = $("#numeric-answers").data("values").toString();
+    if (values) {
+        values.split(' ').forEach(value => {
+            var input = template.clone(true);
+            input.find("input").val(value);
+            $("#numeric-answers").append(input);
+        });
+    } else {
+        $("#numeric-answers").append(template.clone(true));
+    }
+    checkButtonsVisibility();
+})();
+</script>
+{/if}

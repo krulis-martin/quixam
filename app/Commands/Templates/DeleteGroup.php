@@ -39,7 +39,6 @@ class DeleteGroupTemplate extends BaseCommand
     ) {
         parent::__construct();
         $this->templateTests = $templateTests;
-        $this->templateQuestions = $templateQuestions;
         $this->templateQuestionsGroups = $templateQuestionsGroups;
     }
 

@@ -55,6 +55,11 @@ nav.navbar {
     box-shadow: 0 1px 6px #999;
 }
 
+.btn.disabled, .btn:disabled, fieldset:disabled .btn {
+    opacity: 0.4;
+    filter: grayscale(50%);
+}
+
 /*
  * Markdown
  */

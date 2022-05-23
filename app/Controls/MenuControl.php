@@ -34,7 +34,7 @@ class MenuControl extends Control
         /** @var \App\Presenters\BasePresenter */
         $presenter = $this->getPresenter();
         $presenter->getUser()->logout();
-        $presenter->finalizePost($this->link('this'));
+        $presenter->finalizePost($presenter->link('Login:default'));
     }
 
     public function render(): void

@@ -12,6 +12,7 @@ services:
   - App\Helpers\QuestionFactory([
       single: App\Helpers\Questions\QuestionSingle,
       multi: App\Helpers\Questions\QuestionMulti,
+      numeric: App\Helpers\Questions\QuestionNumeric,
     ])
 
   # DB repositories
