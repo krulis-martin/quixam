@@ -72,6 +72,9 @@ final class DashboardPresenter extends AuthenticatedPresenter
      * Signals
      */
 
+    /**
+     * Start button pressed (test goes from planned -> started).
+     */
     public function handleStart(string $id)
     {
         $test = $this->getTestForModification($id);
@@ -83,6 +86,9 @@ final class DashboardPresenter extends AuthenticatedPresenter
         $this->finalizePost($this->link('this'));
     }
 
+    /**
+     * Finish button pressed (test goes from started -> finished).
+     */
     public function handleFinish(string $id)
     {
         $test = $this->getTestForModification($id);
@@ -105,6 +111,9 @@ final class DashboardPresenter extends AuthenticatedPresenter
         $this->finalizePost($this->link('this'));
     }
 
+    /**
+     * Revoke start button pressed (test goes from started -> planned).
+     */
     public function handleRevokeStart(string $id)
     {
         $test = $this->getTestForModification($id);
@@ -116,6 +125,9 @@ final class DashboardPresenter extends AuthenticatedPresenter
         $this->finalizePost($this->link('this'));
     }
 
+    /**
+     * Revoke start button pressed (test goes from finished -> started).
+     */
     public function handleRevokeFinish(string $id)
     {
         $test = $this->getTestForModification($id);
@@ -127,6 +139,10 @@ final class DashboardPresenter extends AuthenticatedPresenter
         $this->finalizePost($this->link('this'));
     }
 
+    /**
+     * Enroll button pressed, the enrolled user entity is created for registered user.
+     * Also the complete instance of the test is generated at this very moment.
+     */
     public function handleEnroll(string $id)
     {
         $test = $this->getTest($id);
@@ -180,14 +196,15 @@ final class DashboardPresenter extends AuthenticatedPresenter
                 ? $this->testTerms->findBy([ 'archivedAt' => null ])
                 : $this->testTerms->getTermsUserSupervises($this->user);
             foreach ($supervisedTests as $test) {
-                $tests[] = [ $test, 'supervised' ];
+                $tests[] = [ $test, 'supervised', null ];
             }
         }
-        foreach ($this->testTerms->getTermsUserIsEnrolledFor($this->user) as $test) {
-            $tests[] = [ $test, 'enrolled' ];
+
+        foreach ($this->enrolledUsers->findBy([ 'user' => $this->user->getId() ]) as $enrolled) {
+            $tests[] = [ $enrolled->getTest(), 'enrolled', $enrolled ];
         }
-        foreach ($this->testTerms->getTermsUserIsRegisteredFor($this->user) as $test) {
-            $tests[] = [ $test, 'registered' ];
+        foreach ($this->enrollmentRegistrations->findBy([ 'user' => $this->user->getId() ]) as $registered) {
+            $tests[] = [ $registered->getTest(), 'registered', $registered ];
         }
         $this->template->tests = $tests;
     }
