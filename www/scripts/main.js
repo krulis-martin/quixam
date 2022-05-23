@@ -121,6 +121,9 @@ $(() => {
     }
   });
 
+  // Initialize highlighting
+  hljs.highlightAll();
+
   window.addEventListener("beforeunload", () => {
     $("#blanket").show();
   });

@@ -66,3 +66,26 @@ nav.navbar {
 .markdown p:last-of-type {
     margin-bottom: 0;
 }
+
+.markdown code {
+    color: #060;
+}
+
+.markdown pre {
+    margin: 1rem 0;
+}
+
+.markdown table {
+    margin: 1rem auto;
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+}
+
+.markdown table td, .markdown table th {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+}
+
+.markdown table th {
+    background-color: #e4eee4;
+}
