@@ -42,7 +42,9 @@
         <td class="text-nowrap">{$test->getLocation()}</td>
         <td class="text-nowrap">
           {if $isSupervisor}
-            {$test->getEnrolledUsers()->count()}{if $test->getRegistrations()->count() > 0} ({$test->getRegistrations()->count()} reg){/if}
+            <a n:href="Test:enrolled $test->getId()">
+              {$test->getEnrolledUsers()->count()}{if $test->getRegistrations()->count() > 0} ({$test->getRegistrations()->count()} reg){/if}
+            </a>
           {else}
             {if $relation === 'enrolled' && $relationObj->hasScore()}
               <strong>{$relationObj->getScore()} {_locale.test.pointsOf} {$relationObj->getMaxScore()}</strong>
@@ -56,20 +58,20 @@
               <form method="POST" action="{link RevokeFinish! id: $test->getId()}" class="d-inline"
                 data-ajax data-ajax-button="revokeFinishButton{$tidx}" data-ajax-confirm="{_locale.dashboard.table.revokeFinishConfirm}"
               >
-                <button id="revokeFinishButton{$tidx}" type="success" class="btn btn-sm btn-danger">{_locale.dashboard.table.revokeFinish}</button>
+                <button id="revokeFinishButton{$tidx}" type="submit" class="btn btn-sm btn-danger">{_locale.dashboard.table.revokeFinish}</button>
               </form>
             {elseif $test->getStartedAt()}
               <form method="POST" action="{link RevokeStart! id: $test->getId()}" class="d-inline"
                 data-ajax data-ajax-button="revokeStartButton{$tidx}" data-ajax-confirm="{_locale.dashboard.table.revokeStartConfirm}"
               >
-                <button id="revokeStartButton{$tidx}" type="success" class="btn btn-sm btn-warning">{_locale.dashboard.table.revokeStart}</button>
+                <button id="revokeStartButton{$tidx}" type="submit" class="btn btn-sm btn-warning">{_locale.dashboard.table.revokeStart}</button>
               </form>
               <form method="POST" action="{link Finish! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="finishButton{$tidx}">
-                <button id="finishButton{$tidx}" type="success" class="btn btn-sm btn-danger">{_locale.dashboard.table.finish}</button>
+                <button id="finishButton{$tidx}" type="submit" class="btn btn-sm btn-danger">{_locale.dashboard.table.finish}</button>
               </form>
             {else}
               <form method="POST" action="{link Start! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="startButton{$tidx}">
-                <button id="startButton{$tidx}" type="success" class="btn btn-sm btn-success">{_locale.dashboard.table.start}</button>
+                <button id="startButton{$tidx}" type="submit" class="btn btn-sm btn-success">{_locale.dashboard.table.start}</button>
               </form>
             {/if}
           

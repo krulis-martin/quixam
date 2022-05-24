@@ -30,6 +30,7 @@ class Answer
 
     /**
      * @ORM\ManyToOne(targetEntity="Question", inversedBy="answers")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $question;
 

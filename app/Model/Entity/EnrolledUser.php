@@ -39,7 +39,7 @@ class EnrolledUser
     protected $user;
 
     /**
-     * @ORM\OneToMany(targetEntity="Question", mappedBy="enrolledUser")
+     * @ORM\OneToMany(targetEntity="Question", mappedBy="enrolledUser", cascade={"persist", "remove"})
      * @ORM\OrderBy({"ordering" = "ASC"})
      */
     protected $questions;

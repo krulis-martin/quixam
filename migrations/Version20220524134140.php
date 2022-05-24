@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20220519135419 extends AbstractMigration
+final class Version20220524134140 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -30,12 +30,12 @@ final class Version20220519135419 extends AbstractMigration
         $this->addSql('CREATE TABLE test_term (id CHAR(36) NOT NULL COMMENT \'(DC2Type:guid)\', template_id CHAR(36) DEFAULT NULL COMMENT \'(DC2Type:guid)\', scheduled_at DATETIME DEFAULT NULL, started_at DATETIME DEFAULT NULL, finished_at DATETIME DEFAULT NULL, archived_at DATETIME DEFAULT NULL, location VARCHAR(255) NOT NULL, note VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, deleted_at DATETIME DEFAULT NULL, INDEX IDX_A076CD425DA0FB8 (template_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE test_term_supervisor (test_term_id CHAR(36) NOT NULL COMMENT \'(DC2Type:guid)\', user_id CHAR(36) NOT NULL COMMENT \'(DC2Type:guid)\', INDEX IDX_44B1A6CD26DE134 (test_term_id), INDEX IDX_44B1A6CA76ED395 (user_id), PRIMARY KEY(test_term_id, user_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user (id CHAR(36) NOT NULL COMMENT \'(DC2Type:guid)\', first_name VARCHAR(255) NOT NULL, last_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, is_verified TINYINT(1) NOT NULL, role VARCHAR(255) NOT NULL, password_hash VARCHAR(255) DEFAULT NULL, external_id VARCHAR(255) DEFAULT NULL, last_authentication_at DATETIME DEFAULT NULL, created_at DATETIME NOT NULL, deleted_at DATETIME DEFAULT NULL, UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), UNIQUE INDEX UNIQ_8D93D6499F75D7B0 (external_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE answer ADD CONSTRAINT FK_DADD4A251E27F6BF FOREIGN KEY (question_id) REFERENCES question (id)');
+        $this->addSql('ALTER TABLE answer ADD CONSTRAINT FK_DADD4A251E27F6BF FOREIGN KEY (question_id) REFERENCES question (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE enrolled_user ADD CONSTRAINT FK_3A059C131E5D0459 FOREIGN KEY (test_id) REFERENCES test_term (id)');
         $this->addSql('ALTER TABLE enrolled_user ADD CONSTRAINT FK_3A059C13A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE enrollment_registration ADD CONSTRAINT FK_C16C31631E5D0459 FOREIGN KEY (test_id) REFERENCES test_term (id)');
         $this->addSql('ALTER TABLE enrollment_registration ADD CONSTRAINT FK_C16C3163A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
-        $this->addSql('ALTER TABLE question ADD CONSTRAINT FK_B6F7494ED5BFE9BA FOREIGN KEY (enrolled_user_id) REFERENCES enrolled_user (id)');
+        $this->addSql('ALTER TABLE question ADD CONSTRAINT FK_B6F7494ED5BFE9BA FOREIGN KEY (enrolled_user_id) REFERENCES enrolled_user (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE question ADD CONSTRAINT FK_B6F7494EF9BBA6B4 FOREIGN KEY (template_questions_group_id) REFERENCES template_questions_group (id)');
         $this->addSql('ALTER TABLE question ADD CONSTRAINT FK_B6F7494E15DEE2DB FOREIGN KEY (template_question_id) REFERENCES template_question (id)');
         $this->addSql('ALTER TABLE question ADD CONSTRAINT FK_B6F7494EBDFC9701 FOREIGN KEY (last_answer_id) REFERENCES answer (id)');

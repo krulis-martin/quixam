@@ -31,6 +31,7 @@ class Question
 
     /**
      * @ORM\ManyToOne(targetEntity="EnrolledUser", inversedBy="questions")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $enrolledUser;
 
@@ -47,7 +48,7 @@ class Question
     protected $templateQuestion;
 
     /**
-     * @ORM\OneToMany(targetEntity="Answer", mappedBy="question")
+     * @ORM\OneToMany(targetEntity="Answer", mappedBy="question", cascade={"persist", "remove"})
      */
     protected $answers;
 
@@ -55,7 +56,7 @@ class Question
      * This is a reference to the last (by createdAt) answer to this question.
      * This is an optimization to speed up displaying of the results.
      *
-     * @ORM\OneToOne(targetEntity="Answer", fetch="EAGER")
+     * @ORM\OneToOne(targetEntity="Answer", fetch="EAGER", cascade={"persist", "detach"})
      * @var Answer|null
      */
     protected $lastAnswer = null;
@@ -152,7 +153,7 @@ class Question
         return $this->lastAnswer;
     }
 
-    public function setLastAnswer(Answer $answer): void
+    public function setLastAnswer(?Answer $answer): void
     {
         $this->lastAnswer = $answer;
     }

@@ -1,0 +1,97 @@
+{block content}
+
+<h1>
+  <i class="fa-solid fa-users-between-lines fa-fw text-muted"></i>
+  {block title}{_locale.enrolledUsers.title}{/block}
+</h1>
+
+<h4 class="mt-4">{$test->getCaption($locale)}, {$test->getScheduledAt()|ldate}</h4>
+
+<span class="d-inline-block me-4">
+  <span class="text-muted">{_locale.test.supervisors}:</span>
+  {foreach $test->getSupervisors() as $supervisor}{$supervisor->getFirstName()} {$supervisor->getLastName()}{sep}, {/sep}{/foreach}
+</span>
+<span class="d-inline-block me-4">
+  <span class="text-muted">{_locale.test.startedAt}:</span>
+  {$test->getStartedAt()|ldate}
+</span>
+{if $test->getFinishedAt() !== null}
+<span class="d-inline-block me-4">
+  <span class="text-muted">{_locale.test.finishedAt}:</span>
+  {$test->getFinishedAt()|ldate}
+</span>
+{/if}
+
+{if !$test->getEnrolledUsers()->isEmpty()}
+<table class="table table-hover align-middle mt-4">
+  <thead>
+    </tr>
+      <th class="text-nowrap">{_locale.enrolledUsers.lastName}</th>
+      <th class="text-nowrap">{_locale.enrolledUsers.firstName}</th>
+      <th class="text-nowrap">{_locale.enrolledUsers.email}</th>
+      <th class="text-nowrap">{_locale.enrolledUsers.externalId}</th>
+      <th class="text-nowrap text-center">
+        {if $test->getFinishedAt()}
+          {_locale.enrolledUsers.points}
+        {else}
+          {_locale.enrolledUsers.answers}
+        {/if}
+      </th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr n:foreach="$test->getEnrolledUsers() as $idx => $enrolledUser">
+      <td class="text-nowrap">{$enrolledUser->getUser()->getLastName()}</td>
+      <td class="text-nowrap">{$enrolledUser->getUser()->getFirstName()}</td>
+      <td class="text-nowrap"><a href="mailto:{$enrolledUser->getUser()->getEmail()}">{$enrolledUser->getUser()->getEmail()}</a></td>
+      <td class="text-nowrap">{$enrolledUser->getUser()->getExternalId()}</td>
+      <td class="text-nowrap text-center">
+        {if $test->getFinishedAt() && $enrolledUser->hasScore()}
+          {$enrolledUser->getScore()}
+        {else}
+          TODO
+        {/if}
+      </td>
+      <td class="text-nowrap text-end w-0">
+        <a href="#">{_locale.enrolledUsers.detail}</a>
+        <form method="POST" action="{link DeleteEnrolled! id: $enrolledUser->getId()}" class="d-inline ms-2"
+          data-ajax data-ajax-button="deleteEnrolledButton{$idx}"
+          data-ajax-confirm="{_locale.enrolledUsers.deleteEnrolledWarning1}" data-ajax-confirm2="{_locale.enrolledUsers.deleteEnrolledWarning2}">
+          <button id="deleteEnrolledButton{$idx}" type="submit" class="btn btn-sm btn-danger">{_locale.enrolledUsers.deleteEnrolled}</button>
+        </form>
+      </td>
+    </tr>
+  </tbody>
+</table>
+{/if}
+
+{if !$test->getRegistrations()->isEmpty()}
+<h5 class="mt-4">{_locale.enrolledUsers.registrations}</h5>
+<table class="table table-hover align-middle">
+  <thead>
+    </tr>
+      <th class="text-nowrap">{_locale.enrolledUsers.email}</th>
+      <th class="text-nowrap">{_locale.enrolledUsers.externalId}</th>
+      <th class="text-nowrap">{_locale.enrolledUsers.matchedUser}</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr n:foreach="$test->getRegistrations() as $idx => $registration">
+      <td class="text-nowrap w-25"><a href="mailto:{$registration->getEmail()}">{$registration->getEmail()}</a></td>
+      <td class="text-nowrap w-25">{$registration->getExternalId()}</td>
+      <td class="text-nowrap w-50">
+        {if $registration->getUser()}
+          {$registration->getUser()->getLastName()} {$registration->getUser()->getFirstName()}
+        {/if}
+      </td>
+      <td class="text-nowrap w-0 text-end">
+        <form method="POST" action="{link DeleteRegistration! id: $registration->getId()}" class="d-inline" data-ajax data-ajax-button="deleteRegistrationButton{$idx}">
+          <button id="deleteRegistrationButton{$idx}" type="submit" class="btn btn-sm btn-danger">{_locale.enrolledUsers.deleteRegistration}</button>
+        </form>
+      </td>
+    </tr>
+  </tbody>
+</table>
+{/if}

@@ -108,7 +108,11 @@ final class QuestionNumeric extends BaseQuestion
     }
 
     /**
-     *
+     * Helper function that renders the numeric template with given parameters.
+     * @param Engine $latte engine for rendering latte templates (separately from the presenters)
+     * @param mixed $answer
+     * @param array $params
+     * @return string rendered template
      */
     private function renderNumericTeplate(Engine $latte, $answer, array $params = []): string
     {

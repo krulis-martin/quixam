@@ -47,7 +47,6 @@ $(() => {
         addAjaxError(res.error);
       }
       if (res.redirect) {
-        $("body").addClass("opacity-25");
         location.assign(res.redirect);
       }
     });
@@ -64,6 +63,13 @@ $(() => {
       if (
         form.dataset.ajaxConfirm &&
         !window.confirm(form.dataset.ajaxConfirm)
+      ) {
+        return;
+      }
+
+      if (
+        form.dataset.ajaxConfirm2 &&
+        !window.confirm(form.dataset.ajaxConfirm2)
       ) {
         return;
       }

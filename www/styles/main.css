@@ -60,6 +60,10 @@ nav.navbar {
     filter: grayscale(50%);
 }
 
+.w-0 {
+    width: 0;
+}
+
 /*
  * Markdown
  */
