@@ -127,7 +127,8 @@ final class TestPresenter extends AuthenticatedPresenter
         $question->setLastAnswer($answerEntity);
         $this->questions->persist($question);
 
-        $this->finalizePost($this->link('default', [ 'id' => $id, 'question' => null ]));
+        $next = $req->getPost('nextQuestion');
+        $this->finalizePost($this->link('default', [ 'id' => $id, 'question' => $next ? $next : null ]));
     }
 
 
@@ -153,6 +154,9 @@ final class TestPresenter extends AuthenticatedPresenter
 
             $this->template->questions = $questions;
             $this->template->selectedQuestionIdx = $selectedQuestionIdx;
+            $this->template->previousQuestion = $selectedQuestionIdx > 0 ? $questions[$selectedQuestionIdx - 1] : null;
+            $this->template->nextQuestion = $selectedQuestionIdx < count($questions) - 1
+                ? $questions[$selectedQuestionIdx + 1] : null;
             if ($selectedQuestionIdx < count($questions)) {
                 $this->template->selectedQuestion = $selectedQuestion = $questions[$selectedQuestionIdx];
                 $this->template->selectedQuestionId = $selectedQuestion->getId();

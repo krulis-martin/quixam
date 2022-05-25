@@ -84,6 +84,12 @@ class TestTerm
     protected $location;
 
     /**
+     * Optional external identification.
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $externalId;
+
+    /**
      * Additional localized note from the supervisor to the students.
      * @ORM\Column(type="string")
      */
@@ -93,12 +99,14 @@ class TestTerm
      * @param TemplateTest $template
      * @param DateTime|null $scheduledAt
      * @param string $location
+     * @param string $externalId
      * @param string|array $note
      */
     public function __construct(
         TemplateTest $template,
         ?DateTime $scheduledAt = null,
         string $location = '',
+        ?string $externalId = null,
         $note = ''
     ) {
         $this->createdAt = new DateTime();
@@ -108,6 +116,7 @@ class TestTerm
         $this->registrations = new ArrayCollection();
         $this->scheduledAt = $scheduledAt;
         $this->location = $location;
+        $this->externalId = $externalId;
 
         if (!is_array($note)) {
             $note = [ 'en' => (string)$note ];
@@ -132,11 +141,6 @@ class TestTerm
     public function getCaption(string $locale, bool $strict = false): string
     {
         return $this->getTemplate()->getLocalizedProperty('caption', $locale, $strict);
-    }
-
-    public function getExternalId(): ?string
-    {
-        return $this->getTemplate()->getExternalId();
     }
 
     public function getCourseId(): ?string
@@ -221,6 +225,16 @@ class TestTerm
     public function setLocation(string $location)
     {
         $this->location = $location;
+    }
+
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+    public function setExternalId(?string $externalId): void
+    {
+        $this->externalId = $externalId;
     }
 
     public function getNote(string $locale, bool $strict = false): string

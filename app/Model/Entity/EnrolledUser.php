@@ -72,7 +72,7 @@ class EnrolledUser
         $this->test = $test;
         $this->user = $user;
         $this->questions = new ArrayCollection();
-        $this->seed = random_int(0, PHP_INT_MAX);
+        $this->seed = random_int(0, 2000000000);
     }
 
     /*

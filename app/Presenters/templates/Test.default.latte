@@ -93,6 +93,8 @@
       {$questionResult|noescape}
     {else}
       <form action="{link Save! question: $selectedQuestion->getId()}" method="POST" data-ajax data-ajax-button="saveButton">
+        <input type="hidden" name="nextQuestion" value="{$nextQuestion?->getId()}">
+        
         {$questionForm|noescape}
 
         {if $answer}
@@ -101,10 +103,15 @@
           {_locale.test.alreadyAnsweredInfo}
         </div>
         {/if}
+
         <button id="saveButton" type="submit" class="btn btn-success btn-lg shadow mt-3">
           <i class="fa-solid fa-download fa-fw"></i>
           {_locale.test.saveAndContinue}
         </button>
+        <a class="btn btn-secondary btn-lg shadow mt-3" n:href="this question => $nextQuestion?->getId()">
+          {_locale.test.skipAndContinue}
+          <i class="fa-solid fa-forward fa-fw"></i>
+        </a>
 
       </form>
     {/if}
