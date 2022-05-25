@@ -6,7 +6,7 @@
 
     <div id="numeric-answers" class="col col-12 col-md-10 col-lg-8 col-xl-6 col-xxl-5" data-values="{join(' ', $answer)}" data-min-count="1" data-max-count="{$maxCount}">
         {if $readonly}
-            <div class="input-group mb-2" n:foreach="($answer ? $answer : ['']) as $value">
+            <div class="input-group mb-2" n:foreach="$answer as $value">
                 <input type="text" class="form-control {$inputClass ?? ''}" value="{$value}" readonly>
             </div>
         {else}

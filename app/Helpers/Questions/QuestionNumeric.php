@@ -117,8 +117,13 @@ final class QuestionNumeric extends BaseQuestion
     private function renderNumericTeplate(Engine $latte, $answer, array $params = []): string
     {
         $params['readonly'] = $params['readonly'] ?? false;
-        $params['answer'] = $answer ? $answer : [];
         $params['maxCount'] = $this->maxCount;
+
+        $answerStr = [];
+        foreach ($answer ?? [] as $record) {
+            $answerStr[] = $record['str'] ?? $record['num'] ?? '';
+        }
+        $params['answer'] = $params['readonly'] && !$answerStr ? [''] : $answerStr;
         return $latte->renderToString(__DIR__ . '/templates/numeric.latte', $params);
     }
 
@@ -177,7 +182,10 @@ final class QuestionNumeric extends BaseQuestion
             if ($num === null) {
                 return null; // invalid value renders whole input invalid
             }
-            $answer[] = $num;
+            $answer[] = [
+                'num' => $num,
+                'str' => $strNum,
+            ];
         }
 
         return $answer;
@@ -189,8 +197,8 @@ final class QuestionNumeric extends BaseQuestion
             return false;
         }
 
-        foreach ($answer as $num) {
-            if (!is_int($num)) {
+        foreach ($answer as $record) {
+            if (!array_key_exists('num', $record) || !is_int($record['num'])) {
                 return false;
             }
         }
@@ -199,18 +207,21 @@ final class QuestionNumeric extends BaseQuestion
 
     public function isAnswerCorrect($answer): bool
     {
-        if (!is_array($answer) || count($answer) !== count($this->correct)) {
+        if (!$this->isAnswerValid($answer)) {
             return false;
         }
 
         $correct = $this->correct;
+        $answerNums = array_map(function ($record) {
+            return $record['num'];
+        }, $answer);
         if (!$this->correctInOrder) {
             sort($correct, SORT_NUMERIC);
-            sort($answer, SORT_NUMERIC);
+            sort($answerNums, SORT_NUMERIC);
         }
 
         foreach ($correct as $idx => $value) {
-            if ($answer[$idx] !== $value) {
+            if ($answerNums[$idx] !== $value) {
                 return false;
             }
         }
