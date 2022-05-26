@@ -11,7 +11,7 @@
             </div>
         {else}
             <div class="input-group mb-2">
-                <input type="text" class="form-control" name="answer[]"}>
+                <input type="text" class="form-control" name="answer[]" maxlength="34">
                 {if $maxCount > 1}
                 <button class="btn btn-outline-danger" type="button" data-action="remove"><i class="fa-regular fa-circle-xmark"></i></button>
                 <button class="btn btn-outline-success" type="button" data-action="add"><i class="fa-solid fa-circle-plus"></i></button>
@@ -69,7 +69,7 @@ $(() => {
         $("#numeric-answers input").each(function() {
             const value = $(this).val().trim();
             if (value) {
-                if (value.match(/^(-?[0-9]+|0[xX][0-9a-fA-F]+|0[bB][01]+)$/)) {
+                if (value.match(/^(-?[0-9]{l}1,10{r}|0[xX][0-9a-fA-F]{l}1,8{r}|0[bB][01]{l}1,32{r})$/)) {
                     ++numbers;
                 } else {
                     isValid = false;

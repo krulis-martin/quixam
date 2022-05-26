@@ -155,12 +155,13 @@ final class QuestionNumeric extends BaseQuestion
     {
         $number = trim($number);
         if (is_numeric($number)) {
-            return (int)$number;
+            $number = (int)$number;
+            return ($number !== null && $number >= -2147483648 && $number <= 2147483647) ? $number : null;
         }
-        if (preg_match('/^0[xX][0-9a-fA-F]+$/', $number)) {
+        if (preg_match('/^0[xX][0-9a-fA-F]{1,8}$/', $number)) {
             return hexdec(substr($number, 2));
         }
-        if (preg_match('/^0[bB][0-1]+$/', $number)) {
+        if (preg_match('/^0[bB][0-1]{1,32}$/', $number)) {
             return bindec(substr($number, 2));
         }
         return null;
