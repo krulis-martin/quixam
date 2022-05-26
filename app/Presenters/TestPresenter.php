@@ -119,7 +119,12 @@ final class TestPresenter extends AuthenticatedPresenter
         }
 
         if ($test->getFinishedAt()) {
-            $this->finalizePostError("Unable to submit answers, the test has already finished."); // TODO translate
+            $this->finalizePostError($this->translator->translate('locale.test.error.alreadyFinished'));
+        }
+
+        $enrolledUser = $this->enrolledUsers->findOneBy([ 'test' => $id, 'user' => $this->user->getId() ]);
+        if (!$enrolledUser || $enrolledUser->isLocked()) {
+            $this->finalizePostError($this->translator->translate('locale.test.error.locked'));
         }
 
         // find the question to which the answer belongs to
@@ -168,7 +173,8 @@ final class TestPresenter extends AuthenticatedPresenter
             $this->template->selectedUser = $enrolledUser->getUser();
             $this->template->readonly = true;
         } else {
-            $this->template->readonly = $test->getFinishedAt() !== null;
+            $this->template->selectedUser = null;
+            $this->template->readonly = $test->getFinishedAt() !== null || $enrolledUser->isLocked();
         }
 
         if ($test->getStartedAt() !== null) {
@@ -195,7 +201,7 @@ final class TestPresenter extends AuthenticatedPresenter
                     $this->template->questionForm
                         = $questionData->renderFormContent($engine, $this->selectedLocale, $answerData);
                 } else {
-                    // finished -> show the results
+                    // readonly -> show the last submited answer (and correcntess if available)
                     $this->template->answerCorrect = $answerData ? $questionData->isAnswerCorrect($answerData) : null;
                     $this->template->questionResult
                         = $questionData->renderResultContent(

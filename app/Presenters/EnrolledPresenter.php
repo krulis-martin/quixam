@@ -36,7 +36,28 @@ final class EnrolledPresenter extends AuthenticatedPresenter
     public $latteFactory;
 
     /**
+     * Signal handler for AJAX call that locks or unlocks given enrolled user.
+     * @param string $id of the enrolled user
+     * @param bool $state new locked state
+     */
+    public function handleLock(string $id, bool $state): void
+    {
+        $enrolledUser = $this->enrolledUsers->get($id);
+        if (!$enrolledUser) {
+            $this->finalizePostError("Enrolled user record no longer exists.");
+        }
+        $testId = $enrolledUser->getTest()->getId();
+
+        $enrolledUser->setLocked($state);
+        $this->enrolledUsers->persist($enrolledUser);
+        $this->enrolledUsers->flush();
+
+        $this->finalizePost($this->link('default', [ 'id' => $testId ]));
+    }
+
+    /**
      * Signal handler for AJAX call that removes enrolled user and the entire instance of the test.
+     * @param string $id of the enrolled user
      */
     public function handleDeleteEnrolled(string $id): void
     {
@@ -66,6 +87,7 @@ final class EnrolledPresenter extends AuthenticatedPresenter
 
     /**
      * Signal handler for AJAX call that removes enrollment registration of a particular user.
+     * @param string $id of the registration
      */
     public function handleDeleteRegistration(string $id): void
     {

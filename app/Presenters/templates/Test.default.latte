@@ -99,6 +99,8 @@
         {else}
           <div class="border rounded border-danger text-danger p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.wrongAnswer}</div>
         {/if}
+      {elseif $enrolledUser->isLocked()}
+        <div class="border rounded border-waning text-warning p-2 my-2"><i class="fa-regular fa-hand fa-fw"></i> {_locale.test.enrolledUserLocked}</div>
       {/if}
 
       {$questionResult|noescape}

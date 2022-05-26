@@ -43,6 +43,7 @@
       <td class="text-nowrap">{$enrolledUser->getUser()->getFirstName()}</td>
       <td class="text-nowrap text-small"><a href="mailto:{$enrolledUser->getUser()->getEmail()}">{$enrolledUser->getUser()->getEmail()}</a></td>
       <td class="text-nowrap">{$enrolledUser->getUser()->getExternalId()}</td>
+      
       <td class="text-nowrap text-center">
         {foreach $questions[$enrolledUser->getUser()->getId()] ?? [] as $question}
           {var $answer = $question->getLastAnswer()}
@@ -54,6 +55,7 @@
           </span>
         {/foreach}
       </td>
+      
       {if $test->getFinishedAt() && $enrolledUser->hasScore()}
         <td class="text-nowrap text-center">
           <strong>{$enrolledUser->hasScore() ? $enrolledUser->getScore() : '-'}</strong>
@@ -70,9 +72,18 @@
           {/if}
         </td>
       {/if}
+
       <td class="text-nowrap text-end w-0">
         <a n:href="Test:default $test->getId(), selectedUser: $enrolledUser->getUser()->getId()">{_locale.enrolledUsers.detail}</a>
-        <form method="POST" action="{link DeleteEnrolled! id: $enrolledUser->getId()}" class="d-inline ms-2"
+
+        <form method="POST" action="{link Lock! id: $enrolledUser->getId(), state: !$enrolledUser->isLocked()}"
+          class="d-inline ms-1" data-ajax data-ajax-button="lockButton{$idx}">
+          <button id="lockButton{$idx}" type="submit" class="btn btn-sm btn-warning">
+            {if $enrolledUser->isLocked()}{_locale.enrolledUsers.unlock}{else}{_locale.enrolledUsers.lock}{/if}
+          </button>
+        </form>
+
+        <form method="POST" action="{link DeleteEnrolled! id: $enrolledUser->getId()}" class="d-inline ms-1"
           data-ajax data-ajax-button="deleteEnrolledButton{$idx}"
           data-ajax-confirm="{_locale.enrolledUsers.deleteEnrolledWarning1}" data-ajax-confirm2="{_locale.enrolledUsers.deleteEnrolledWarning2}">
           <button id="deleteEnrolledButton{$idx}" type="submit" class="btn btn-sm btn-danger">{_locale.enrolledUsers.deleteEnrolled}</button>

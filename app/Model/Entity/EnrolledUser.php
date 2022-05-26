@@ -63,6 +63,12 @@ class EnrolledUser
     protected $maxScore = null;
 
     /**
+     * When the ernolled user gets locked, no additional answers can be submitted by the corresponding user.
+     * @ORM\Column(type="boolean")
+     */
+    protected $locked = false;
+
+    /**
      * @param TestTerm $test
      * @param User $user
      */
@@ -127,5 +133,15 @@ class EnrolledUser
     public function setMaxScore(int $maxScore): void
     {
         $this->maxScore = $maxScore;
+    }
+
+    public function isLocked(): bool
+    {
+        return $this->locked;
+    }
+
+    public function setLocked($locked = true): void
+    {
+        $this->locked = $locked;
     }
 }
