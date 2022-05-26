@@ -64,6 +64,24 @@ nav.navbar {
     width: 0;
 }
 
+.text-small {
+    font-size: 80%;
+}
+
+.text-smaller {
+    font-size: 66%;
+}
+
+a.navbar-brand {
+    color: #daa520 !important;
+    text-shadow: 1px 1px 2px #cb9;
+    line-height: 27px;
+}
+
+a.navbar-brand > span {
+    transform: translate(0, -2px);
+}
+
 /*
  * Markdown
  */

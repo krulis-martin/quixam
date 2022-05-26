@@ -34,7 +34,7 @@ class EnrolledUser
     protected $test;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="enrolledForTests")
+     * @ORM\ManyToOne(targetEntity="User", fetch="EAGER")
      */
     protected $user;
 

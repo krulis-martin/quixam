@@ -31,4 +31,17 @@ class Questions extends BaseRepository
         $qb->setParameter('test', $test->getId());
         return $qb->getQuery()->getResult();
     }
+
+    public function getQuestionsOfTestSorted(TestTerm $test): array
+    {
+        $questions = $this->getQuestionsOfTest($test);
+        $result = [];
+        foreach ($questions as $question) {
+            $result[$question->getEnrolledUser()->getUser()->getId()][$question->getOrdering()] = $question;
+        }
+        foreach ($result as &$userQuestions) {
+            ksort($userQuestions);
+        }
+        return $result;
+    }
 }

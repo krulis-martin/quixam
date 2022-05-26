@@ -132,12 +132,16 @@ final class QuestionNumeric extends BaseQuestion
         return $this->renderNumericTeplate($latte, $answer);
     }
 
-    public function renderResultContent(Engine $latte, string $locale, $answer = null): string
-    {
-        $params = [
-            'readonly' => true,
-            'inputClass' => $this->isAnswerCorrect($answer) ? 'text-success' : 'text-danger',
-        ];
+    public function renderResultContent(
+        Engine $latte,
+        string $locale,
+        $answer = null,
+        ?bool $answerIsCorrect = null
+    ): string {
+        $params = [ 'readonly' => true ];
+        if ($answerIsCorrect !== null) {
+            $params['inputClass'] = $answerIsCorrect ? 'text-success' : 'text-danger';
+        }
         return $this->renderNumericTeplate($latte, $answer, $params);
     }
 

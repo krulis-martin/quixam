@@ -7,6 +7,15 @@
   {$test->getScheduledAt()|ldate}
 </h1>
 
+{if $selectedUser}
+<h4 class="my-3 p-3 border border-secondary rounded bg-light">
+  <i class="fa-regular fa-user fa-fw text-muted"></i>
+  {_locale.test.resultsOfUser}:
+  {$selectedUser->getFirstName()} {$selectedUser->getLastName()}
+  <a n:href="Test:enrolled $test->getId()" class="float-md-end text-smaller mt-1"><i class="fa-solid fa-share-from-square fa-fw"></i> {_locale.test.backToEnrolled}</a>
+</h4>
+{/if}
+
 <span class="d-inline-block me-4">
   <span class="text-muted">{_locale.test.supervisors}:</span>
   {foreach $test->getSupervisors() as $supervisor}{$supervisor->getFirstName()} {$supervisor->getLastName()}{sep}, {/sep}{/foreach}
@@ -81,20 +90,22 @@
 
     <div class="bg-light border p-3 my-3 rounded">{$questionText|markdown}</div>
 
-    {if $test->getFinishedAt() !== null}
-      {if !$answer}
-        <div class="border rounded border-secondary text-muted p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.missingAnswer}</div>
-      {elseif $answerCorrect}
-        <div class="border rounded border-success text-success p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.correctAnswer}</div>
-      {else}
-        <div class="border rounded border-danger text-danger p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.wrongAnswer}</div>
+    {if $readonly}
+      {if $test->getFinishedAt() !== null}
+        {if !$answer}
+          <div class="border rounded border-secondary text-muted p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.missingAnswer}</div>
+        {elseif $answerCorrect}
+          <div class="border rounded border-success text-success p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.correctAnswer}</div>
+        {else}
+          <div class="border rounded border-danger text-danger p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.wrongAnswer}</div>
+        {/if}
       {/if}
 
       {$questionResult|noescape}
     {else}
       <form action="{link Save! question: $selectedQuestion->getId()}" method="POST" data-ajax data-ajax-button="saveButton">
         <input type="hidden" name="nextQuestion" value="{$nextQuestion?->getId()}">
-        
+
         {$questionForm|noescape}
 
         {if $answer}

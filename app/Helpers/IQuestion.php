@@ -44,9 +44,16 @@ interface IQuestion extends JsonSerializable
      * @param string $locale selected locale
      * @param mixed $answer deserialized json structure sent over by the client
      *                      the answer will be used for rendering (null = this question was not answered)
+     * @param bool|null $answerIsCorrect how the answer shold be displayed
+     *                                   (null = display it indiferently)
      * @return string raw HTML fragment which is pasted without excaping into the output
      */
-    public function renderResultContent(Engine $latte, string $locale, $answer = null): string;
+    public function renderResultContent(
+        Engine $latte,
+        string $locale,
+        $answer = null,
+        ?bool $answerIsCorrect = null
+    ): string;
 
     /**
      * Process data sent over from a form and create an answer structure.

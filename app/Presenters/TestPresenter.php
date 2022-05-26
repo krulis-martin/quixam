@@ -44,6 +44,9 @@ final class TestPresenter extends AuthenticatedPresenter
     /** @persistent */
     public $question = null;
 
+    /** @persistent */
+    public $selectedUser = null;
+
     /**
      * Return enrolled user entity based on the presenter's parameters.
      * @param string $id test term ID
@@ -51,7 +54,11 @@ final class TestPresenter extends AuthenticatedPresenter
      */
     private function getEnrolledUser(string $id): ?EnrolledUser
     {
-        return $this->enrolledUsers->findOneBy([ 'test' => $id, 'user' => $this->user->getId() ]);
+        $userId = $this->user->getId();
+        if ($this->selectedUser && $this->user->getRole() !== User::ROLE_STUDENT) {
+            $userId = $this->selectedUser;
+        }
+        return $this->enrolledUsers->findOneBy([ 'test' => $id, 'user' => $userId ]);
     }
 
     /**
@@ -106,6 +113,15 @@ final class TestPresenter extends AuthenticatedPresenter
      */
     public function handleSave(string $id): void
     {
+        $test = $this->testTerms->get($id);
+        if (!$test) {
+            $this->error("Test $id does not exist.", 404);
+        }
+
+        if ($test->getFinishedAt()) {
+            $this->finalizePostError("Unable to submit answers, the test has already finished."); // TODO translate
+        }
+
         // find the question to which the answer belongs to
         if (!$this->question || !$this->questions->get($this->question)) {
             $this->finalizePostError("Unable to save the answer when no question is selected.");
@@ -142,15 +158,22 @@ final class TestPresenter extends AuthenticatedPresenter
         }
         $this->template->test = $test;
 
-        $enrolledUser = $this->getEnrolledUser($id); // TODO in the future allow user selection for supervisors
+        $enrolledUser = $this->getEnrolledUser($id);
         if (!$enrolledUser) {
             $this->error("Selected user is not enrolled for the test.", 404);
         }
         $this->template->enrolledUser = $enrolledUser;
 
+        if ($enrolledUser->getUser()->getId() !== $this->user->getId()) {
+            $this->template->selectedUser = $enrolledUser->getUser();
+            $this->template->readonly = true;
+        } else {
+            $this->template->readonly = $test->getFinishedAt() !== null;
+        }
+
         if ($test->getStartedAt() !== null) {
             $questions = $enrolledUser->getQuestions()->toArray();
-            $selectedQuestionIdx = $this->getSelectedQuestion($questions, $test->getFinishedAt() !== null);
+            $selectedQuestionIdx = $this->getSelectedQuestion($questions, $this->template->readonly);
 
             $this->template->questions = $questions;
             $this->template->selectedQuestionIdx = $selectedQuestionIdx;
@@ -167,7 +190,7 @@ final class TestPresenter extends AuthenticatedPresenter
                 $answer = $selectedQuestion->getLastAnswer();
                 $answerData = $answer ? $answer->getAnswer() : null;
                 $this->template->answer = $answer;
-                if ($test->getFinishedAt() === null) {
+                if (!$this->template->readonly) {
                     // still open -> show form
                     $this->template->questionForm
                         = $questionData->renderFormContent($engine, $this->selectedLocale, $answerData);
@@ -175,7 +198,12 @@ final class TestPresenter extends AuthenticatedPresenter
                     // finished -> show the results
                     $this->template->answerCorrect = $answerData ? $questionData->isAnswerCorrect($answerData) : null;
                     $this->template->questionResult
-                        = $questionData->renderResultContent($engine, $this->selectedLocale, $answerData);
+                        = $questionData->renderResultContent(
+                            $engine,
+                            $this->selectedLocale,
+                            $answerData,
+                            $test->getFinishedAt() !== null ? $this->template->answerCorrect : null
+                        );
                 }
             }
         }
@@ -252,5 +280,16 @@ final class TestPresenter extends AuthenticatedPresenter
             $this->error("Test $id does not exist.", 404);
         }
         $this->template->test = $test;
+
+        $enrolledUsers = $test->getEnrolledUsers()->toArray();
+        usort($enrolledUsers, function ($a, $b) {
+            $a = $a->getUser();
+            $b = $b->getUser();
+            $res = strcmp($a->getLastName(), $b->getLastName());
+            return $res !== 0 ? $res : strcmp($a->getFirstName(), $b->getFirstName());
+        });
+        $this->template->enrolledUsers = $enrolledUsers;
+
+        $this->template->questions = $this->questions->getQuestionsOfTestSorted($test);
     }
 }
