@@ -56,7 +56,18 @@
       </td>
       {if $test->getFinishedAt() && $enrolledUser->hasScore()}
         <td class="text-nowrap text-center">
-          {$enrolledUser->hasScore() ? $enrolledUser->getScore() : '-'}
+          <strong>{$enrolledUser->hasScore() ? $enrolledUser->getScore() : '-'}</strong>
+          {if $enrolledUser->hasScore()}
+            {if $enrolledUser->getScore() >= 17}
+              <span class="d-inline-block text-white rounded px-1 ms-1 bg-success">1</span>
+            {elseif $enrolledUser->getScore() >= 14}
+              <span class="d-inline-block text-white rounded px-1 ms-1 bg-warning">2</span>
+            {elseif $enrolledUser->getScore() >= 11}
+              <span class="d-inline-block text-white rounded px-1 ms-1 bg-secondary">3</span>
+            {else}
+              <span class="d-inline-block text-white rounded px-1 ms-1 bg-danger">4</span>
+            {/if}
+          {/if}
         </td>
       {/if}
       <td class="text-nowrap text-end w-0">

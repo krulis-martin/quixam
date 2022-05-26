@@ -42,7 +42,7 @@
         <td class="text-nowrap">{$test->getLocation()}</td>
         <td class="text-nowrap">
           {if $isSupervisor && $relation === 'supervised'}
-            <a n:href="Test:enrolled $test->getId()">
+            <a n:href="Enrolled:default $test->getId()">
               {$test->getEnrolledUsers()->count()}{if $test->getRegistrations()->count() > 0} ({$test->getRegistrations()->count()} reg){/if}
             </a>
           {else}

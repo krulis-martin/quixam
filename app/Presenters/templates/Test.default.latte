@@ -12,7 +12,7 @@
   <i class="fa-regular fa-user fa-fw text-muted"></i>
   {_locale.test.resultsOfUser}:
   {$selectedUser->getFirstName()} {$selectedUser->getLastName()}
-  <a n:href="Test:enrolled $test->getId()" class="float-md-end text-smaller mt-1"><i class="fa-solid fa-share-from-square fa-fw"></i> {_locale.test.backToEnrolled}</a>
+  <a n:href="Enrolled:default $test->getId()" class="float-md-end text-smaller mt-1"><i class="fa-solid fa-share-from-square fa-fw"></i> {_locale.test.backToEnrolled}</a>
 </h4>
 {/if}
 
