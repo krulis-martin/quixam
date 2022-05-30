@@ -143,16 +143,16 @@ class RegisterUsers extends BaseCommand
     protected function createRegistration(TestTerm $term, array $csvRow)
     {
         $externalId = $this->input->getOption('externalId');
+        $externalId = $externalId ? ($csvRow[$externalId] ?? null) : null;
         $email = $this->input->getOption('email');
+        $email = $email ? ($csvRow[$email] ?? null) : null;
         $user = null;
 
         if ($externalId) {
-            $externalId = $csvRow[$externalId];
             $user = $this->users->findByExternalId($externalId);
         }
 
         if (!$user && $email) {
-            $email = $csvRow[$email];
             $user = $this->users->findByEmail($email);
         }
 

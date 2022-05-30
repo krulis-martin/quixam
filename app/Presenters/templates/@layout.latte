@@ -1,24 +1,25 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="{$basePath}/styles/bootstrap.min.css" rel="stylesheet">
-    <link href="{$basePath}/styles/fontawesome/css/all.min.css" rel="stylesheet">
-    <link href="{$basePath}/styles/main.css" rel="stylesheet">
-    <link href="{$basePath}/styles/highlight/default.min.css" rel="stylesheet"">
-    <title>{ifset title}{include title|stripHtml} | {/ifset}Quixam</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{$basePath}/styles/bootstrap.min.css" rel="stylesheet">
+  <link href="{$basePath}/styles/fontawesome/css/all.min.css" rel="stylesheet">
+  <link href="{$basePath}/styles/main.css" rel="stylesheet">
+  <link href="{$basePath}/styles/highlight/default.min.css" rel="stylesheet"">
+  <title>{ifset title}{include title|stripHtml} | {/ifset}Quixam</title>
 
-    {block scripts}
-      <script src="{$basePath}/styles/bootstrap.bundle.min.js"></script>
-      <script src="{$basePath}/scripts/jquery-3.6.0.min.js"></script>
-      <script src="{$basePath}/scripts/netteForms.min.js"></script><!-- originally https://nette.github.io/resources/js/3/netteForms.min.js -->
-      <script src="{$basePath}/scripts/highlight/highlight.min.js"></script>
-      <script src="{$basePath}/scripts/main.js"></script>
-    {/block}
-  </head>
-  <body>
-    <div id="blanket"><i class="fa-solid fa-spinner fa-fw fa-spin-pulse"></i></div>
+  {block scripts}
+    <script src="{$basePath}/styles/bootstrap.bundle.min.js"></script>
+    <script src="{$basePath}/scripts/jquery-3.6.0.min.js"></script>
+    <script src="{$basePath}/scripts/netteForms.min.js"></script><!-- originally https://nette.github.io/resources/js/3/netteForms.min.js -->
+    <script src="{$basePath}/scripts/highlight/highlight.min.js"></script>
+    <script src="{$basePath}/scripts/main.js"></script>
+  {/block}
+</head>
+<body>
+  <div id="blanket"><i class="fa-solid fa-spinner fa-fw fa-spin-pulse"></i></div>
+  <div id="main-wrap">
 
     {control menu}
 
@@ -28,10 +29,19 @@
           {$flash->message}
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+      </div>
     </div>
 
     <div class="container my-3">
       {include content}
     </div>
-  </body>
+
+  </div>
+  <div id="footer-wrap" class="border-top bg-light">
+    <footer class="container p-2 text-small text-muted">
+      <span class="float-start">&copy; Martin Kruliš, 2022</span>
+      <span class="float-end">v0.0.1 (<a href="https://github.com/krulis-martin/quixam" target="_blank">GitHub</a>)</span>
+    </footer>
+  </div>
+</body>
 </html>

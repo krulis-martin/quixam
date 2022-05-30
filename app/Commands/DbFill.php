@@ -77,17 +77,28 @@ class DbFill extends BaseCommand
                 if (!array_key_exists($class, $this->repositories)) {
                     throw new RuntimeException("Referenced entity class '$class' not found.");
                 }
+                $id = $matches['id'];
                 if ($matches['class'] === 'User') {
-                    $arg = $this->repositories[$class]->findByEmail($matches['id']);
-                    if (!$arg) {
-                        $id = $matches['id'];
-                        throw new RuntimeException("User '$id' not found.");
-                    }
+                    $arg = $this->repositories[$class]->findByEmail($id);
                 } else {
-                    $arg = $this->repositories[$class]->findOrThrow($matches['id']);
+                    $arg = $this->repositories[$class]->get($id);
+                    if (!$arg && property_exists($class, 'externalId')) {
+                        $candidates = $this->repositories[$class]->findBy(['externalId' => $id]);
+                        if (count($candidates) > 1) {
+                            throw new RuntimeException("External ID '$id' of entity '$class' is valid, "
+                                . "but ambiguous (more than one record has that ID).");
+                        } elseif (count($candidates) === 1) {
+                            $arg = reset($candidates);
+                        }
+                    }
+                }
+
+                if (!$arg) {
+                    throw new RuntimeException("Entity $class with ID '$id' not found.");
                 }
             }
         }
+
 
         return $args;
     }

@@ -202,7 +202,8 @@ final class TestPresenter extends AuthenticatedPresenter
                         = $questionData->renderFormContent($engine, $this->selectedLocale, $answerData);
                 } else {
                     // readonly -> show the last submited answer (and correcntess if available)
-                    $this->template->answerCorrect = $answerData ? $questionData->isAnswerCorrect($answerData) : null;
+                    $this->template->answerCorrect = $answerData !== null
+                        ? $questionData->isAnswerCorrect($answerData) : null;
                     $this->template->questionResult
                         = $questionData->renderResultContent(
                             $engine,

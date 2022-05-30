@@ -92,7 +92,7 @@
 
     {if $readonly}
       {if $test->getFinishedAt() !== null}
-        {if !$answer}
+        {if $answer === null}
           <div class="border rounded border-secondary text-muted p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.missingAnswer}</div>
         {elseif $answerCorrect}
           <div class="border rounded border-success text-success p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.correctAnswer}</div>
