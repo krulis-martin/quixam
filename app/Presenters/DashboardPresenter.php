@@ -193,7 +193,7 @@ final class DashboardPresenter extends AuthenticatedPresenter
         $tests = [];
         if ($isSupervisor) {
             $supervisedTests = $this->user->getRole() === User::ROLE_ADMIN
-                ? $this->testTerms->findBy([ 'archivedAt' => null ])
+                ? $this->testTerms->findBy([ 'archivedAt' => null ], [ 'scheduledAt' => 'ASC' ])
                 : $this->testTerms->getTermsUserSupervises($this->user);
             foreach ($supervisedTests as $test) {
                 $tests[] = [ $test, 'supervised', null ];
