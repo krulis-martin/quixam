@@ -105,7 +105,8 @@ class Question
         TemplateQuestionsGroup $templateGroup,
         TemplateQuestion $templateQuestion,
         int $ordering,
-        $data
+        $data,
+        string $type = null
     ) {
         $this->createdAt = new DateTime();
         $this->answers = new ArrayCollection();
@@ -114,7 +115,7 @@ class Question
         $this->templateQuestion = $templateQuestion;
         $this->ordering = $ordering;
         $this->points = $templateGroup->getPoints();
-        $this->type = $templateQuestion->getType();
+        $this->type = $type ?? $templateQuestion->getType();
         $this->caption = $templateQuestion->getCaptionRaw();
         $this->data = ($data === null) ? '' : json_encode($data);
     }

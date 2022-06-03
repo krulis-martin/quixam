@@ -16,6 +16,16 @@ use Exception;
  */
 final class QuestionSingle extends BaseChoiceQuestion
 {
+    /**
+     * Set the answers and the correct answer manually.
+     * @param array $answers
+     * @param int $correct
+     */
+    public function setAnswers(array $answers, int $correct): void
+    {
+        $this->setAnswersInternal($answers, $correct);
+    }
+
     /*
      * Implementing the interface
      */

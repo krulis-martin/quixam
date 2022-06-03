@@ -43,6 +43,39 @@ final class QuestionNumeric extends BaseQuestion
     }
 
     /**
+     * Set the correct answer(s).
+     * @param array $correct
+     */
+    public function setCorrectAnswer(array $correct): void
+    {
+        if (count($correct) < $this->minCount || count($correct) > $this->maxCount) {
+            throw new QuestionException("The number of correct answers is out of limits.");
+        }
+
+        foreach ($correct as $c) {
+            if (!is_int($c)) {
+                throw new QuestionException("The correct answers must be only integers.");
+            }
+        }
+
+        $this->correct = $correct;
+    }
+
+    /**
+     * Configure min-max range for accepted answers (how many numbers are expected).
+     * @param int $min
+     * @param int $max
+     */
+    public function setLimits(int $min, int $max): void
+    {
+        if ($min >= $max || $min < 0) {
+            throw new QuestionException("Invalid count range [$min, $max].");
+        }
+        $this->minCount = $min;
+        $this->maxCount = $max;
+    }
+
+    /**
      * Helper function that loads internal parameters from JSON (template or save question data).
      * @param array $json decoded input data structure
      * @param string $errorPrefix used as initial part of message if exception needs to be thrown

@@ -16,6 +16,16 @@ use Exception;
  */
 final class QuestionMulti extends BaseChoiceQuestion
 {
+    /**
+     * Set the answers and the correct answers manually.
+     * @param array $answers
+     * @param int[] $correct
+     */
+    public function setAnswers(array $answers, array $correct): void
+    {
+        $this->setAnswersInternal($answers, $correct);
+    }
+
     /*
      * Implementing the interface
      */

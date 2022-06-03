@@ -37,6 +37,28 @@ abstract class BaseChoiceQuestion extends BaseQuestion
     }
 
     /**
+     * Set the answers and the correct answer(s) manually.
+     * @param array $answers
+     * @param int|int[] $correct
+     */
+    protected function setAnswersInternal(array $answers, $correct): void
+    {
+        try {
+            $this->answers = $this->loadAnswers($answers, 'Error');
+        } catch (Exception $e) {
+            throw new QuestionException("Unable to set answers, invalid format detected.", $e);
+        }
+
+        foreach (is_array($correct) ? $correct : [$correct] as $c) {
+            if (!is_int($c) || !array_key_exists($c, $this->answers)) {
+                throw new QuestionException("Invalid correct answer index '$c'.");
+            }
+        }
+
+        $this->correct = $correct;
+    }
+
+    /**
      * Load a list of individual answers. Each has a numeric key and localized text as contents.
      * @param array $answers structure to be loaded
      * @param string $errorPrefix used as a prefix for exception message if something fails
@@ -55,7 +77,7 @@ abstract class BaseChoiceQuestion extends BaseQuestion
             }
             return $result;
         } catch (Exception $e) {
-            throw new QuestionException("$errorPrefix, answer text does not have valid format.", $e);
+            throw new QuestionException("$errorPrefix, question answers do not have valid format.", $e);
         }
     }
 

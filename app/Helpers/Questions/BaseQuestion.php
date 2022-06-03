@@ -109,6 +109,18 @@ abstract class BaseQuestion implements IQuestion
         return $key !== null ? $value[$key] : null; /** @phpstan-ignore-line */
     }
 
+    /**
+     * Set text manually. This is used when the question is being constructred (e.g., in a generator).
+     * @param string|array $text
+     */
+    public function setText($text): void
+    {
+        $this->text = self::normalize(self::schemaOfLocaizedText(), $text);
+        if (!$this->text) {
+            throw new QuestionException("Invalid text format (should be a string or an array of localized strings).");
+        }
+    }
+
     /*
      * Implementing the interface
      */
