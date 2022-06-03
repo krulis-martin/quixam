@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
+use App\Helpers\Questions\BaseQuestion;
+use Nette\Schema\Processor;
+
 /**
- *
+ * Base class for the dynamic question. It wraps the parts hidden from the generator code
+ * and provides API the generator can use.
+ * The derived class only implements the generate method where the custom code is executed.
  */
 class DynamicQuestionBase
 {
@@ -39,13 +44,43 @@ class DynamicQuestionBase
     private $question = null;
 
     /**
-     * @param string $code to be executed for generating the question
+     * @param array $data deserialized json containing code and optionally the initial text
      * @param QuestionFactory $questionFactory (injection)
      */
-    public function __construct(string $code, QuestionFactory $questionFactory)
+    public function __construct(array $data, QuestionFactory $questionFactory)
     {
-        $this->code = $code;
+        if (empty($data['code']) || !is_string($data['code'])) {
+            throw new QuestionException("Dynamic question does not contain valid code for the generator.");
+        }
+
+        $this->code = $data['code'];
         $this->questionFactory = $questionFactory;
+
+        if (!empty($data['text'])) {
+            $processor = new Processor();
+            $processor->process(BaseQuestion::schemaOfLocaizedText(), $data['text']); // throws ValidationException
+
+            if (is_array($data['text'])) {
+                foreach ($data['text'] as $locale => $text) {
+                    $this->setText($text, $locale);
+                }
+            } else {
+                $this->setText($data['text']);
+            }
+        }
+    }
+
+    /**
+     * Use AST-parser to validate the code does not contain anything malicous.
+     * @param string $code to be verified
+     * @return array|bool with error strings or bool (true if the code is ok)
+     */
+    public static function validateCode(string $code)
+    {
+
+        // TODO AST check of the code
+
+        return true;
     }
 
     /*
@@ -81,7 +116,7 @@ class DynamicQuestionBase
      * @param string $type identifier
      * @return IQuestion just created
      */
-    public function init(string $type): IQuestion
+    protected function init(string $type): IQuestion
     {
         $this->type = $type;
         $this->question = $this->questionFactory->create($type);
@@ -93,7 +128,7 @@ class DynamicQuestionBase
      * @param string $text to be set (overrides current text)
      * @param array|string $locales identifier or list of identifiers
      */
-    public function setText(string $text, $locales = [ 'en', 'cs' ]): void
+    protected function setText(string $text, $locales = [ 'en', 'cs' ]): void
     {
         if (!is_array($locales)) {
             $locales = [ $locales ];
@@ -113,7 +148,7 @@ class DynamicQuestionBase
      * @param string $text to be set (overrides current text)
      * @param array|string $locales identifier or list of identifiers
      */
-    public function appendText(string $text, $locales = [ 'en', 'cs' ]): void
+    protected function appendText(string $text, $locales = [ 'en', 'cs' ]): void
     {
         if (!is_array($locales)) {
             $locales = [ $locales ];
@@ -135,7 +170,7 @@ class DynamicQuestionBase
      * @param array|string $locales identifier or list of identifiers
      * @param bool $preg if true, regex replacement (preg_replace) is used, otherwose str_replace()
      */
-    public function replaceText($search, $replace, $locales = [ 'en', 'cs' ], bool $preg = false): void
+    protected function replaceText($search, $replace, $locales = [ 'en', 'cs' ], bool $preg = false): void
     {
         if (!is_array($locales)) {
             $locales = [ $locales ];

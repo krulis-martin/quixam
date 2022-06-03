@@ -47,31 +47,6 @@ class TestOrchestrator
     }
 
     /**
-     * Assemble a dynamic question and invoke generator method.
-     * @param TemplateQuestion $templateQuestion with the initial data for the generator
-     * @return DynamicQuestion constructed and generated (ready for harvesting)
-     */
-    private function createDynamicQuestion(TemplateQuestion $templateQuestion): DynamicQuestion
-    {
-        $data = $templateQuestion->getData();
-        // TODO validate
-
-        $dynamicQuestion = new DynamicQuestion($data['code'], $this->questionFactory);
-        if (!empty($data['text'])) {
-            if (is_array($data['text'])) {
-                foreach ($data['text'] as $locale => $text) {
-                    $dynamicQuestion->setText($text, $locale);
-                }
-            } else {
-                $dynamicQuestion->setText($data['text']);
-            }
-        }
-
-        $dynamicQuestion->generate();
-        return $dynamicQuestion;
-    }
-
-    /**
      * Create a set of question instances for given enrolled user.
      * Nothing is returned, the questions are persisted in db.
      * @param EnrolledUser $user enrolled for a particular test
@@ -102,8 +77,9 @@ class TestOrchestrator
                 $questionData = $this->questionFactory->create($templateQuestion->getType());
                 $questionData->instantiate($templateQuestion->getData(), $user->getSeed() + $ordering);
             } else {
-                // no type = question generated dynamically
-                $dynamicQuestion = $this->createDynamicQuestion($templateQuestion);
+                // no type => question generated dynamically
+                $dynamicQuestion = new DynamicQuestion($templateQuestion->getData(), $this->questionFactory);
+                $dynamicQuestion->generate();
                 $type = $dynamicQuestion->getType();
                 $questionData = $dynamicQuestion->getQuestion();
             }

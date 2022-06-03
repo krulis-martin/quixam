@@ -11,6 +11,7 @@ use App\Model\Repository\TemplateTests;
 use App\Model\Repository\TemplateQuestions;
 use App\Model\Repository\TemplateQuestionsGroups;
 use App\Helpers\QuestionFactory;
+use App\Helpers\DynamicQuestion;
 use DateTime;
 use DateInterval;
 use Exception;
@@ -117,13 +118,34 @@ class AddQuestionTemplate extends BaseCommand
         $data = json_decode(file_get_contents($filePath), true);
 
         $type = $this->input->getOption('type') ?? '';
-        $questionData = $this->questionFactory->create($type);
 
-        for ($seed = 0; $seed < 20; ++$seed) {
-            $questionData->instantiate($data, $seed); // throws on error
+        // smoke tests
+        if ($type) {
+            // regular (static) question
+            $questionData = $this->questionFactory->create($type);
+            for ($seed = 0; $seed < 20; ++$seed) {
+                $questionData->instantiate($data, $seed); // throws on error
+            }
+        } else {
+            // dynamic (generated question)
+            $dynamicQuestion = new DynamicQuestion($data, $this->questionFactory);
+            $res = DynamicQuestion::validateCode($dynamicQuestion->getCode());
+            if ($res !== true) {
+                foreach (is_array($res) ? $res : [] as $error) {
+                    echo "Code validation error: $error\n";
+                }
+                throw new RuntimeException("Code validation of dynamic question generator failed.");
+            }
+
+            $dynamicQuestion->generate();
+
+            for ($seed = 0; $seed < 20; ++$seed) {
+                $dynamicQuestion = new DynamicQuestion($data, $this->questionFactory);
+                $dynamicQuestion->generate();
+            }
         }
 
-        return $data;
+        return [ $type, $data ];
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -145,8 +167,7 @@ class AddQuestionTemplate extends BaseCommand
             // prepare question data
             $caption = $this->getCaption();
             $captionJson = json_encode($caption);
-            $type = $input->getOption('type');
-            $data = $this->getQuestionData();
+            [ $type, $data ] = $this->getQuestionData();
             $dataJson = $data === null ? '' : json_encode($data);
 
             if (
