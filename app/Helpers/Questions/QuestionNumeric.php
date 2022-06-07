@@ -68,7 +68,7 @@ final class QuestionNumeric extends BaseQuestion
      */
     public function setLimits(int $min, int $max): void
     {
-        if ($min >= $max || $min < 0) {
+        if ($min > $max || $min < 0) {
             throw new QuestionException("Invalid count range [$min, $max].");
         }
         $this->minCount = $min;

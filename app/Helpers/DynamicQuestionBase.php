@@ -186,4 +186,18 @@ class DynamicQuestionBase
                 : str_replace($search, $replace, $this->text[$locale]);
         }
     }
+
+    /**
+     * Random wrapper that relies on pre-initialized seed.
+     * @param int $min minimal value
+     * @param int|null $max maximal value (inclusive), if null, default max is used
+     * @return int|false random value, false if max < min
+     */
+    protected function random(int $min = 0, $max = null)
+    {
+        if ($max === null) {
+            $max = mt_getrandmax();
+        }
+        return mt_rand($min, $max);
+    }
 }

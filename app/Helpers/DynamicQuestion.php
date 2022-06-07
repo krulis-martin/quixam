@@ -16,7 +16,10 @@ class DynamicQuestion extends DynamicQuestionBase
      */
     public function generate(): void
     {
-        exec($this->getCode());
+        // !!! DANGER - eval() is used here !!!
+        if (eval($this->getCode()) === false) {
+            throw new QuestionException("Generator code execution failed.");
+        }
 
         if (!$this->getType() || !$this->getQuestion()) {
             throw new QuestionException("The generator did not initialize the question.");
