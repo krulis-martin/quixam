@@ -6,6 +6,7 @@ namespace App\Helpers;
 
 use App\Helpers\Questions\BaseQuestion;
 use Nette\Schema\Processor;
+use Exception;
 
 /**
  * Base class for the dynamic question. It wraps the parts hidden from the generator code
@@ -81,6 +82,35 @@ class DynamicQuestionBase
         // TODO AST check of the code
 
         return true;
+    }
+
+    /**
+     * Internal generator method that is overloaded by the derived class.
+     * This method is intentionally in a derived class so private things are kept in the base class.
+     */
+    protected function generateInternal(): void
+    {
+        throw new Exception("Not implemented.");
+    }
+
+    /**
+     * The main routine, which generate the dynamic question.
+     */
+    public function generate(int $seed): void
+    {
+        Random::setSeed($seed);
+
+        $this->generateInternal();
+
+        if (!$this->getType() || !$this->getQuestion()) {
+            throw new QuestionException("The generator did not initialize the question.");
+        }
+
+        // the text must be copied from internal buffer to the constructed question at the end
+        $question = $this->getQuestion();
+        if ($question instanceof \App\Helpers\Questions\BaseQuestion) {
+            $question->setText($this->getText());
+        }
     }
 
     /*

@@ -10,25 +10,11 @@ namespace App\Helpers;
  */
 class DynamicQuestion extends DynamicQuestionBase
 {
-    /**
-     * The main routine, which generate the dynamic question.
-     * This method is intentionally in a derived class so private things are kept in the base class.
-     */
-    public function generate(): void
+    protected function generateInternal(): void
     {
         // !!! DANGER - eval() is used here !!!
         if (eval($this->getCode()) === false) {
             throw new QuestionException("Generator code execution failed.");
-        }
-
-        if (!$this->getType() || !$this->getQuestion()) {
-            throw new QuestionException("The generator did not initialize the question.");
-        }
-
-        // the text must be copied from internal buffer to the constructed question at the end
-        $question = $this->getQuestion();
-        if ($question instanceof \App\Helpers\Questions\BaseQuestion) {
-            $question->setText($this->getText());
         }
     }
 }

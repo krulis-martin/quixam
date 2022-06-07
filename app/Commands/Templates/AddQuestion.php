@@ -137,11 +137,11 @@ class AddQuestionTemplate extends BaseCommand
                 throw new RuntimeException("Code validation of dynamic question generator failed.");
             }
 
-            $dynamicQuestion->generate();
+            $dynamicQuestion->generate(42);
 
             for ($seed = 0; $seed < 20; ++$seed) {
                 $dynamicQuestion = new DynamicQuestion($data, $this->questionFactory);
-                $dynamicQuestion->generate();
+                $dynamicQuestion->generate($seed);
             }
         }
 

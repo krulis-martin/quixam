@@ -79,7 +79,7 @@ class TestOrchestrator
             } else {
                 // no type => question generated dynamically
                 $dynamicQuestion = new DynamicQuestion($templateQuestion->getData(), $this->questionFactory);
-                $dynamicQuestion->generate();
+                $dynamicQuestion->generate($user->getSeed() + $ordering);
                 $type = $dynamicQuestion->getType();
                 $questionData = $dynamicQuestion->getQuestion();
             }
