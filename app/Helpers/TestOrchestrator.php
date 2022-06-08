@@ -46,6 +46,22 @@ class TestOrchestrator
         $this->questionFactory = $questionFactory;
     }
 
+    public function instantiateQuestionData(string $type, $data, int $seed)
+    {
+        if ($type) {
+            // regular (static) question
+            $questionData = $this->questionFactory->create($type);
+            $questionData->instantiate($data, $seed);
+        } else {
+            // no type => question generated dynamically
+            $dynamicQuestion = new DynamicQuestion($data, $this->questionFactory);
+            $dynamicQuestion->generate($seed);
+            $type = $dynamicQuestion->getType();
+            $questionData = $dynamicQuestion->getQuestion();
+        }
+        return $questionData;
+    }
+
     /**
      * Create a set of question instances for given enrolled user.
      * Nothing is returned, the questions are persisted in db.
@@ -72,24 +88,12 @@ class TestOrchestrator
         foreach ($templateQuestions as $idx => $templateQuestion) {
             $ordering = $idx + 1;
             $type = $templateQuestion->getType();
-            if ($type) {
-                // regular (static) question
-                $questionData = $this->questionFactory->create($templateQuestion->getType());
-                $questionData->instantiate($templateQuestion->getData(), $user->getSeed() + $ordering);
-            } else {
-                // no type => question generated dynamically
-                $dynamicQuestion = new DynamicQuestion($templateQuestion->getData(), $this->questionFactory);
-                $dynamicQuestion->generate($user->getSeed() + $ordering);
-                $type = $dynamicQuestion->getType();
-                $questionData = $dynamicQuestion->getQuestion();
-            }
-
             $question = new Question(
                 $user,
                 $templateQuestion->getQuestionsGroup(),
                 $templateQuestion,
                 $ordering,
-                $questionData,
+                $this->instantiateQuestionData($type, $templateQuestion->getData(), $user->getSeed() + $ordering),
                 $type
             );
             $maxScore += $question->getPoints();

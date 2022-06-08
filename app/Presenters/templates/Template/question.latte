@@ -1,0 +1,47 @@
+{block content}
+
+<h1>
+  <i class="fa-solid fa-scroll fa-fw text-muted"></i>
+  {block title}{_locale.templateQuestion.title}: {$question->getCaption($locale)}{/block}
+</h1>
+
+<table class="mt-4">
+  <tr>
+    <th class="align-baseline pe-3 text-muted">{_locale.templateQuestion.randomSeed}:</th>
+    <td class="align-baseline">
+      <form id="seedForm" action="{link this}" method="GET">
+        <div class="input-group mb-2">
+            <button class="btn btn-secondary" type="button" data-action="decrement"><i class="fa-solid fa-angle-left"></i></button>
+            <input type="text" class="form-control" name="seed" id="seed" maxlength="10" pattern="^[0-9]+$" value={$seed}>
+            <button class="btn btn-secondary" type="button" data-action="increment"><i class="fa-solid fa-angle-right"></i></button>
+        </div>
+      </form>
+    </td>
+  </tr>
+</table>
+
+<div class="bg-light border p-3 my-3 rounded">{$text|markdown}</div>
+{$result|noescape}
+
+<script type="text/javascript">
+$(() => {
+    const baseUrl = $("#seedForm").attr("action");
+    console.log(location);
+    function updateSeed(delta) {
+        const val = parseInt($("#seed").val());
+        if (isNaN(val)) return;
+        $("#seed").val(val + delta);
+        $("#seed").change();
+    }
+
+    $("#seedForm button[data-action='decrement']").click(() => { updateSeed(-1); });
+    $("#seedForm button[data-action='increment']").click(() => { updateSeed(1); });
+    $("#seed").change(function() {
+        const val = parseInt($(this).val());
+        if (isNaN(val)) return;
+        window.location.replace('?seed=' + val);
+    });
+
+    $("#seedForm").submit(ev => ev.preventDefault());
+});
+</script>

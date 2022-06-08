@@ -1,0 +1,46 @@
+{block content}
+
+<h1>
+  <i class="fa-solid fa-scroll fa-fw text-muted"></i>
+  {block title}{_locale.template.title}{/block}
+</h1>
+
+<article n:foreach="$tests as $test">
+  <h3>{$test->getCaption($locale)} (<code>{$test->getExternalId()}</code>)</h3>
+
+  <table class="table mt-3">
+    <tbody n:foreach="$test->getQuestionGroups() as $group">
+      <tr class="bg-light">
+        <th><i class="fa-solid fa-cubes text-muted"></i></th>
+        <th colspan="2">
+          {$group->getOrdering()}.
+          <code>{$group->getExternalId()}</code>
+        </th>
+        <td colspan="2" class="text-end text-muted">
+          {_locale.template.points}: {$group->getPoints()}
+        </td>
+      </tr>
+      <tr n:foreach="$group->getQuestions() as $question">
+        <td></td>
+        <td>
+          {if $question->getType() === 'single'}
+            <i class="fa-regular fa-circle-dot fa-fw text-muted" title="{_locale.template.type.single}"></i>
+          {elseif $question->getType() === 'multi'}
+            <i class="fa-regular fa-square-check fa-fw text-muted" title="{_locale.template.type.multi}"></i>
+          {elseif $question->getType() === 'numeric'}
+            <i class="fa-solid fa-hashtag fa-fw text-muted" title="{_locale.template.type.numeric}"></i>
+          {elseif $question->getType() === ''}
+            <i class="fa-solid fa-gears fa-fw text-muted" title="{_locale.template.type.generated}"></i>
+          {else}
+            <i class="fa-regular fa-circle-question fa-fw text-muted" title="{_locale.template.type.unknown}"></i>
+          {/if}
+        </td>
+        <td class="text-nowrap"><code>{$question->getExternalId()}</code></td>
+        <td class="w-100">{$question->getCaption($locale)}</td>
+        <td class="text-nowrap">
+          <a n:href=":question id => $question->getId()">{_locale.template.preview}</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</article>

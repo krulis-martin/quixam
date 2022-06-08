@@ -76,4 +76,10 @@ interface IQuestion extends JsonSerializable
      * @return bool true if the answer is a correct one
      */
     public function isAnswerCorrect($answer): bool;
+
+    /**
+     * Return a correct answer in the format, that is accepted by isAnswerValid and isAnswerCorrect.
+     * @return mixed
+     */
+    public function getCorrectAnswer();
 }

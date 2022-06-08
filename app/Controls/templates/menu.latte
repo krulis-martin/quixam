@@ -14,9 +14,14 @@
           <a class="nav-link active" aria-current="page" href="">TODO</a>
         </li-->
         {if $user}
-        <li class="nav-item">
-          <a class="nav-link" href="{plink Dashboard:default}">{_locale.dashboard.title}</a>
-        </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{plink Dashboard:default}">{_locale.dashboard.title}</a>
+          </li>
+          {if $user->getRole() === App\Model\Entity\User::ROLE_ADMIN}
+            <li class="nav-item">
+              <a class="nav-link" href="{plink Template:default}">{_locale.template.title}</a>
+            </li>
+          {/if}
         {/if}
       </ul>
     </div>

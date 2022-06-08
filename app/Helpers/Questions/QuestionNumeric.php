@@ -16,17 +16,25 @@ use Exception;
  */
 final class QuestionNumeric extends BaseQuestion
 {
-    /** @var int */
-    protected $minCount = 1;
+    private const FORMAT_DEC = 'dec';
+    private const FORMAT_HEX = 'hex';
+    private const FORMAT_BIN = 'bin';
+    private const KNOWN_FORMATS = [ self::FORMAT_DEC, self::FORMAT_HEX, self::FORMAT_BIN ];
 
     /** @var int */
-    protected $maxCount = 10;
+    private $minCount = 1;
+
+    /** @var int */
+    private $maxCount = 10;
 
     /** @var int[] */
-    protected $correct = [];
+    private $correct = [];
 
     /** @var bool */
-    protected $correctInOrder = true;
+    private $correctInOrder = true;
+
+    /** @var string */
+    private $bestFormat = self::FORMAT_DEC;
 
     /**
      * Assembles nette validation schema for question template data.
@@ -39,6 +47,7 @@ final class QuestionNumeric extends BaseQuestion
             'correctInOrder' => Expect::bool(),
             'minCount' => Expect::int(),
             'maxCount' => Expect::int(),
+            'bestFormat' => Expect::string(),
         ])->skipDefaults()->castTo('array');
     }
 
@@ -82,7 +91,7 @@ final class QuestionNumeric extends BaseQuestion
      */
     private function loadParameters(array $json, string $errorPrefix): void
     {
-        foreach (['minCount', 'maxCount', 'correct', 'correctInOrder'] as $key) {
+        foreach (['minCount', 'maxCount', 'correct', 'correctInOrder', 'bestFormat'] as $key) {
             if (array_key_exists($key, $json)) {
                 $this->$key = $json[$key];
             }
@@ -100,6 +109,9 @@ final class QuestionNumeric extends BaseQuestion
         }
         if ($this->minCount > count($this->correct) || $this->maxCount < count($this->correct)) {
             throw new QuestionException("$errorPrefix, the correct answer is out of the minCount-maxCount range.");
+        }
+        if (!in_array($this->bestFormat, self::KNOWN_FORMATS)) {
+            throw new QuestionException("$errorPrefix, unknown best format '$this->bestFormat'.");
         }
     }
 
@@ -265,5 +277,17 @@ final class QuestionNumeric extends BaseQuestion
         }
 
         return true;
+    }
+
+    public function getCorrectAnswer()
+    {
+        return array_map(function ($num) {
+            if ($this->bestFormat === self::FORMAT_HEX) {
+                return [ 'num' => $num, 'str' => '0x' . dechex($num) ];
+            } elseif ($this->bestFormat === self::FORMAT_BIN) {
+                return [ 'num' => $num, 'str' => '0b' . decbin($num) ];
+            }
+            return [ 'num' => $num ];
+        }, $this->correct);
     }
 }

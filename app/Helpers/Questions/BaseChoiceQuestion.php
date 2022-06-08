@@ -153,4 +153,9 @@ abstract class BaseChoiceQuestion extends BaseQuestion
         $json['correct'] = $this->correct;
         return $json;
     }
+
+    public function getCorrectAnswer()
+    {
+        return $this->correct;
+    }
 }
