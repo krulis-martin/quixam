@@ -111,7 +111,7 @@ class TemplateQuestion
         return $this->id;
     }
 
-    public function getCreatedFrom(): ?TemplateQuestionsGroup
+    public function getCreatedFrom(): ?TemplateQuestion
     {
         return $this->createdFrom;
     }

@@ -115,6 +115,16 @@ class BaseSoftDeleteRepository extends BaseRepository
     }
 
     /**
+     * @param mixed $id
+     * @return T
+     * @throws NotFoundException
+     */
+    public function findEvenIfDeletedOrThrow($id)
+    {
+        return parent::findOrThrow($id);
+    }
+
+    /**
      * @param Criteria $params
      * @return mixed A lazy collection or a selectable entity
      */

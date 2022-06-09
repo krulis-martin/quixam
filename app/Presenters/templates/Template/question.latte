@@ -1,9 +1,44 @@
 {block content}
 
 <h1>
-  <i class="fa-solid fa-scroll fa-fw text-muted"></i>
+  <i class="fa-solid fa-file-circle-question fa-fw text-muted"></i>
   {block title}{_locale.templateQuestion.title}: {$question->getCaption($locale)}{/block}
 </h1>
+
+<span class="d-inline-block me-4">
+  <span class="text-muted">{_locale.templateQuestion.externalId}:</span>
+  <code>{$question->getExternalId()}</code>
+</span>
+<span class="d-inline-block me-4">
+  <span class="text-muted">{_locale.templateQuestion.groupId}:</span>
+  <code>{$question->getQuestionsGroup()->getExternalId()}</code>
+</span>
+<span class="d-inline-block me-4">
+  <span class="text-muted">{_locale.templateQuestion.points}:</span>
+  {$question->getQuestionsGroup()->getPoints()}
+</span>
+<span class="d-inline-block me-4">
+  <span class="text-muted">{_locale.templateQuestion.createdAt}:</span>
+  {$question->getCreatedAt()|ldate}
+</span>
+{if $question->getCreatedFrom()}
+<a class="d-inline-block me-4" n:href="this id: $question->getCreatedFrom()->getId()">
+  {_locale.templateQuestion.previous}
+  <i class="fa-solid fa-share-from-square fa-flip-horizontal"></i>
+</a>
+{/if}
+
+{if $question->getDeletedAt()}
+  <div class="border rounded border-danger text-danger p-3 my-3">
+    <i class="fa-solid fa-skull fa-fw"></i>
+    {_locale.templateQuestion.deleted}
+    {$question->getDeletedAt()|ldate}.
+    <a n:href="this id: $currentQuestion->getId()" class="float-end">
+      {_locale.templateQuestion.linkToCurrent}
+      <i class="fa-solid fa-share-from-square"></i>
+    </a>
+  </div>
+{/if}
 
 <table class="mt-4">
   <tr>

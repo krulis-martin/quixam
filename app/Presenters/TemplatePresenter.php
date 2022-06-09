@@ -7,6 +7,7 @@ namespace App\Presenters;
 use App\Model\Repository\TemplateTests;
 use App\Model\Repository\TemplateQuestions;
 use App\Model\Entity\TemplateTest;
+use App\Model\Entity\TemplateQuestion;
 use App\Helpers\TestOrchestrator;
 use Nette;
 use Nette\Application\UI\Form;
@@ -25,6 +26,16 @@ final class TemplatePresenter extends AuthenticatedPresenter
 
     /** @var LatteFactory @inject */
     public $latteFactory;
+
+    private function getCurrentQuestion(TemplateQuestion $question): TemplateQuestion
+    {
+        $previous = $question;
+        do {
+            $question = $previous;
+            $previous = $this->templateQuestions->findOneByEvenIfDeleted([ 'createdFrom' => $question->getId() ]);
+        } while ($previous);
+        return $question;
+    }
 
     public function checkDefault(): bool
     {
@@ -46,7 +57,7 @@ final class TemplatePresenter extends AuthenticatedPresenter
     {
         $this->template->locale = $this->selectedLocale;
 
-        $question = $this->templateQuestions->findOrThrow($id);
+        $question = $this->templateQuestions->findEvenIfDeletedOrThrow($id);
         $this->template->question = $question;
 
         $this->template->seed = $seed;
@@ -66,5 +77,9 @@ final class TemplatePresenter extends AuthenticatedPresenter
             $questionData->getCorrectAnswer(),
             true
         );
+
+        if ($question->getDeletedAt()) {
+            $this->template->currentQuestion = $this->getCurrentQuestion($question);
+        }
     }
 }
