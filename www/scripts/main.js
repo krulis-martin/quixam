@@ -116,6 +116,10 @@ $(() => {
       }
 
       globalAjaxLock = true;
+      var waitingIcon = createWaitingIcon();
+      $(this).append(waitingIcon);
+      $(this).addClass("disabled");
+      $(this).attr("aria-disabled", "true");
 
       fetch(link.href, {
         method: link.dataset.ajax,
@@ -124,6 +128,9 @@ $(() => {
         .then(postProcessAjax)
         .finally(() => {
           globalAjaxLock = false;
+          waitingIcon.remove();
+          $(this).removeClass("disabled");
+          $(this).attr("aria-disabled", "false");
         });
     }
   });

@@ -46,7 +46,14 @@ class TestOrchestrator
         $this->questionFactory = $questionFactory;
     }
 
-    public function instantiateQuestionData(string $type, $data, int $seed)
+    /**
+     * Instantiate/generate question data.
+     * @param string $type passed by a reference since dynamic questions will change it
+     * @param mixed $data parsed JSON data from the question template
+     * @param int $seed random initializer
+     * @return mixed structure with instantiated question data
+     */
+    public function instantiateQuestionData(string &$type, $data, int $seed)
     {
         if ($type) {
             // regular (static) question
@@ -88,12 +95,13 @@ class TestOrchestrator
         foreach ($templateQuestions as $idx => $templateQuestion) {
             $ordering = $idx + 1;
             $type = $templateQuestion->getType();
+            $data = $this->instantiateQuestionData($type, $templateQuestion->getData(), $user->getSeed() + $ordering);
             $question = new Question(
                 $user,
                 $templateQuestion->getQuestionsGroup(),
                 $templateQuestion,
                 $ordering,
-                $this->instantiateQuestionData($type, $templateQuestion->getData(), $user->getSeed() + $ordering),
+                $data,
                 $type
             );
             $maxScore += $question->getPoints();

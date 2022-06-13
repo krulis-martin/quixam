@@ -64,7 +64,7 @@ final class TemplatePresenter extends AuthenticatedPresenter
 
         $type = $question->getType();
         $questionData = $this->testOrchestrator->instantiateQuestionData(
-            $question->getType(),
+            $type,
             $question->getData(),
             $seed
         );

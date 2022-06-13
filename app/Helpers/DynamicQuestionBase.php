@@ -230,4 +230,9 @@ class DynamicQuestionBase
         }
         return mt_rand($min, $max);
     }
+
+    protected function shuffleArray(array &$array)
+    {
+        Random::shuffleArray($array);
+    }
 }

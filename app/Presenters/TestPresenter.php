@@ -152,6 +152,24 @@ final class TestPresenter extends AuthenticatedPresenter
         $this->finalizePost($this->link('default', [ 'id' => $id, 'question' => $next ? $next : null ]));
     }
 
+    public function handleLockSelf(string $id): void
+    {
+        $test = $this->testTerms->get($id);
+        if (!$test) {
+            $this->error("Test $id does not exist.", 404);
+        }
+
+        if (!$test->getFinishedAt()) {
+            $enrolledUser = $this->enrolledUsers->findOneBy([ 'test' => $id, 'user' => $this->user->getId() ]);
+            if ($enrolledUser && !$enrolledUser->isLocked()) {
+                $enrolledUser->setLocked();
+                $this->enrolledUsers->persist($enrolledUser);
+                $this->enrolledUsers->flush();
+            }
+        }
+
+        $this->finalizePost($this->link('default', [ 'id' => $id, 'question' => null ]));
+    }
 
     public function renderDefault(string $id)
     {
@@ -179,7 +197,7 @@ final class TestPresenter extends AuthenticatedPresenter
 
         if ($test->getStartedAt() !== null) {
             $questions = $enrolledUser->getQuestions()->toArray();
-            $selectedQuestionIdx = $this->getSelectedQuestion($questions, $this->template->readonly);
+            $selectedQuestionIdx = $this->getSelectedQuestion($questions, $test->getFinishedAt() !== null);
 
             $this->template->questions = $questions;
             $this->template->selectedQuestionIdx = $selectedQuestionIdx;

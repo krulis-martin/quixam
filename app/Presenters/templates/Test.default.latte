@@ -55,10 +55,15 @@
           $answerTmp !== null && $test->getFinishedAt() && !$answerTmp->getPoints() ? 'bg-danger text-danger'"
           n:href="this question => $question->getId()">{$question->getOrdering()}</a>
       </li>
-      <li class="page-item {$selectedQuestionIdx >= count($questions)-1 ? 'disabled'}">
+      {if $test->getFinishedAt() === null}
+      <li class="page-item {$selectedQuestionIdx >= count($questions) ? 'active'}">
+        <a class="page-link" n:href="this question => null">{_locale.test.end}</a>
+      </li>
+      {/if}
+      <li class="page-item {$selectedQuestionIdx >= (count($questions) - ($test->getFinishedAt() === null ? 0 : 1)) ? 'disabled'}">
         <a class="page-link"
           n:href="this question => $selectedQuestionIdx < count($questions)-1 ? $questions[$selectedQuestionIdx+1]->getId()"
-          >{if $selectedQuestionIdx >= count($questions)}{_locale.test.end}{else}{_locale.test.next}{/if}</a>
+          >{_locale.test.next}</a>
       </li>
     </ul>
   </nav>
@@ -100,7 +105,7 @@
           <div class="border rounded border-danger text-danger p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.wrongAnswer}</div>
         {/if}
       {elseif $enrolledUser->isLocked()}
-        <div class="border rounded border-warning text-warning p-2 my-2"><i class="fa-regular fa-hand fa-fw"></i> {_locale.test.enrolledUserLocked}</div>
+        <div class="border rounded border-info text-info p-2 my-2"><i class="fa-regular fa-hand fa-fw"></i> {_locale.test.enrolledUserLocked}</div>
       {/if}
 
       {$questionResult|noescape}
@@ -130,12 +135,30 @@
     {/if}
   {else}
     <p>
-      {_locale.test.completed.message1}
-    </p>
-    <p>
-      {_locale.test.completed.message2}
+      {if $enrolledUser->isLocked()}
+        {_locale.test.completed.message1Locked}
+      {else}
+        {_locale.test.completed.message1}
+      {/if}
     </p>
 
+    {if !$enrolledUser->isLocked()}
+      <a class="btn btn-warning mb-3" n:href="LockSelf!" data-ajax="POST" data-ajax-confirm="{_locale.test.lockMyselfConfirm}">
+        <i class="fa-solid fa-user-lock fa-fw"></i>
+        {_locale.test.lockMyselfButton}
+      </a>
+    {/if}
+
+    <p>
+      {_locale.test.completed.message2}
+      {_locale.test.completed.messagePointRanges}
+    </p>
+    <ul>
+      <li><strong>17-20</strong> {_locale.test.completed.points.1}</li>
+      <li><strong>14-17</strong> {_locale.test.completed.points.2}</li>
+      <li><strong>11-13</strong> {_locale.test.completed.points.3}</li>
+      <li><strong>10 {_locale.test.completed.points.less}</strong> {_locale.test.completed.points.4}</li>
+    </ul>
   {/if}
 
 {else}
