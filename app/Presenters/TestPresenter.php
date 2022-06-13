@@ -230,6 +230,16 @@ final class TestPresenter extends AuthenticatedPresenter
                             $test->getFinishedAt() !== null ? $this->template->answerCorrect : null
                         );
                 }
+
+                // teacher can see a correct anwer
+                if ($this->user->getRole() !== User::ROLE_STUDENT && empty($this->template->answerCorrect)) {
+                    $this->template->correctAnswer = $questionData->renderResultContent(
+                        $engine,
+                        $this->selectedLocale,
+                        $questionData->getCorrectAnswer(),
+                        true
+                    );
+                }
             }
         }
     }

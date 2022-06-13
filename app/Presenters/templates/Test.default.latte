@@ -133,6 +133,19 @@
 
       </form>
     {/if}
+
+    {if !empty($correctAnswer)}
+    <button class="btn btn-outline-danger btn-sm mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#correctAnswer"
+      aria-expanded="false" aria-controls="collapseExample">
+      {_locale.test.correctAnswerButton}
+    </button>
+    <div class="collapse" id="correctAnswer">
+      <div class="card card-body mt-3">
+        {$correctAnswer|noescape}
+      </div>
+    </div>
+    {/if}
+
   {else}
     <p>
       {if $enrolledUser->isLocked()}
