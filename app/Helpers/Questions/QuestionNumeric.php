@@ -85,6 +85,18 @@ final class QuestionNumeric extends BaseQuestion
     }
 
     /**
+     * Change the best format (affects how the correct answers are presented).
+     * @param string $format identifier (must be a known format)
+     */
+    public function setBestFormat(string $format): void
+    {
+        if (!in_array($format, self::KNOWN_FORMATS)) {
+            throw new QuestionException("Unknown best format '$format'.");
+        }
+        $this->bestFormat = $format;
+    }
+
+    /**
      * Helper function that loads internal parameters from JSON (template or save question data).
      * @param array $json decoded input data structure
      * @param string $errorPrefix used as initial part of message if exception needs to be thrown
@@ -146,7 +158,7 @@ final class QuestionNumeric extends BaseQuestion
     public function jsonSerialize()
     {
         $json = parent::jsonSerialize();
-        foreach (['minCount', 'maxCount', 'correct', 'correctInOrder'] as $key) {
+        foreach (['minCount', 'maxCount', 'correct', 'correctInOrder', 'bestFormat'] as $key) {
             $json[$key] = $this->$key;
         }
         return $json;

@@ -152,6 +152,9 @@ final class TestPresenter extends AuthenticatedPresenter
         $this->finalizePost($this->link('default', [ 'id' => $id, 'question' => $next ? $next : null ]));
     }
 
+    /**
+     * Signal handler for the self-lock button.
+     */
     public function handleLockSelf(string $id): void
     {
         $test = $this->testTerms->get($id);
@@ -171,9 +174,54 @@ final class TestPresenter extends AuthenticatedPresenter
         $this->finalizePost($this->link('default', [ 'id' => $id, 'question' => null ]));
     }
 
+    /**
+     * Handle the points override button.
+     */
+    public function handlePointsOverride(string $id, bool $override): void
+    {
+        if ($this->user->getRole() === User::ROLE_STUDENT) {
+            $this->error("The user does not have sufficient priviledges to perform this operation.", 403);
+        }
+
+        $test = $this->testTerms->get($id);
+        if (!$test) {
+            $this->error("Test $id does not exist.", 404);
+        }
+
+        if (!$test->getFinishedAt()) {
+            $this->finalizePostError("The test is not finished yet!");
+        }
+
+        // find the question to which the answer belongs to
+        if (!$this->question || !$this->questions->get($this->question)) {
+            $this->finalizePostError("Unable to override points when no question is selected.");
+        }
+        $question = $this->questions->get($this->question);
+        if ($question->getLastAnswer() === null) {
+            $this->finalizePostError("Cannot override question with no answer.");
+        }
+        $answer = $question->getLastAnswer();
+
+        $enrolledUser = $this->getEnrolledUser($id);
+        if (!$enrolledUser) {
+            $this->finalizePostError("The enrolled user record is missing!");
+        }
+
+        $oldValue = $answer->getPoints();
+        $newValue = $override ? $question->getPoints() : 0;
+        $answer->setPoints($newValue);
+        $this->answers->persist($answer);
+
+        $enrolledUser->setScore($enrolledUser->getScore() + $newValue - $oldValue);
+        $this->enrolledUsers->persist($enrolledUser);
+
+        $this->finalizePost($this->link('default', [ 'id' => $id, 'question' => $this->question ]));
+    }
+
     public function renderDefault(string $id)
     {
         $this->template->locale = $this->selectedLocale;
+        $this->template->isSupervisor = $this->user->getRole() !== User::ROLE_STUDENT;
 
         $test = $this->testTerms->get($id);
         if (!$test) {

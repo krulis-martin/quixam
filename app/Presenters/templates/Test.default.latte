@@ -146,6 +146,20 @@
     </div>
     {/if}
 
+    {if $test->getFinishedAt() !== null && $answer && !$answerCorrect && $isSupervisor}
+      {if $answer->getPoints() === 0}
+        <a class="btn btn-success btn-sm mt-3" n:href="PointsOverride! question: $selectedQuestion->getId(), override: true">
+          <i class="fa-solid fa-diagram-next fa-fw"></i>
+          {_locale.test.overridePoints}
+        </a>
+      {else}
+        <a class="btn btn-danger btn-sm mt-3" n:href="PointsOverride! question: $selectedQuestion->getId(), override: false">
+          <i class="fa-solid fa-ban fa-fw"></i>
+          {_locale.test.cancelOverride}
+        </a>
+      {/if}
+    {/if}
+
   {else}
     <p>
       {if $enrolledUser->isLocked()}
@@ -168,7 +182,7 @@
     </p>
     <ul>
       <li><strong>17-20</strong> {_locale.test.completed.points.1}</li>
-      <li><strong>14-17</strong> {_locale.test.completed.points.2}</li>
+      <li><strong>14-16</strong> {_locale.test.completed.points.2}</li>
       <li><strong>11-13</strong> {_locale.test.completed.points.3}</li>
       <li><strong>10 {_locale.test.completed.points.less}</strong> {_locale.test.completed.points.4}</li>
     </ul>
