@@ -101,6 +101,7 @@ final class TestPresenter extends AuthenticatedPresenter
             }
 
             if ($enrolled->getTest()->getFinishedAt() !== null) {
+                // student cannot access old tests when writting a test
                 return !$this->testTerms->getTermsUserIsEnrolledFor($this->user, true); // true = only ative
             }
 
