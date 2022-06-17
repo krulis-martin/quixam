@@ -200,8 +200,12 @@ final class DashboardPresenter extends AuthenticatedPresenter
             }
         }
 
+        $this->template->hasActiveTest = false;
         foreach ($this->enrolledUsers->findBy([ 'user' => $this->user->getId() ]) as $enrolled) {
             $tests[] = [ $enrolled->getTest(), 'enrolled', $enrolled ];
+            if ($enrolled->getTest()->getFinishedAt() === null) {
+                $this->template->hasActiveTest = true;
+            }
         }
         foreach ($this->enrollmentRegistrations->findBy([ 'user' => $this->user->getId() ]) as $registered) {
             $tests[] = [ $registered->getTest(), 'registered', $registered ];

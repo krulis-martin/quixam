@@ -22,9 +22,11 @@ class TestTerms extends BaseSoftDeleteRepository
 
     /**
      * Retrieve a list of terms for which a user is enrolled for.
+     * @param User $user
+     * @param bool $onlyActive list only tests currently being written (not finished yet)
      * @return TestTerm[]
      */
-    public function getTermsUserIsEnrolledFor(User $user): array
+    public function getTermsUserIsEnrolledFor(User $user, bool $onlyActive = false): array
     {
         $qb = $this->createQueryBuilder("tt");
         $qb->innerJoin("tt.enrolledUsers", "eu")
@@ -32,6 +34,10 @@ class TestTerms extends BaseSoftDeleteRepository
             ->andWhere($qb->expr()->isNull("tt.archivedAt"))
             ->orderBy('tt.scheduledAt');
         $qb->setParameters([ 'user' => $user->getId() ]);
+
+        if ($onlyActive) {
+            $qb->andWhere($qb->expr()->isNull("tt.finishedAt"));
+        }
         return $qb->getQuery()->getResult();
     }
 

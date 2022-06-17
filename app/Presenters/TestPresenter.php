@@ -96,7 +96,15 @@ final class TestPresenter extends AuthenticatedPresenter
         if ($this->user->getRole() === User::ROLE_STUDENT) {
             // a student must be enrolled to see the test, which has already started
             $enrolled = $this->getEnrolledUser($id);
-            return $enrolled !== null && $enrolled->getTest()->getStartedAt() !== null;
+            if ($enrolled === null || $enrolled->getTest()->getStartedAt() === null) {
+                return false;
+            }
+
+            if ($enrolled->getTest()->getFinishedAt() !== null) {
+                return !$this->testTerms->getTermsUserIsEnrolledFor($this->user, true); // true = only ative
+            }
+
+            return true;
         }
 
         if ($this->user->getRole() === User::ROLE_TEACHER) {

@@ -78,9 +78,20 @@
           {else}
             {* student relations *}
             {if $test->getStartedAt() && $relation === 'enrolled'}
-              <a n:href="Test:default $test->getId()">
-                {if $test->getFinishedAt()}{_locale.dashboard.table.results}{else}{_locale.dashboard.table.continue}{/if}
-              </a>
+              {if $relationObj->isLocked() && $test->getFinishedAt() === null}
+                <i class="fa-solid fa-lock fa-fw text-secondary" title="{_locale.dashboard.table.locked}"></i>
+              {/if}
+              {if !$hasActiveTest || $test->getFinishedAt() === null}
+                <a n:href="Test:default $test->getId()">
+                  {if $test->getFinishedAt()}
+                    {_locale.dashboard.table.results}
+                  {elseif $relationObj->isLocked()}
+                    {_locale.dashboard.table.browse}
+                  {else}
+                    {_locale.dashboard.table.continue}
+                  {/if}
+                </a>
+              {/if}
             {elseif $test->getStartedAt()}
               {if $test->getFinishedAt()}
                 <em>{_locale.dashboard.table.missed}</em>
