@@ -8,7 +8,7 @@
 <article n:foreach="$tests as $test">
   <h3>{$test->getCaption($locale)} (<code>{$test->getExternalId()}</code>)</h3>
 
-  <table class="table mt-3">
+  <table class="table mt-3 align-middle">
     <tbody n:foreach="$test->getQuestionGroups() as $group">
       <tr class="bg-light">
         <th><i class="fa-solid fa-cubes text-muted"></i></th>
@@ -36,9 +36,21 @@
           {/if}
         </td>
         <td class="text-nowrap"><code>{$question->getExternalId()}</code></td>
-        <td class="w-100">{$question->getCaption($locale)}</td>
-        <td class="text-nowrap">
+        <td class="w-100 {$question->isDisabled() ? 'text-muted'}">
+          <i n:if="$question->isDisabled()" class="fa-solid fa-lock fa-fw text-muted"></i>
+          {$question->getCaption($locale)}
+        </td>
+        <td class="text-nowrap text-end">
           <a n:href=":question id => $question->getId()">{_locale.template.preview}</a>
+          <a n:if="!$question->isDisabled()" class="btn btn-danger btn-sm" n:href="SetDisabled! id => $question->getId(), disabled: true" data-ajax="POST">
+            <i class="fa-solid fa-lock fa-fw"></i>
+            {_locale.template.disableButton}
+          </a>
+          <a n:if="$question->isDisabled()" class="btn btn-success btn-sm" n:href="SetDisabled! id => $question->getId(), disabled: false" data-ajax="POST">
+            <i class="fa-solid fa-lock-open fa-fw"></i>
+            {_locale.template.enableButton}
+          </a>
+
         </td>
       </tr>
     </tbody>

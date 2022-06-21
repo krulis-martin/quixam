@@ -84,7 +84,9 @@ class TestOrchestrator
         // select questions for the test
         $templateQuestions = [];
         foreach ($testTemplate->getQuestionGroups() as $templateGroup) {
-            $candidates = $templateGroup->getQuestions()->toArray();
+            $candidates = $templateGroup->getQuestions()->filter(function (TemplateQuestion $tq) {
+                return !$tq->isDisabled(); // disabled templates are removed from candidate list
+            })->toArray();
             foreach (Random::selectRandomSubset($candidates, $templateGroup->getSelectCount()) as $tq) {
                 $templateQuestions[] = $tq;
             }

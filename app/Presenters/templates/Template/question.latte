@@ -28,17 +28,20 @@
 </a>
 {/if}
 
-{if $question->getDeletedAt()}
-  <div class="border rounded border-danger text-danger p-3 my-3">
-    <i class="fa-solid fa-skull fa-fw"></i>
-    {_locale.templateQuestion.deleted}
-    {$question->getDeletedAt()|ldate}.
-    <a n:href="this id: $currentQuestion->getId()" class="float-end">
-      {_locale.templateQuestion.linkToCurrent}
-      <i class="fa-solid fa-share-from-square"></i>
-    </a>
-  </div>
-{/if}
+<div n:if="$question->getDeletedAt()" class="border rounded border-danger text-danger p-3 my-3">
+  <i class="fa-solid fa-skull fa-fw"></i>
+  {_locale.templateQuestion.deleted}
+  {$question->getDeletedAt()|ldate}.
+  <a n:href="this id: $currentQuestion->getId()" class="float-end">
+    {_locale.templateQuestion.linkToCurrent}
+    <i class="fa-solid fa-share-from-square"></i>
+  </a>
+</div>
+
+<div n:if="$question->isDisabled() && !$question->getDeletedAt()" class="border rounded border-info text-info p-2 my-3">
+  <i class="fa-solid fa-lock fa-fw"></i>
+  {_locale.templateQuestion.disabledInfo}
+</div>
 
 <table class="mt-4">
   <tr>

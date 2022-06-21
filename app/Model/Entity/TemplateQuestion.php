@@ -72,6 +72,13 @@ class TemplateQuestion
     protected $data = '';
 
     /**
+     * Allows temporarily disabling the question, so it will be visible in listings,
+     * but it cannot be selected when a test is being instantiated.
+     * @ORM\Column(type="boolean")
+     */
+    protected $disabled = false;
+
+    /**
      * @param TemplateQuestionsGroup $group where the question belongs to
      * @param string $type
      * @param mixed $data (that will be serialized in JSON)
@@ -158,5 +165,15 @@ class TemplateQuestion
     public function getDataRaw(): string
     {
         return $this->data;
+    }
+
+    public function isDisabled(): bool
+    {
+        return $this->disabled;
+    }
+
+    public function setDisabled(bool $disabled = true): void
+    {
+        $this->disabled = $disabled;
     }
 }

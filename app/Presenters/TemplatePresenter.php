@@ -27,6 +27,14 @@ final class TemplatePresenter extends AuthenticatedPresenter
     /** @var LatteFactory @inject */
     public $latteFactory;
 
+    public function handleSetDisabled(string $id, bool $disabled): void
+    {
+        $question = $this->templateQuestions->findOrThrow($id);
+        $question->setDisabled($disabled);
+        $this->templateQuestions->persist($question);
+        $this->finalizePost($this->link('this'));
+    }
+
     private function getCurrentQuestion(TemplateQuestion $question): TemplateQuestion
     {
         $previous = $question;
