@@ -136,7 +136,7 @@ abstract class BaseQuestion implements IQuestion
         $this->loadText($json, 'Corrupted question data');
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return [ 'text' => $this->text ];
     }

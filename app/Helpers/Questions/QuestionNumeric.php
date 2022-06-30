@@ -155,7 +155,7 @@ final class QuestionNumeric extends BaseQuestion
         $this->loadParameters($json, "Question data are corrupted");
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         $json = parent::jsonSerialize();
         foreach (['minCount', 'maxCount', 'correct', 'correctInOrder', 'bestFormat'] as $key) {

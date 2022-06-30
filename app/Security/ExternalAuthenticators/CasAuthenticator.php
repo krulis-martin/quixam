@@ -107,7 +107,6 @@ class CasAuthenticator implements IExternalAuthenticator
 
     public function initialize(): void
     {
-        /** @phpstan-ignore-next-line */
         phpCAS::client(CAS_VERSION_3_0, $this->server, $this->port, $this->uri);
 
         if ($this->certificate) {

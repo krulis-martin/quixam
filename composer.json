@@ -5,7 +5,7 @@
 	"type": "project",
 	"license": ["MIT"],
 	"require": {
-		"php": ">= 7.4",
+		"php": ">= 8.1",
 		"nette/application": "^3.1",
 		"nette/bootstrap": "^3.1",
 		"nette/caching": "^3.1",
@@ -21,7 +21,7 @@
 		"latte/latte": "^2.9",
 		"tracy/tracy": "^2.8",
 		"nettrine/orm": "^0.8.3",
-		"nettrine/dbal": "^0.7.1",
+		"nettrine/dbal": "^0.8.0",
 		"nettrine/migrations": "^0.8.0",
 		"nettrine/extensions-atlantic18": "^0.6.0",
 		"gedmo/doctrine-extensions": "^3.6.0",
@@ -31,7 +31,7 @@
 		"contributte/translation": "^1.0",
 		"jasig/phpcas": "^1.5",
 		"contributte/monolog": "^0.5.0",
-		"baraja-core/markdown-latte-filter": "^2.0",
+		"baraja-core/markdown-latte-filter": "^3.1",
 		"nette/schema": "^1.2"
 	},
 	"require-dev": {
@@ -46,5 +46,10 @@
 		}
 	},
 	"minimum-stability": "dev",
-	"prefer-stable": true
+	"prefer-stable": true,
+	"config": {
+		"allow-plugins": {
+			"symfony/thanks": true
+		}
+	}
 }
