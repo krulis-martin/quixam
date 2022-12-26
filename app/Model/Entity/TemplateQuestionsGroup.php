@@ -28,8 +28,10 @@ class TemplateQuestionsGroup
 
     /**
      * @ORM\Id
-     * @ORM\Column(type="guid")
-     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Column(type="uuid", unique=true)
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\CustomIdGenerator(class=\Ramsey\Uuid\Doctrine\UuidGenerator::class)
+     * @var \Ramsey\Uuid\UuidInterface
      */
     protected $id;
 
@@ -106,7 +108,7 @@ class TemplateQuestionsGroup
 
     public function getId(): string
     {
-        return $this->id;
+        return (string)$this->id;
     }
 
     public function getCreatedFrom(): ?TemplateQuestionsGroup

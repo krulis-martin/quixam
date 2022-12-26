@@ -202,6 +202,13 @@ class DynamicQuestionBase
      */
     protected function replaceText($search, $replace, $locales = [ 'en', 'cs' ], bool $preg = false): void
     {
+        if (!is_string($search) && !is_array($search)) {
+            $search = "$search";
+        }
+        if (!is_string($replace) && !is_array($replace)) {
+            $replace = "$replace";
+        }
+
         if (!is_array($locales)) {
             $locales = [ $locales ];
         }
