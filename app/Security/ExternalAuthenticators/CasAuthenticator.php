@@ -107,7 +107,8 @@ class CasAuthenticator implements IExternalAuthenticator
 
     public function initialize(): void
     {
-        phpCAS::client(CAS_VERSION_3_0, $this->server, $this->port, $this->uri);
+        $base = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
+        phpCAS::client(CAS_VERSION_3_0, $this->server, $this->port, $this->uri, $base);
 
         if ($this->certificate) {
             $this->logger->debug("Using $this->certificate PEM chain to verify CAS server.");

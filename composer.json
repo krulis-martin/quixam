@@ -31,7 +31,7 @@
 		"contributte/translation": "^1.0",
 		"jasig/phpcas": "^1.5",
 		"contributte/monolog": "^0.5.0",
-		"baraja-core/markdown-latte-filter": "^3.1",
+		"baraja-core/markdown-latte-filter": "<3.2",
 		"nette/schema": "^1.2",
 		"ramsey/uuid-doctrine": "^1.8"
 	},
