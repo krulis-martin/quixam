@@ -1,0 +1,19 @@
+table[data-memory-view] td, table[data-memory-view] th {
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+}
+
+table[data-memory-view] input {
+    width: 2.5em;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: right;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+table[data-memory-view] input.invalid {
+    color: #900;
+    background-color: #fcc;
+    border: 1px solid red;
+}
