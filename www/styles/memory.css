@@ -4,7 +4,8 @@ table[data-memory-view] td, table[data-memory-view] th {
 }
 
 table[data-memory-view] input {
-    width: 2.5em;
+    width: 3ch;
+    box-sizing: content-box;
     font-weight: bold;
     font-family: 'Courier New', Courier, monospace;
     text-align: right;

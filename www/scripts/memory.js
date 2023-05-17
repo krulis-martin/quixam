@@ -125,13 +125,16 @@ $(() => {
 
       // fill cells
       for (let i = 0; i < 16; i += 2) {
-        const text =
-          "0x" +
-          memory
-            .getWord(baseOffset + offset + i)
-            .toString(16)
-            .padStart(4, "0");
-        $(this).append(_td(text, "", { colspan: 2 }));
+        const value = memory.getWord(baseOffset + offset + i);
+        const text = "0x" + value.toString(16).padStart(4, "0");
+        const hint =
+          "0b" +
+          value
+            .toString(2)
+            .padStart(16, "0")
+            .replace(/(.{4})/g, " $1")
+            .trim();
+        $(this).append(_td(text, "", { colspan: 2, title: hint }));
         memory.getWord(baseOffset + offset + i);
       }
 
