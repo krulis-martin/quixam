@@ -1,0 +1,121 @@
+<input id="orderQuestionAnswer" type="text" name="answer" value="{$selected ? implode(' ', $selected) : ''}" n:attr="readonly: $readonly" class="d-none">
+
+<div n:if="!$readonly" class="my-2 p-1 text-muted small">
+    <i class="fa-regular fa-lightbulb"></i>
+    {_locale.templateQuestion.order.explain}
+</div>
+
+<div class="my-3 {$readonly ? 'readonly' : ''}">
+    <div class="row">
+        <div class="col-6">
+            <h5>{_locale.templateQuestion.order.selectedItems}</h5>
+        </div>
+        <div class="col-6">
+            <h5 class="text-muted">{_locale.templateQuestion.order.remainingItems}</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div id="orderQuestionSelected" class="orderQuestionContainer {$correctClass} {$selected ? '' : 'empty'}">
+                <div n:foreach="$selected as $idx" data-item="{$idx}">{$items[$idx]->getText($locale)|markdown}</div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div id="orderQuestionRemaining" class="orderQuestionContainer">
+                <div n:foreach="$remaining as $idx" data-item="{$idx}">{$items[$idx]->getText($locale)|markdown}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{if !$readonly}
+<script type="text/javascript">
+$(() => {
+    $(".orderQuestionContainer").sortable({
+      connectWith: ".orderQuestionContainer",
+      placeholder: "orderQuestionPlaceholder",
+      update: () => {
+        const answer = $("#orderQuestionSelected div[data-item]").toArray().map(div => div.dataset.item);
+        $("#orderQuestionAnswer").val(answer.join(' '));
+        if (answer.length === 0) {
+            $("#orderQuestionSelected").addClass("empty");
+        } else {
+            $("#orderQuestionSelected").removeClass("empty");
+        }
+    }
+    }).disableSelection();
+});
+</script>
+{/if}
+
+<style>
+.orderQuestionContainer {
+    padding-bottom: 2.5em;
+    margin-bottom: -2.5em;
+}
+
+.orderQuestionContainer.empty {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border: 2px dotted #bbb;
+    height: 5em;
+    border-radius: 1em;
+    position: relative;
+}
+
+.orderQuestionContainer.empty::before {
+    content: '{_locale.templateQuestion.order.emptyAnswer}';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 70%;
+    color: #999;
+    transform: translate(-50%, -50%);
+}
+
+.orderQuestionContainer > div {
+    margin: 0.25rem 0;
+    padding: 0.5rem;
+    border: 1px solid #bbb;
+    background-color: #eee;
+    cursor: grab;
+}
+
+.readonly .orderQuestionContainer > div {
+    cursor: default;
+}
+
+#orderQuestionRemaining > div {
+    opacity: 0.5;
+}
+
+#orderQuestionSelected > div {
+    border: 1px solid #bbf;
+    background-color: #eef;
+    box-shadow: 0.1rem 0.1rem 0.5rem 0 #ccd;
+}
+
+#orderQuestionSelected.correct > div {
+    border: 1px solid #bfb;
+    background-color: #efe;
+    box-shadow: 0.1rem 0.1rem 0.5rem 0 #cdc;
+}
+
+#orderQuestionSelected.wrong > div {
+    border: 1px solid #fbb;
+    background-color: #fee;
+    box-shadow: 0.1rem 0.1rem 0.5rem 0 #dcc;
+}
+
+#orderQuestionSelected > div.orderQuestionPlaceholder, #orderQuestionRemaining > div.orderQuestionPlaceholder {
+    background-color: #f0f0f0;
+    border: 0;
+    height: 2.5em;
+    box-shadow: inset 0 0 1em 0.25em white;
+    opacity: 1;
+}
+
+#orderQuestionSelected.empty > div.orderQuestionPlaceholder {
+    height: 4.5em;
+}
+</style>

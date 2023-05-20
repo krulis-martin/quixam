@@ -29,6 +29,8 @@
             <i class="fa-regular fa-square-check fa-fw text-muted" title="{_locale.template.type.multi}"></i>
           {elseif $question->getType() === 'numeric'}
             <i class="fa-solid fa-hashtag fa-fw text-muted" title="{_locale.template.type.numeric}"></i>
+          {elseif $question->getType() === 'order'}
+            <i class="fa-solid fa-arrow-down-short-wide fa-fw text-muted" title="{_locale.template.type.order}"></i>
           {elseif $question->getType() === ''}
             <i class="fa-solid fa-gears fa-fw text-muted" title="{_locale.template.type.generated}"></i>
           {else}

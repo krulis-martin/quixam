@@ -10,7 +10,7 @@ use JsonSerializable;
 interface IQuestion extends JsonSerializable
 {
     /**
-     * Load question template data and generates an instance of the question using given random seed.
+     * Load question template data and generate an instance of the question using given random seed.
      * @param mixed $templateJson deserialized data from a template
      * @param int $seed used to initialize random generators
      */

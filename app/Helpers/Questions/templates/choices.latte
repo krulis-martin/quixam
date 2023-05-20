@@ -17,7 +17,7 @@
                     value="{$idx}"
                     class="form-check-input"
                     id="option_{$idx}"
-                    {in_array($idx, $answers) ? 'checked' : ''}
+                    n:attr="checked: in_array($idx, $answers)"
                 >
                 {/if}
             </td>

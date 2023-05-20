@@ -133,7 +133,7 @@ class Random
         }
         if ($count < count($preselected)) {
             throw new InvalidArgumentException("Unable to select only $count items, when " . count($preselected)
-                . " are already pre-selected.");
+            . " are already pre-selected.");
         }
 
         $keys = array_keys($data);
@@ -176,6 +176,85 @@ class Random
         foreach ($resultKeys as $key) {
             $result[$key] = $data[$key];
         }
+        return $result;
+    }
+
+    /**
+     * Helper function for knapsack problem. Takes configuraion [ size => number of items ] and returns string ID.
+     * For debugging purposes, the string is created as math expression size1 * number1 + size2 * number2 ...
+     * @param array $content stats
+     * @return string that can be used as key in an array for instance
+     */
+    private static function knapsackHash(array $content): string
+    {
+        ksort($content, SORT_NUMERIC);
+        foreach ($content as $size => &$count) {
+            $count = "$size*$count";
+        }
+        return implode('+', $content);
+    }
+
+    /**
+     * Random version of a knapsack solver.
+     * @param array $sizes [ item index => size ], the size must be a positive int (relatively small)
+     * @param int $min number of items we need to choose
+     * @param int $max number of items we need to choose
+     * @return array indices of the selected items
+     */
+    public static function selectRandomKnapsack(array $sizes, int $min, int $max): array
+    {
+        if ($max === 0) {
+            return [];
+        }
+
+        // sortout sizes into categories (assuming theyre discrete and their number is small)
+        $sizeCategories = []; // size => [ item indices ]
+        $stats = []; // size => count([ item indices ])
+        foreach ($sizes as $idx => $size) {
+            if ($size > 0) {
+                $sizeCategories[$size] = $sizeCategories[$size] ?? [];
+                $sizeCategories[$size][] = $idx;
+                $stats[$size] = ($stats[$size] ?? 0) + 1;
+            }
+        }
+
+        // dynamic programming
+        $knapsack = []; // size => possible solutions
+        for ($s = 1; $s <= $max; ++$s) {
+            $knapsack[$s] = [];
+            foreach ($stats as $size => $count) {
+                if ($size === $s) {
+                    $content = [ $size => 1 ]; // trivial satisfaction, one item fills the sack
+                    $knapsack[$s][self::knapsackHash($content)] = $content;
+                }
+
+                foreach (($knapsack[$s - $size] ?? []) as $content) { // all possible configurations of smaller knapsack
+                    // content is described as possible full-knapsack configuration ([ size => items count ])
+                    if (($content[$size] ?? 0) < $stats[$size]) { // still have some items of this size
+                        $content[$size] = ($content[$size] ?? 0) + 1; // create a new configuration
+                        $knapsack[$s][self::knapsackHash($content)] = $content; // hash to deduplicate configurations
+                    }
+                }
+            }
+        }
+
+        // get possible configurations for generating the answer
+        $configurations = [];
+        for ($s = $min; $s <= $max; ++$s) {
+            $configurations = array_merge($configurations, array_values($knapsack[$s]));
+        }
+        if (!$configurations) {
+            return [];
+        }
+
+        // generate random answer based on the configuration
+        $configuration = $configurations[mt_rand(0, count($configurations) - 1)];
+        $result = [];
+        foreach ($configuration as $size => $count) {
+            self::shuffleArray($sizeCategories[$size]);
+            $result = array_merge($result, array_slice($sizeCategories[$size], 0, $count));
+        }
+        self::shuffleArray($result);
         return $result;
     }
 }

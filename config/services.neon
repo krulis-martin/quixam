@@ -13,6 +13,7 @@ services:
       single: App\Helpers\Questions\QuestionSingle,
       multi: App\Helpers\Questions\QuestionMulti,
       numeric: App\Helpers\Questions\QuestionNumeric,
+      order: App\Helpers\Questions\QuestionOrder,
     ])
 
   # DB repositories
