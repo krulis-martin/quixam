@@ -16,6 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Ramsey\Uuid\Uuid;
 
 /**
  * A console command that creates a new user (without password).
@@ -81,7 +82,7 @@ class DbFill extends BaseCommand
                 if ($matches['class'] === 'User') {
                     $arg = $this->repositories[$class]->findByEmail($id);
                 } else {
-                    $arg = $this->repositories[$class]->get($id);
+                    $arg = Uuid::isValid($id) ? $this->repositories[$class]->get($id) : null;
                     if (!$arg && property_exists($class, 'externalId')) {
                         $candidates = $this->repositories[$class]->findBy(['externalId' => $id]);
                         if (count($candidates) > 1) {
