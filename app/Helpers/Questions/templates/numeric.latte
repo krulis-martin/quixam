@@ -4,7 +4,7 @@
         <strong>{_locale.answer}:</strong>
     </div>
 
-    <div id="numeric-answers" class="col col-12 col-md-10 col-lg-8 col-xl-6 col-xxl-5" data-values="{join(' ', $answer)}" data-min-count="1" data-max-count="{$maxCount}">
+    <div id="numeric-answers" class="col col-12 col-md-10 col-lg-8 col-xl-6 col-xxl-5" data-values="{join(' ', $answer)}" data-min-count="{$minCount}" data-max-count="{$maxCount}">
         {if $readonly}
             <div class="input-group mb-2" n:foreach="$answer as $value">
                 <input type="text" class="form-control {$inputClass ?? ''}" value="{$value}" readonly>
@@ -92,7 +92,10 @@ $(() => {
             $("#numeric-answers").append(input);
         });
     } else {
-        $("#numeric-answers").append(template.clone(true));
+        const count = Math.max(1, minCount);
+        for (let i = 0; i < count; ++i) {
+            $("#numeric-answers").append(template.clone(true));
+        }
     }
     checkButtonsVisibility();
     validate();
