@@ -60,6 +60,13 @@ body, html {
     cursor: wait;
 }
 
+table td.placeholder {
+    background-color: #ddd;
+    margin: 0.25em;
+    min-width: 5em;
+    min-height: 2em;
+}
+
 /*
  * Bootstrap overrided
  */
