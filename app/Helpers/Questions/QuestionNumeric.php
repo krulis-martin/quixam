@@ -174,7 +174,7 @@ final class QuestionNumeric extends BaseQuestion
     private function renderNumericTeplate(Engine $latte, $answer, array $params = []): string
     {
         $params['readonly'] = $params['readonly'] ?? false;
-        $params['minCount'] = $this->maxCount;
+        $params['minCount'] = $this->minCount;
         $params['maxCount'] = $this->maxCount;
 
         $answerStr = [];
