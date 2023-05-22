@@ -332,6 +332,7 @@ final class QuestionOrder extends BaseQuestion
     public function jsonSerialize(): mixed
     {
         $json = parent::jsonSerialize();
+        $json['items'] = $this->items;
         return $json;
     }
 }
