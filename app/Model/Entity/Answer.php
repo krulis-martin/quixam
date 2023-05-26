@@ -54,12 +54,19 @@ class Answer
      */
     protected $points = null;
 
+    /**
+     * IP address of the client who submitted this answer (as perceived by the server).
+     * @ORM\Column(type="string")
+     */
+    protected $ipAddress = "";
 
-    public function __construct(Question $question, $answer)
+
+    public function __construct(Question $question, $answer, string $ipAddress = "")
     {
         $this->createdAt = new DateTime();
         $this->question = $question;
         $this->answer = json_encode($answer);
+        $this->ipAddress = $ipAddress;
     }
 
     /*
@@ -100,5 +107,10 @@ class Answer
     {
         $this->evaluatedAt = new DateTime();
         $this->points = $points;
+    }
+
+    public function getIpAddress(): string
+    {
+        return $this->ipAddress;
     }
 }

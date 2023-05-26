@@ -151,7 +151,7 @@ final class TestPresenter extends AuthenticatedPresenter
         }
 
         // save the answer
-        $answerEntity = new Answer($question, $answer);
+        $answerEntity = new Answer($question, $answer, $this->getHttpRequest()->getRemoteAddress() ?? '');
         $this->answers->persist($answerEntity);
 
         $question->setLastAnswer($answerEntity);
