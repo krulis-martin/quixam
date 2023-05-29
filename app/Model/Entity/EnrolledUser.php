@@ -146,4 +146,20 @@ class EnrolledUser
     {
         $this->locked = $locked;
     }
+
+    /**
+     * Return a grade based on given score and test grading system.
+     * @return string|int|null null if the grade cannot be determined
+     */
+    public function getGrade()
+    {
+        $grading = $this->test->getGrading();
+        return $this->score !== null ? $grading->getGrade($this->score) : $this->score;
+    }
+
+    public function getGradeColor(): ?string
+    {
+        $grading = $this->test->getGrading();
+        return $this->score !== null ? $grading->getGradeColor($this->score) : $this->score;
+    }
 }

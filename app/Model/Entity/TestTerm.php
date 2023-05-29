@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Entity;
 
+use App\Helpers\Grading;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -98,6 +99,19 @@ class TestTerm
     protected $note;
 
     /**
+     * This is a copy of grading column from TemplateTest entity
+     * (so that grading does not change with time if the template is updated).
+     * @ORM\Column(type="string")
+     */
+    protected $grading;
+
+    /**
+     * Internal cache for deserialized grading object (that wraps the grading algorithm).
+     * @var Grading|null
+     */
+    private $gradingObj = null;
+
+    /**
      * @param TemplateTest $template
      * @param DateTime|null $scheduledAt
      * @param string $location
@@ -119,6 +133,7 @@ class TestTerm
         $this->scheduledAt = $scheduledAt;
         $this->location = $location;
         $this->externalId = $externalId;
+        $this->grading = $template->getGradingRaw(); // copy grading, so it is fixed in time
 
         if (!is_array($note)) {
             $note = [ 'en' => (string)$note ];
@@ -252,6 +267,15 @@ class TestTerm
     public function overwriteNote(array $translations): void
     {
         $this->overwriteLocalizedProperty('note', $translations);
+    }
+
+    public function getGrading(): Grading
+    {
+        if ($this->gradingObj === null) {
+            $grading = $this->grading ? json_decode($this->grading, true) : [];
+            $this->gradingObj = new Grading($grading);
+        }
+        return $this->gradingObj;
     }
 
     /*

@@ -25,16 +25,20 @@
   {$test->getStartedAt()|ldate}
 </span>
 {if $test->getFinishedAt() !== null}
-<span class="d-inline-block me-4">
-  <span class="text-muted">{_locale.test.finishedAt}:</span>
-  {$test->getFinishedAt()|ldate}
-</span>
+  <span class="d-inline-block me-4">
+    <span class="text-muted">{_locale.test.finishedAt}:</span>
+    {$test->getFinishedAt()|ldate}
+  </span>
 {/if}
 {if $enrolledUser->hasScore()}
-<strong class="d-inline-block float-lg-end">
-  <span class="text-muted">{_locale.test.awardedPoints}:</span>
-  {$enrolledUser->getScore()} {_locale.test.pointsOf} {$enrolledUser->getMaxScore()}
-</strong>
+  <strong class="d-inline-block float-lg-end">
+    <span class="text-muted">{_locale.test.awardedPoints}:</span>
+    {$enrolledUser->getScore()} {_locale.test.pointsOf} {$enrolledUser->getMaxScore()}
+
+    {var $grade = $enrolledUser->getGrade()}
+    <span n:if="$grade !== null" class="d-inline-block text-white rounded px-1 ms-2"
+      style="background-color: {$enrolledUser->getGradeColor()|noescape}">{$grade}</span>
+  </strong>
 {/if}
 
 {if $test->getStartedAt() !== null}
@@ -181,10 +185,21 @@
       {_locale.test.completed.messagePointRanges}
     </p>
     <ul>
-      <li><strong>17-20</strong> {_locale.test.completed.points.1}</li>
-      <li><strong>14-16</strong> {_locale.test.completed.points.2}</li>
-      <li><strong>11-13</strong> {_locale.test.completed.points.3}</li>
-      <li><strong>10 {_locale.test.completed.points.less}</strong> {_locale.test.completed.points.4}</li>
+      <li n:foreach="$test->getGrading() as $mark">
+        {var $range = $test->getGrading()->getMarkRange($mark)}
+        <strong>
+          {if $range[1] === null}
+            {$range[0]} {_locale.test.completed.points.more}
+          {elseif $range[0] === 0 && $range[1] > 0}
+            {$range[1]} {_locale.test.completed.points.less}
+          {elseif $range[0] !== $range[1]}
+            {$range[0]}-{$range[1]}
+          {else}
+            {$range[0]}
+          {/if}
+        </strong>
+        &nbsp;&rArr;&nbsp; {_locale.test.completed.points.mark} <strong>{$mark}</strong>
+      </li>
     </ul>
   {/if}
 

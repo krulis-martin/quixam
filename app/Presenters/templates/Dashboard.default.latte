@@ -48,6 +48,9 @@
           {else}
             {if $relation === 'enrolled' && $relationObj->hasScore()}
               <strong>{$relationObj->getScore()} {_locale.test.pointsOf} {$relationObj->getMaxScore()}</strong>
+              {var $grade = $relationObj->getGrade()}
+              <span n:if="$grade !== null" class="d-inline-block text-white rounded px-1 ms-1"
+                style="background-color: {$relationObj->getGradeColor()|noescape}">{$grade}</span>
             {/if}
           {/if}
         </td>

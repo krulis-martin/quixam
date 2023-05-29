@@ -60,15 +60,9 @@
         <td class="text-nowrap text-center">
           <strong>{$enrolledUser->hasScore() ? $enrolledUser->getScore() : '-'}</strong>
           {if $enrolledUser->hasScore()}
-            {if $enrolledUser->getScore() >= 17}
-              <span class="d-inline-block text-white rounded px-1 ms-1 bg-success">1</span>
-            {elseif $enrolledUser->getScore() >= 14}
-              <span class="d-inline-block text-white rounded px-1 ms-1 bg-warning">2</span>
-            {elseif $enrolledUser->getScore() >= 11}
-              <span class="d-inline-block text-white rounded px-1 ms-1 bg-secondary">3</span>
-            {else}
-              <span class="d-inline-block text-white rounded px-1 ms-1 bg-danger">4</span>
-            {/if}
+            {var $grading = $enrolledUser->getGrade()}
+            <span n:if="$grading !== null" class="d-inline-block text-white rounded px-1 ms-1"
+              style="background-color: {$enrolledUser->getGradeColor()|noescape}">{$grading}</span>
           {/if}
         </td>
       {/if}

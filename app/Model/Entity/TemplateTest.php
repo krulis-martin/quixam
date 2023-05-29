@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Entity;
 
+use App\Helpers\Grading;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -61,11 +62,26 @@ class TemplateTest
     protected $courseId;
 
     /**
+     * Optional JSON structure with grading limits. Must be an associative array (collection), where keys are marks
+     * and values are point limits (integers). The point limits are lower bounds, the nearest one determines the mark.
+     * E.g., [ 1 => 17, 2 => 14, 3 => 11, 4 => 0 ]: 17+ => mark 1, 14-16 => mark 2, 11-13 => mark 3, else => 4
+     * @ORM\Column(type="string")
+     */
+    protected $grading;
+
+    /**
+     * Internal cache for deserialized grading object (that wraps the grading algorithm).
+     * @var Grading|null
+     */
+    private $gradingObj = null;
+
+    /**
      * @param array|string $caption as a string with English caption or an array with [ locale => translation ]
      * @param string|null $externalId
      * @param string|null $courseId
+     * @param Grading $grading
      */
-    public function __construct($caption, ?string $externalId = null, ?string $courseId = null)
+    public function __construct($caption, ?string $externalId = null, ?string $courseId = null, Grading $grading = null)
     {
         $this->createdAt = new DateTime();
         $this->questionsGroups = new ArrayCollection();
@@ -78,6 +94,9 @@ class TemplateTest
             }
             $this->overwriteCaption($caption);
         }
+
+        $this->gradingObj = $grading ?? new Grading();
+        $this->grading = json_encode($this->gradingObj);
     }
 
     /*
@@ -131,5 +150,19 @@ class TemplateTest
     public function setCourseId(?string $courseId): void
     {
         $this->courseId = $courseId;
+    }
+
+    public function getGradingRaw(): string
+    {
+        return $this->grading;
+    }
+
+    public function getGrading(): Grading
+    {
+        if ($this->gradingObj === null) {
+            $grading = $this->grading ? json_decode($this->grading, true) : [];
+            $this->gradingObj = new Grading($grading);
+        }
+        return $this->gradingObj;
     }
 }
