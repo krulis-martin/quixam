@@ -130,7 +130,10 @@ class RegisterUsers extends BaseCommand
             return $this->testTerms->findOrThrow($termId);
         }
 
-        $terms = $this->testTerms->findBy([ 'startedAt' => null, 'finishedAt' => null ], [ 'scheduledAt' => 'ASC' ]);
+        $terms = $this->testTerms->findBy(
+            [ 'startedAt' => null, 'finishedAt' => null, 'archivedAt' => null ],
+            [ 'scheduledAt' => 'ASC' ]
+        );
         return $this->select('Select term', $terms, function (TestTerm $term): string {
             $date = $term->getScheduledAt() ? $term->getScheduledAt()->format('j.n.Y H:i') : 'not scheduled yet';
             return $term->getId() . ': ' . $term->getCaption('en') . " ($date)";
