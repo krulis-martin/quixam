@@ -26,9 +26,6 @@ final class LoginPresenter extends BasePresenter
     /** @var Passwords @inject */
     public $passwordsService;
 
-    /** @var IExternalAuthenticator @inject */
-    public $externalAuthenticator;
-
     /** @var LoggerInterface @inject **/
     public $logger;
 

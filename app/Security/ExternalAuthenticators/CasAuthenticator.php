@@ -177,8 +177,14 @@ class CasAuthenticator implements IExternalAuthenticator
         return '';
     }
 
-    public function logout(): void
+    public function logout(?string $url = null): void
     {
-        phpCAS::logout();
+        if (phpCAS::isSessionAuthenticated()) {
+            if ($url) {
+                phpCAS::logoutWithRedirectService($url);
+            } else {
+                phpCAS::logout();
+            }
+        }
     }
 }

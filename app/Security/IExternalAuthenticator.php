@@ -62,6 +62,7 @@ interface IExternalAuthenticator
 
     /**
      * Erase all related tokens (cookies, sessions...).
+     * @param string|null $url where to redirect after logout (null = do not redirect)
      */
-    public function logout(): void;
+    public function logout(?string $url = null): void;
 }

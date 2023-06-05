@@ -2,6 +2,7 @@ locales.en: "English"
 locales.cs: "Czech"
 
 answer: "Answer"
+or: "or"
 
 role.student: "Student"
 role.teacher: "Teacher"

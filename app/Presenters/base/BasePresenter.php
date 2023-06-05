@@ -6,6 +6,7 @@ namespace App\Presenters;
 
 use App\Controls\MenuControl;
 use App\Exceptions\BadRequestException;
+use App\Security\IExternalAuthenticator;
 use Nette\Application\UI\Presenter;
 use Nette\Localization\ITranslator;
 use Nette\Application\UI\Form;
@@ -22,6 +23,9 @@ class BasePresenter extends Presenter
 
     /** @var TranslatorSessionResolver @inject */
     public $translatorSessionResolver;
+
+    /** @var IExternalAuthenticator @inject */
+    public $externalAuthenticator;
 
     /** @var string */
     protected $selectedLocale = 'en';

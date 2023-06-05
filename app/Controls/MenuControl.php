@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controls;
 
 use App\Model\Entity\User;
+use App\Security\IExternalAuthenticator;
 use Nette\Application\UI\Control;
 use Nette\Localization\ITranslator;
 use Contributte\Translation\LocalesResolvers\Session as TranslatorSessionResolver;
@@ -34,6 +35,11 @@ class MenuControl extends Control
         /** @var \App\Presenters\BasePresenter */
         $presenter = $this->getPresenter();
         $presenter->getUser()->logout();
+
+        $presenter->externalAuthenticator->initialize();
+        $presenter->externalAuthenticator->logout($presenter->link('//Login:default'));
+
+        // if the previous logout did not end in redirect, make it ourselves
         $presenter->finalizePost($presenter->link('Login:default'));
     }
 

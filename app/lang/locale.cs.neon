@@ -2,6 +2,7 @@ locales.en: "Angličtina"
 locales.cs: "Čeština"
 
 answer: "Odpověď"
+or: "nebo"
 
 role.student: "Student"
 role.teacher: "Vyučující"
