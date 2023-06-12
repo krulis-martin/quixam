@@ -1,6 +1,8 @@
 {block content}
-<h1 n:block=title>Page Not Found</h1>
 
-<p>The page you requested has been taken off the site. We apologize for the inconvenience.</p>
+<h1 class="my-5">
+    <i class="fa-solid fa-ghost fa-fw fa-shake text-muted" style="--fa-animation-duration: 8s; --fa-animation-timing: ease-in-out;"></i>
+    410 {block title}{_locale.error.410.title}{/block}
+</h1>
 
-<p><small>error 410</small></p>
+<p>{_locale.error.410.description}</p>

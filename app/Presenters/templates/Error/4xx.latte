@@ -1,4 +1,8 @@
 {block content}
-<h1 n:block=title>Oops...</h1>
 
-<p>Your browser sent a request that this server could not understand or process.</p>
+<h1 class="my-5">
+    <i class="fa-solid fa-ghost fa-fw fa-shake text-muted" style="--fa-animation-duration: 8s; --fa-animation-timing: ease-in-out;"></i>
+    4xx {block title}{_locale.error.4xx.title}{/block}
+</h1>
+
+<p>{_locale.error.4xx.description}</p>

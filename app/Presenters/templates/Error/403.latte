@@ -1,7 +1,8 @@
 {block content}
-<h1 n:block=title>Access Denied</h1>
 
-<p>You do not have permission to view this page. Please try contact the web
-site administrator if you believe you should be able to view this page.</p>
+<h1 class="my-5">
+    <i class="fa-solid fa-ghost fa-fw fa-shake text-muted" style="--fa-animation-duration: 8s; --fa-animation-timing: ease-in-out;"></i>
+    403 {block title}{_locale.error.403.title}{/block}
+</h1>
 
-<p><small>error 403</small></p>
+<p>{_locale.error.403.description}</p>

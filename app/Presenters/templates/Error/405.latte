@@ -1,6 +1,8 @@
 {block content}
-<h1 n:block=title>Method Not Allowed</h1>
 
-<p>The requested method is not allowed for the URL.</p>
+<h1 class="my-5">
+    <i class="fa-solid fa-ghost fa-fw fa-shake text-muted" style="--fa-animation-duration: 8s; --fa-animation-timing: ease-in-out;"></i>
+    405 {block title}{_locale.error.405.title}{/block}
+</h1>
 
-<p><small>error 405</small></p>
+<p>{_locale.error.405.description}</p>
