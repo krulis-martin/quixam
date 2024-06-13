@@ -12,8 +12,9 @@ use App\Model\Entity\EnrolledUser;
 use App\Model\Entity\EnrollmentRegistration;
 use App\Model\Entity\Question;
 use App\Model\Entity\User;
-use Nette;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
+use Nette;
+use DateTime;
 
 /**
  * Displays users enrolled for particular test.
@@ -138,5 +139,8 @@ final class EnrolledPresenter extends AuthenticatedPresenter
         $this->template->enrolledUsers = $enrolledUsers;
 
         $this->template->questions = $this->questions->getQuestionsOfTestSorted($test);
+
+        $this->template->onlineDateThreshold = new DateTime("15 minutes ago");
+        //$this->template->onlineDateThreshold->sub("15 minutes");
     }
 }

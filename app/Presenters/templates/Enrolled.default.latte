@@ -96,6 +96,7 @@
       <th class="text-nowrap">{_locale.enrolledUsers.email}</th>
       <th class="text-nowrap">{_locale.enrolledUsers.externalId}</th>
       <th class="text-nowrap">{_locale.enrolledUsers.matchedUser}</th>
+      <th class="text-nowrap">{_locale.user.authenticatedAt}</th>
       <th></th>
     </tr>
   </thead>
@@ -103,9 +104,22 @@
     <tr n:foreach="$test->getRegistrations() as $idx => $registration">
       <td class="text-nowrap w-25"><a href="mailto:{$registration->getEmail()}">{$registration->getEmail()}</a></td>
       <td class="text-nowrap w-25">{$registration->getExternalId()}</td>
-      <td class="text-nowrap w-50">
+      <td class="text-nowrap w-25">
         {if $registration->getUser()}
           {$registration->getUser()->getLastName()} {$registration->getUser()->getFirstName()}
+        {/if}
+      </td>
+      <td class="text-nowrap w-25">
+        {if $registration->getUser() && $registration->getUser()->getLastAuthenticationAt()}
+          {if $registration->getUser()->getLastAuthenticationAt() < $onlineDateThreshold}
+          <span class="text-muted">
+            <i class="fa-regular fa-circle-xmark me-2"></i>
+          {else}
+          <span class="text-success fw-bold">
+            <i class="fa-regular fa-circle-check me-2"></i>
+          {/if}
+            {$registration->getUser()->getLastAuthenticationAt()|ldate:'j. n. Y (H:i:s)'}
+          </span>
         {/if}
       </td>
       <td class="text-nowrap w-0 text-end">
