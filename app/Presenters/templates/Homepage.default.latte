@@ -7,7 +7,7 @@
 <p>{_locale.homepage.para3}</p>
 
 
-<h4 class="mt-4 mb-2"><i class="fa-solid fa-trophy fa-fw text-muted"></i> {_locale.homepage.sba.title}</h4>
+<h4 class="mt-4 mb-2"><i class="fa-solid fa-trophy fa-fw text-muted me-3"></i>{_locale.homepage.sba.title}</h4>
 
 <p>{_locale.homepage.sba.para1}</p>
 
@@ -35,8 +35,9 @@
     </tbody>
 </table>
 
+<hr>
 
-<h4 class="mt-4 mb-2"><i class="fa-solid fa-list-check fa-fw text-muted"></i> {_locale.homepage.multi.title}</h4>
+<h4 class="mt-4 mb-2"><i class="fa-solid fa-list-check fa-fw text-muted me-3"></i>{_locale.homepage.multi.title}</h4>
 
 <p>{_locale.homepage.multi.para1}</p>
 
@@ -64,8 +65,9 @@
     </tbody>
 </table>
 
+<hr>
 
-<h4 class="mt-4 mb-2"><i class="fa-solid fa-dice fa-fw text-muted"></i> {_locale.homepage.num.title}</h4>
+<h4 class="mt-4 mb-2"><i class="fa-solid fa-dice fa-fw text-muted me-3"></i>{_locale.homepage.num.title}</h4>
 
 <p>{_locale.homepage.num.para1}</p>
 
@@ -75,4 +77,39 @@
     <input type="text" class="form-control" name="answer" maxlength="34" value="42" readonly>
     <button class="btn btn-outline-danger" type="button" data-action="remove"><i class="fa-regular fa-circle-xmark"></i></button>
     <button class="btn btn-outline-success" type="button" data-action="add"><i class="fa-solid fa-circle-plus"></i></button>
+</div>
+
+<hr>
+
+<h4 class="mt-4 mb-2"><i class="fa-solid fa-bars fa-fw text-muted me-3"></i>{_locale.homepage.order.title}</h4>
+
+<p>{_locale.homepage.order.para1}</p>
+
+<div class="bg-light border p-3 my-3 rounded"><strong>{_locale.homepage.example}:</strong> {_locale.homepage.order.question}</div>
+<div class="my-3 readonly">
+    <div class="row">
+        <div class="col-6">
+            <h5>{_locale.templateQuestion.order.selectedItems}</h5>
+        </div>
+        <div class="col-6">
+            <h5 class="text-muted">{_locale.templateQuestion.order.remainingItems}</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div id="orderQuestionSelected" class="orderQuestionContainer">
+                <div>{_locale.homepage.order.answer1}</div>
+                <div>{_locale.homepage.order.answer2}</div>
+                <div>{_locale.homepage.order.answer3}</div>
+                <div>{_locale.homepage.order.answer4}</div>
+                <div>{_locale.homepage.order.answer5}</div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div id="orderQuestionRemaining" class="orderQuestionContainer">
+                <div>{_locale.homepage.order.remaining1}</div>
+                <div>{_locale.homepage.order.remaining2}</div>
+            </div>
+        </div>
+    </div>
 </div>
