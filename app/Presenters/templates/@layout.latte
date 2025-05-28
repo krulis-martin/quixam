@@ -21,6 +21,12 @@
     <script src="{$basePath}/scripts/main.js"></script>
     <script src="{$basePath}/scripts/memory.js"></script>
   {/block}
+  
+  <style type="text/css">
+    .orderQuestionContainer.empty::before {
+      content: '{_locale.templateQuestion.order.emptyAnswer}';
+    }
+  </style>
 </head>
 <body>
   <div id="blanket"><i class="fa-solid fa-spinner fa-fw fa-spin-pulse"></i></div>
