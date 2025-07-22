@@ -34,7 +34,7 @@ final class QuestionOrderItem extends LocalizedEntity implements JsonSerializabl
     public static function schemaOfTemplate()
     {
         return Expect::structure([
-            'text' => BaseQuestion::schemaOfLocaizedText()->required(),
+            'text' => BaseQuestion::schemaOfLocalizedText()->required(),
             'correctOrder' => Expect::int()->nullable()->required(),
             'mandatory' => Expect::bool()->required(),
             'preselected' => Expect::bool()->required(),

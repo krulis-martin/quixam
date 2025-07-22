@@ -32,7 +32,7 @@
           {$test->getCaption($locale)}
           {if !$test->getSupervisors()->isEmpty()}
             <small class="text-muted">
-              ({foreach $test->getSupervisors() as $supervisor}<span class="{$supervisor->getId() === $user->getId() ? 'fw-bold text-success'}">{$supervisor->getLastName()}</span>{sep}, {/sep}{/foreach})
+              ({foreach $test->getSupervisors() as $supervisor}<span class="{$supervisor->getId() === $userData->getId() ? 'fw-bold text-success'}">{$supervisor->getLastName()}</span>{sep}, {/sep}{/foreach})
             </small>
           {/if}
         </td>

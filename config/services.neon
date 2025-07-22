@@ -4,9 +4,12 @@ services:
   authenticator: App\Security\Authenticator
   - App\Security\CasAuthenticator(%casAuthenticator%)
   - App\Helpers\LatteDateFilter
+  - App\Helpers\MarkdownFilter
+
   nette.latteFactory:
     setup:
       - addFilter(ldate, @App\Helpers\LatteDateFilter)
+      - addFilter(markdown, @App\Helpers\MarkdownFilter)
 
   - App\Helpers\TestOrchestrator
   - App\Helpers\QuestionFactory([
@@ -52,7 +55,6 @@ extensions:
   nettrine.extensions.atlantic18: Nettrine\Extensions\Atlantic18\DI\Atlantic18BehaviorExtension
   translation: Contributte\Translation\DI\TranslationExtension
   monolog: Contributte\Monolog\DI\MonologExtension
-  markdownLatteFilter: Baraja\Markdown\MarkdownLatteFilterExtension
 
 nettrine.dbal:
   debug:
@@ -95,8 +97,9 @@ nettrine.extensions.atlantic18:
 nettrine.migrations:
   table: doctrine_migrations # database table for applied migrations
   column: version # database column for applied migrations
-  directory: %appDir%/../migrations # directory, where all migrations are stored
-  namespace: Migrations # namespace of migration classes
+  directories:
+    Migrations: %appDir%/../migrations  # directory, where all migrations are stored
+  #namespace: Migrations # namespace of migration classes
 
 
 translation:

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Presenters;
 
 use App\Model\Repository\Users;
-use App\Model\Entity\User;
-use Nette;
 use Nette\Application\UI\Form;
 use Nette\Security\Passwords;
 use Psr\Log\LoggerInterface;
@@ -34,7 +32,7 @@ final class UserPresenter extends AuthenticatedPresenter
             ->setRequired($this->translator->translate('locale.user.password.required'))
             ->addRule(
                 $form::MIN_LENGTH,
-                $this->translator->translate('locale.user.password.minLength', [ 'length' => 5 ]),
+                $this->translator->translate('locale.user.password.minLength', ['length' => 5]),
                 5
             );
 
@@ -94,6 +92,6 @@ final class UserPresenter extends AuthenticatedPresenter
 
     public function renderDefault(): void
     {
-        $this->template->user = $this->user;
+        $this->template->userData = $this->user;
     }
 }

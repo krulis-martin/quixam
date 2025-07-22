@@ -7,8 +7,6 @@ namespace App\Console;
 use App\Model\Entity\User;
 use App\Model\Repository\Users;
 use App\Model\Repository\EnrollmentRegistrations;
-use DateTime;
-use DateInterval;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,10 +23,10 @@ class AddUser extends BaseCommand
     protected static $defaultName = 'users:add';
 
     /** @var Users */
-    private $users;
+    protected $users;
 
     /** @var EnrollmentRegistrations */
-    private $registrations;
+    protected $registrations;
 
     public function __construct(Users $users, EnrollmentRegistrations $registrations)
     {
@@ -54,17 +52,19 @@ class AddUser extends BaseCommand
         try {
             // make sure we have all the inputs
             $email = $input->getArgument('email');
-            $firstName = $lastName = $role = null; // just to satisfy phpstan
-            foreach ([ 'firstName', 'lastName', 'role' ] as $key) {
-                $$key = trim($input->getOption($key));
-                if (empty($$key)) {
-                    $$key = trim($this->prompt("$key: "));
+            $firstName = $lastName = $role = ''; // just to satisfy phpstan
+            foreach (['firstName', 'lastName', 'role'] as $key) {
+                $val = trim($input->getOption($key) ?? '');
+                if ($val === '') {
+                    $val = trim($this->prompt("$key: "));
                 }
 
-                if (empty($$key)) {
+                if ($val === '') {
                     $output->writeln("Parameter '$key' must be set.");
                     return Command::FAILURE;
                 }
+
+                $$key = $val;  // assign it to the right variable
             }
 
             if (!in_array($role, User::ROLES)) {
