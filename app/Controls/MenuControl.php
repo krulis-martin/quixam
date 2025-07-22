@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 namespace App\Controls;
 
-use App\Model\Entity\User;
-use App\Security\IExternalAuthenticator;
 use Nette\Application\UI\Control;
-use Nette\Localization\ITranslator;
+use Nette\Localization\Translator;
 use Contributte\Translation\LocalesResolvers\Session as TranslatorSessionResolver;
 
 class MenuControl extends Control
 {
-    /** @var ITranslator */
+    /** @var Translator */
     public $translator;
 
     /** @var TranslatorSessionResolver */
     public $translatorSessionResolver;
 
-    public function __construct(ITranslator $translator, TranslatorSessionResolver $translatorSessionResolver)
+    public function __construct(Translator $translator, TranslatorSessionResolver $translatorSessionResolver)
     {
         $this->translator = $translator;
         $this->translatorSessionResolver = $translatorSessionResolver;
@@ -48,9 +46,9 @@ class MenuControl extends Control
         if ($this->getPresenter()->getUser()->isLoggedIn()) {
             /** @var \App\Security\Identity */
             $identity =  $this->getPresenter()->getUser()->getIdentity();
-            $this->template->user = $identity->getUserData();
+            $this->template->userData = $identity->getUserData();
         } else {
-            $this->template->user = null;
+            $this->template->userData = null;
         }
 
         /** @phpstan-ignore-next-line */

@@ -7,15 +7,10 @@ namespace App\Helpers;
 use App\Model\Entity\EnrolledUser;
 use App\Model\Entity\Question;
 use App\Model\Entity\TemplateQuestion;
-use App\Model\Entity\TemplateQuestionsGroup;
 use App\Model\Entity\TestTerm;
-use App\Model\Entity\User;
 use App\Model\Repository\Answers;
 use App\Model\Repository\EnrolledUsers;
 use App\Model\Repository\Questions;
-use App\Model\Repository\TemplateQuestions;
-use App\Model\Repository\TemplateQuestionsGroups;
-use App\Model\Repository\TestTerms;
 use Nette\SmartObject;
 
 class TestOrchestrator
@@ -48,12 +43,12 @@ class TestOrchestrator
 
     /**
      * Instantiate/generate question data.
-     * @param string $type passed by a reference since dynamic questions will change it
+     * @param string|null $type passed by a reference since dynamic questions will change it
      * @param mixed $data parsed JSON data from the question template
      * @param int $seed random initializer
      * @return mixed structure with instantiated question data
      */
-    public function instantiateQuestionData(string &$type, $data, int $seed)
+    public function instantiateQuestionData(?string &$type, $data, int $seed)
     {
         if ($type) {
             // regular (static) question
@@ -119,7 +114,7 @@ class TestOrchestrator
      * The method does not return anything, it only makes updated to the database.
      * @param TestTerm $test which is being evaluated
      */
-    public function evlauate(TestTerm $test): void
+    public function evaluate(TestTerm $test): void
     {
         // prepare score table for each user
         $enrolledUsers = $test->getEnrolledUsers();

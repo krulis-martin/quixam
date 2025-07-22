@@ -30,7 +30,7 @@ class DynamicQuestionBase
      * Localized text of the question (which can be modified/created by the generator).
      * @var array
      */
-    private $text = [ 'en' => '', 'cs' => '' ];
+    private $text = ['en' => '', 'cs' => ''];
 
     /**
      * Type of the generated question (must be specified by the generator).
@@ -59,7 +59,7 @@ class DynamicQuestionBase
 
         if (!empty($data['text'])) {
             $processor = new Processor();
-            $processor->process(BaseQuestion::schemaOfLocaizedText(), $data['text']); // throws ValidationException
+            $processor->process(BaseQuestion::schemaOfLocalizedText(), $data['text']); // throws ValidationException
 
             if (is_array($data['text'])) {
                 foreach ($data['text'] as $locale => $text) {
@@ -158,10 +158,10 @@ class DynamicQuestionBase
      * @param string $text to be set (overrides current text)
      * @param array|string $locales identifier or list of identifiers
      */
-    protected function setText(string $text, $locales = [ 'en', 'cs' ]): void
+    protected function setText(string $text, $locales = ['en', 'cs']): void
     {
         if (!is_array($locales)) {
-            $locales = [ $locales ];
+            $locales = [$locales];
         }
 
         foreach ($locales as $locale) {
@@ -178,10 +178,10 @@ class DynamicQuestionBase
      * @param string $text to be set (overrides current text)
      * @param array|string $locales identifier or list of identifiers
      */
-    protected function appendText(string $text, $locales = [ 'en', 'cs' ]): void
+    protected function appendText(string $text, $locales = ['en', 'cs']): void
     {
         if (!is_array($locales)) {
-            $locales = [ $locales ];
+            $locales = [$locales];
         }
 
         foreach ($locales as $locale) {
@@ -200,7 +200,7 @@ class DynamicQuestionBase
      * @param array|string $locales identifier or list of identifiers
      * @param bool $preg if true, regex replacement (preg_replace) is used, otherwose str_replace()
      */
-    protected function replaceText($search, $replace, $locales = [ 'en', 'cs' ], bool $preg = false): void
+    protected function replaceText($search, $replace, $locales = ['en', 'cs'], bool $preg = false): void
     {
         if (!is_string($search) && !is_array($search)) {
             $search = "$search";
@@ -210,7 +210,7 @@ class DynamicQuestionBase
         }
 
         if (!is_array($locales)) {
-            $locales = [ $locales ];
+            $locales = [$locales];
         }
 
         foreach ($locales as $locale) {

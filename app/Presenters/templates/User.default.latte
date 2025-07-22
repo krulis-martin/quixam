@@ -7,43 +7,43 @@
     <tbody>
       <tr>
         <th class="text-nowrap">{_locale.user.firstName}:</th>
-        <td class="w-100">{$user->getFirstName()}</td>
+        <td class="w-100">{$userData->getFirstName()}</td>
       </tr>
       <tr>
         <th class="text-nowrap">{_locale.user.lastName}:</th>
-        <td class="w-100">{$user->getLastName()}</td>
+        <td class="w-100">{$userData->getLastName()}</td>
       </tr>
       <tr>
         <th class="text-nowrap">{_locale.user.email}:</th>
         <td class="w-100">
-          <a href="mailto:{$user->getEmail()}">{$user->getEmail()}</a>
-          {if $user->isVerified()}
+          <a href="mailto:{$userData->getEmail()}">{$userData->getEmail()}</a>
+          {if $userData->isVerified()}
           <i class="fa-regular fa-circle-check fa-fw text-success" title="{_locale.user.emailVerified}"></i>
           {else}
           <i class="fa-solid fa-triangle-exclamation fa-fw text-warning" title="{_locale.user.emailNotVerified}"></i>
           {/if}
         </td>
       </tr>
-      {if $user->getExternalId()}
+      {if $userData->getExternalId()}
       <tr>
         <th class="text-nowrap">{_locale.user.externalId}:</th>
-        <td class="w-100">{$user->getExternalId()}</td>
+        <td class="w-100">{$userData->getExternalId()}</td>
       </tr>
       {/if}
       <tr>
         <th class="text-nowrap">{_locale.user.role}:</th>
         <td class="w-100">
-          {var $role = "locale.role." . $user->getRole()}
+          {var $role = "locale.role." . $userData->getRole()}
           {$role|translate}
         </td>
       </tr>
       <tr>
         <th class="text-nowrap">{_locale.user.createdAt}:</th>
-        <td class="w-100">{$user->getCreatedAt()|date:'j. n. Y (H:i:s)'}</td>
+        <td class="w-100">{$userData->getCreatedAt()|date:'j. n. Y (H:i:s)'}</td>
       </tr>
       <tr>
         <th class="text-nowrap">{_locale.user.authenticatedAt}:</th>
-        <td class="w-100">{$user->getLastAuthenticationAt()|ldate:'j. n. Y (H:i:s)'}</td>
+        <td class="w-100">{$userData->getLastAuthenticationAt()|ldate:'j. n. Y (H:i:s)'}</td>
       </tr>
     </tbody>
   </table>
@@ -52,7 +52,7 @@
 
 <h2 class="mt-3">{_locale.user.localAccountTitle}</h2>
 
-{if $user->isPasswordEmpty()}
+{if $userData->isPasswordEmpty()}
   <p>
     {_locale.user.localAccountNotSet}
   </p>

@@ -28,8 +28,8 @@ abstract class BaseChoiceQuestion extends BaseQuestion
     public static function schemaOfTemplate()
     {
         return Expect::structure([
-            'text' => BaseQuestion::schemaOfLocaizedText()->required(),
-            'answers' => Expect::listOf(BaseQuestion::schemaOfLocaizedText())->required(),
+            'text' => BaseQuestion::schemaOfLocalizedText()->required(),
+            'answers' => Expect::listOf(BaseQuestion::schemaOfLocalizedText())->required(),
             'count' => Expect::int()->required(),
             'correct' => Expect::anyOf(Expect::int(), Expect::listOf('int'))->required(),
             'exclusive' => Expect::listOf(Expect::listOf('int')),
@@ -68,7 +68,7 @@ abstract class BaseChoiceQuestion extends BaseQuestion
     {
         try {
             $result = [];
-            $schema = self::schemaOfLocaizedText();
+            $schema = self::schemaOfLocalizedText();
             foreach ($answers as $idx => $answer) {
                 if (!is_int($idx)) {
                     throw new QuestionException("$errorPrefix, an answer does not have numeric key.");
@@ -94,7 +94,7 @@ abstract class BaseChoiceQuestion extends BaseQuestion
         $exclusive = $templateJson['exclusive'];
 
         // verification of correct answer keys
-        $correct = is_array($templateJson['correct']) ? $templateJson['correct'] : [ $templateJson['correct'] ];
+        $correct = is_array($templateJson['correct']) ? $templateJson['correct'] : [$templateJson['correct']];
         foreach ($correct as $key) {
             if (!array_key_exists($key, $allAnswers)) {
                 throw new QuestionException("Invalid question template, correct answer refers to non-existing option.");

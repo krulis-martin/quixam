@@ -8,7 +8,7 @@ use App\Controls\MenuControl;
 use App\Exceptions\BadRequestException;
 use App\Security\IExternalAuthenticator;
 use Nette\Application\UI\Presenter;
-use Nette\Localization\ITranslator;
+use Nette\Localization\Translator;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\Checkbox;
 use Contributte\Translation\LocalesResolvers\Session as TranslatorSessionResolver;
@@ -18,7 +18,7 @@ use Contributte\Translation\LocalesResolvers\Session as TranslatorSessionResolve
  */
 class BasePresenter extends Presenter
 {
-    /** @var ITranslator @inject */
+    /** @var Translator @inject */
     public $translator;
 
     /** @var TranslatorSessionResolver @inject */
@@ -51,11 +51,11 @@ class BasePresenter extends Presenter
      * @param string|null $redirect URL to which the page is redirected
      *                              (null means no redirect for AJAX and redirect to 'this' for regular HTTP)
      */
-    public function finalizePost(string $redirect = null): void
+    public function finalizePost(?string $redirect = null): void
     {
         if ($this->isAjax()) {
             // AJAX is handled with JSON response (redirect is suggested inside to JS handler)
-            $res = [ 'ok' => true ];
+            $res = ['ok' => true];
             if ($redirect) {
                 $res['redirect'] = $redirect;
             }
@@ -70,13 +70,13 @@ class BasePresenter extends Presenter
 
     /**
      * Complete a POST request by sending JSON response with error (AJAX)
-     * or setting a flas message and redirect to 'this' (regular requests).
+     * or setting a flags message and redirect to 'this' (regular requests).
      * @param string $msg error message
      */
     public function finalizePostError(string $msg): void
     {
         if ($this->isAjax()) {
-            $res = [ 'ok' => false, 'error' => $msg ];
+            $res = ['ok' => false, 'error' => $msg];
             $this->sendJson($res);
         } else {
             $this->flashMessage($msg, "danger");
@@ -87,7 +87,8 @@ class BasePresenter extends Presenter
     public static function formForBootstrap(Form $form): void
     {
         $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null; /** @phpstan-ignore-line */
+        $renderer->wrappers['controls']['container'] = null;
+        /** @phpstan-ignore-line */
         $renderer->wrappers['pair']['container'] = 'div class="form-group row"';
         $renderer->wrappers['pair']['.error'] = 'has-danger';
         $renderer->wrappers['control']['container'] = 'div class="col-sm-9 pb-2"';

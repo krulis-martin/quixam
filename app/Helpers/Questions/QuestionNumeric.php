@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helpers\Questions;
 
-use App\Helpers\IQuestion;
 use App\Helpers\QuestionException;
-use App\Helpers\Random;
 use Nette\Schema\Expect;
 use Latte\Engine;
 use Exception;
@@ -19,7 +17,7 @@ final class QuestionNumeric extends BaseQuestion
     private const FORMAT_DEC = 'dec';
     private const FORMAT_HEX = 'hex';
     private const FORMAT_BIN = 'bin';
-    private const KNOWN_FORMATS = [ self::FORMAT_DEC, self::FORMAT_HEX, self::FORMAT_BIN ];
+    private const KNOWN_FORMATS = [self::FORMAT_DEC, self::FORMAT_HEX, self::FORMAT_BIN];
 
     /** @var int */
     private $minCount = 1;
@@ -42,7 +40,7 @@ final class QuestionNumeric extends BaseQuestion
     public static function schemaOfTemplate()
     {
         return Expect::structure([
-            'text' => BaseQuestion::schemaOfLocaizedText()->required(),
+            'text' => BaseQuestion::schemaOfLocalizedText()->required(),
             'correct' => Expect::anyOf(Expect::int(), Expect::listOf('int'))->required(),
             'correctInOrder' => Expect::bool(),
             'minCount' => Expect::int(),
@@ -109,7 +107,7 @@ final class QuestionNumeric extends BaseQuestion
             }
         }
         if (!is_array($this->correct)) {
-            $this->correct = [ $this->correct ];
+            $this->correct = [$this->correct];
         }
 
         // sanity checks
@@ -171,7 +169,7 @@ final class QuestionNumeric extends BaseQuestion
      * @param array $params
      * @return string rendered template
      */
-    private function renderNumericTeplate(Engine $latte, $answer, array $params = []): string
+    private function renderNumericTemplate(Engine $latte, $answer, array $params = []): string
     {
         $params['readonly'] = $params['readonly'] ?? false;
         $params['minCount'] = $this->minCount;
@@ -187,7 +185,7 @@ final class QuestionNumeric extends BaseQuestion
 
     public function renderFormContent(Engine $latte, string $locale, $answer = null): string
     {
-        return $this->renderNumericTeplate($latte, $answer);
+        return $this->renderNumericTemplate($latte, $answer);
     }
 
     public function renderResultContent(
@@ -196,11 +194,11 @@ final class QuestionNumeric extends BaseQuestion
         $answer = null,
         ?bool $answerIsCorrect = null
     ): string {
-        $params = [ 'readonly' => true ];
+        $params = ['readonly' => true];
         if ($answerIsCorrect !== null) {
             $params['inputClass'] = $answerIsCorrect ? 'text-success' : 'text-danger';
         }
-        return $this->renderNumericTeplate($latte, $answer, $params);
+        return $this->renderNumericTemplate($latte, $answer, $params);
     }
 
     /**
@@ -214,7 +212,7 @@ final class QuestionNumeric extends BaseQuestion
         $number = trim($number);
         if (is_numeric($number)) {
             $number = (int)$number;
-            return ($number !== null && $number >= -2147483648 && $number <= 2147483647) ? $number : null;
+            return ($number >= -2147483648 && $number <= 2147483647) ? $number : null;
         }
         if (preg_match('/^0[xX][0-9a-fA-F]{1,8}$/', $number)) {
             return hexdec(substr($number, 2));
@@ -296,11 +294,11 @@ final class QuestionNumeric extends BaseQuestion
     {
         return array_map(function ($num) {
             if ($this->bestFormat === self::FORMAT_HEX) {
-                return [ 'num' => $num, 'str' => '0x' . dechex($num) ];
+                return ['num' => $num, 'str' => '0x' . dechex($num)];
             } elseif ($this->bestFormat === self::FORMAT_BIN) {
-                return [ 'num' => $num, 'str' => '0b' . decbin($num) ];
+                return ['num' => $num, 'str' => '0b' . decbin($num)];
             }
-            return [ 'num' => $num ];
+            return ['num' => $num];
         }, $this->correct);
     }
 }

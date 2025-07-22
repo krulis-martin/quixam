@@ -24,7 +24,7 @@ class LocalizedEntity
     /**
      * Return nette schema specification for localized text entity.
      */
-    public static function schemaOfLocaizedText()
+    public static function schemaOfLocalizedText()
     {
         return Expect::anyOf(
             Expect::string(),
@@ -61,7 +61,7 @@ class LocalizedEntity
         }
 
         try {
-            $this->text = self::normalize(self::schemaOfLocaizedText(), $json['text']);
+            $this->text = self::normalize(self::schemaOfLocalizedText(), $json['text']);
             if (!$this->text) {
                 throw new QuestionException("$errorPrefix, item 'text' has no localizations.");
             }
@@ -114,7 +114,7 @@ class LocalizedEntity
      */
     public function setText($text): void
     {
-        $this->text = static::normalize(static::schemaOfLocaizedText(), $text);
+        $this->text = static::normalize(static::schemaOfLocalizedText(), $text);
         if (!$this->text) {
             throw new QuestionException("Invalid text format (should be a string or an array of localized strings).");
         }
