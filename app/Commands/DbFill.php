@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace App\Console;
 
-use App\Model\Entity\User;
-use App\Model\Repository\Users;
 use DateTime;
-use DateInterval;
 use Exception;
 use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Ramsey\Uuid\Uuid;
@@ -21,10 +18,9 @@ use Ramsey\Uuid\Uuid;
 /**
  * A console command that creates a new user (without password).
  */
+#[AsCommand(name: 'db:fill', description: 'Load entities from yaml file to database.')]
 class DbFill extends BaseCommand
 {
-    protected static $defaultName = 'db:fill';
-
     /** @var array [ entity class => repository object ] */
     private $repositories = [];
 
@@ -41,7 +37,6 @@ class DbFill extends BaseCommand
 
     protected function configure()
     {
-        $this->setName(self::$defaultName)->setDescription('Load entities from yaml file to database.');
         $this->addArgument('file', InputArgument::REQUIRED, 'Yaml file with data to load.');
     }
 

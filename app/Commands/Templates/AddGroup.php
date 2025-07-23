@@ -5,29 +5,26 @@ declare(strict_types=1);
 namespace App\Console;
 
 use App\Model\Entity\TemplateTest;
-use App\Model\Entity\TemplateQuestion;
 use App\Model\Entity\TemplateQuestionsGroup;
 use App\Model\Repository\TemplateTests;
 use App\Model\Repository\TemplateQuestions;
 use App\Model\Repository\TemplateQuestionsGroups;
-use DateTime;
-use DateInterval;
-use Exception;
-use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Exception;
+use RuntimeException;
 
 /**
  * A console command that creates or replaces template questions group.
  */
+#[AsCommand(name: 'templates:addGroup', description: 'Add/update template questions group.')]
 class AddGroupTemplate extends BaseCommand
 {
-    protected static $defaultName = 'templates:addGroup';
-
     /** @var TemplateTests */
     private $templateTests;
 
@@ -50,7 +47,6 @@ class AddGroupTemplate extends BaseCommand
 
     protected function configure()
     {
-        $this->setName(self::$defaultName)->setDescription('Add/update template questions group.');
         $this->addArgument('test', InputArgument::REQUIRED, 'External ID of the test template.');
         $this->addArgument('externalId', InputArgument::REQUIRED, 'External ID of the template questions group.');
         $this->addOption(
@@ -80,7 +76,7 @@ class AddGroupTemplate extends BaseCommand
     protected function getTemplateTest(): TemplateTest
     {
         $testExternalId = $this->input->getArgument('test');
-        $test = $this->templateTests->findOneBy([ 'externalId' => $testExternalId ]);
+        $test = $this->templateTests->findOneBy(['externalId' => $testExternalId]);
         if (!$test) {
             throw new RuntimeException("Test template '$testExternalId' does not exist.");
         }
@@ -135,7 +131,7 @@ class AddGroupTemplate extends BaseCommand
             $test = $this->getTemplateTest();
 
             $groupId = $input->getArgument('externalId');
-            $group = $this->templateQuestionsGroups->findOneBy([ 'externalId' => $groupId, 'test' => $test->getId() ]);
+            $group = $this->templateQuestionsGroups->findOneBy(['externalId' => $groupId, 'test' => $test->getId()]);
 
             $ordering = $this->getIntOption('ordering', $group ? $group->getOrdering() : $this->getMaxOrdering($test));
             $count = $this->getIntOption('count', $group ? $group->getSelectCount() : 1);

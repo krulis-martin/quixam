@@ -6,28 +6,25 @@ namespace App\Console;
 
 use App\Model\Entity\EnrollmentRegistration;
 use App\Model\Entity\TestTerm;
-use App\Model\Entity\User;
 use App\Model\Repository\EnrollmentRegistrations;
 use App\Model\Repository\TestTerms;
 use App\Model\Repository\Users;
-use DateTime;
-use DateInterval;
-use Exception;
-use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Exception;
+use RuntimeException;
 
 /**
- * A console command that creates enrollemnt registrations from csv file.
+ * A console command that creates enrollment registrations from csv file.
  */
+#[AsCommand(name: 'terms:registerUsers', description: 'Create enrollment registrations from a CSV file.')]
 class RegisterUsers extends BaseCommand
 {
-    protected static $defaultName = 'terms:registerUsers';
-
     /** @var EnrollmentRegistrations */
     private $enrollmentRegistrations;
 
@@ -47,7 +44,6 @@ class RegisterUsers extends BaseCommand
 
     protected function configure()
     {
-        $this->setName(self::$defaultName)->setDescription('Create enrollment registration from data in CSV file.');
         $this->addArgument(
             'file',
             InputArgument::REQUIRED,
@@ -89,14 +85,14 @@ class RegisterUsers extends BaseCommand
         $externalId = $this->input->getOption('externalId');
         if ($externalId && !in_array($externalId, $header)) {
             throw new RuntimeException(
-                "Column '$externalId' speficied as eternal id, but no such column is in the file '$file'."
+                "Column '$externalId' specified as eternal id, but no such column is in the file '$file'."
             );
         }
 
         $email = $this->input->getOption('email');
         if ($email && !in_array($email, $header)) {
             throw new RuntimeException(
-                "Column '$email' speficied as email, but no such column is in the file '$file'."
+                "Column '$email' specified as email, but no such column is in the file '$file'."
             );
         }
 
@@ -131,8 +127,8 @@ class RegisterUsers extends BaseCommand
         }
 
         $terms = $this->testTerms->findBy(
-            [ 'startedAt' => null, 'finishedAt' => null, 'archivedAt' => null ],
-            [ 'scheduledAt' => 'ASC' ]
+            ['startedAt' => null, 'finishedAt' => null, 'archivedAt' => null],
+            ['scheduledAt' => 'ASC']
         );
         return $this->select('Select term', $terms, function (TestTerm $term): string {
             $date = $term->getScheduledAt() ? $term->getScheduledAt()->format('j.n.Y H:i') : 'not scheduled yet';

@@ -5,29 +5,25 @@ declare(strict_types=1);
 namespace App\Console;
 
 use App\Model\Entity\TemplateTest;
-use App\Model\Entity\TemplateQuestion;
 use App\Model\Entity\TemplateQuestionsGroup;
 use App\Model\Repository\TemplateTests;
 use App\Model\Repository\TemplateQuestions;
 use App\Model\Repository\TemplateQuestionsGroups;
-use DateTime;
-use DateInterval;
-use Exception;
-use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Exception;
+use RuntimeException;
 
 /**
  * A console command that soft-deletes given template question.
  */
+#[AsCommand(name: 'templates:deleteQuestion', description: 'Soft-delete template question.')]
 class DeleteQuestionTemplate extends BaseCommand
 {
-    protected static $defaultName = 'templates:deleteQuestion';
-
     /** @var TemplateTests */
     private $templateTests;
 
@@ -50,7 +46,6 @@ class DeleteQuestionTemplate extends BaseCommand
 
     protected function configure()
     {
-        $this->setName(self::$defaultName)->setDescription('Soft-delete template question.');
         $this->addArgument('test', InputArgument::REQUIRED, 'External ID of the test template.');
         $this->addArgument('group', InputArgument::REQUIRED, 'External ID of the template questions group.');
         $this->addArgument('externalId', InputArgument::REQUIRED, 'External ID of the template questions.');
@@ -63,7 +58,7 @@ class DeleteQuestionTemplate extends BaseCommand
     protected function getTemplateTest(): TemplateTest
     {
         $testExternalId = $this->input->getArgument('test');
-        $test = $this->templateTests->findOneBy([ 'externalId' => $testExternalId ]);
+        $test = $this->templateTests->findOneBy(['externalId' => $testExternalId]);
         if (!$test) {
             throw new RuntimeException("Test template '$testExternalId' does not exist.");
         }
@@ -77,7 +72,7 @@ class DeleteQuestionTemplate extends BaseCommand
     protected function getTemplateQuestionsGroup(TemplateTest $test): TemplateQuestionsGroup
     {
         $groupEid = $this->input->getArgument('group');
-        $group = $this->templateQuestionsGroups->findOneBy([ 'test' => $test->getId(), 'externalId' => $groupEid ]);
+        $group = $this->templateQuestionsGroups->findOneBy(['test' => $test->getId(), 'externalId' => $groupEid]);
         if (!$group) {
             throw new RuntimeException("Template questions group '$groupEid' does not exist.");
         }

@@ -12,24 +12,22 @@ use App\Model\Repository\TemplateQuestions;
 use App\Model\Repository\TemplateQuestionsGroups;
 use App\Helpers\QuestionFactory;
 use App\Helpers\DynamicQuestion;
-use DateTime;
-use DateInterval;
-use Exception;
-use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Exception;
+use RuntimeException;
 
 /**
  * A console command that creates or replaces template question.
  */
+#[AsCommand(name: 'templates:addQuestion', description: 'Add/update template question.')]
 class AddQuestionTemplate extends BaseCommand
 {
-    protected static $defaultName = 'templates:addQuestion';
-
     /** @var TemplateTests */
     private $templateTests;
 
@@ -57,7 +55,6 @@ class AddQuestionTemplate extends BaseCommand
 
     protected function configure()
     {
-        $this->setName(self::$defaultName)->setDescription('Add/update template question.');
         $this->addArgument('test', InputArgument::REQUIRED, 'External ID of the test template.');
         $this->addArgument('group', InputArgument::REQUIRED, 'External ID of the template questions group.');
         $this->addArgument('externalId', InputArgument::REQUIRED, 'External ID of the template questions.');
@@ -74,7 +71,7 @@ class AddQuestionTemplate extends BaseCommand
     protected function getTemplateTest(): TemplateTest
     {
         $testExternalId = $this->input->getArgument('test');
-        $test = $this->templateTests->findOneBy([ 'externalId' => $testExternalId ]);
+        $test = $this->templateTests->findOneBy(['externalId' => $testExternalId]);
         if (!$test) {
             throw new RuntimeException("Test template '$testExternalId' does not exist.");
         }
@@ -88,7 +85,7 @@ class AddQuestionTemplate extends BaseCommand
     protected function getTemplateQuestionsGroup(TemplateTest $test): TemplateQuestionsGroup
     {
         $groupEid = $this->input->getArgument('group');
-        $group = $this->templateQuestionsGroups->findOneBy([ 'test' => $test->getId(), 'externalId' => $groupEid ]);
+        $group = $this->templateQuestionsGroups->findOneBy(['test' => $test->getId(), 'externalId' => $groupEid]);
         if (!$group) {
             throw new RuntimeException("Template questions group '$groupEid' does not exist.");
         }
@@ -101,7 +98,7 @@ class AddQuestionTemplate extends BaseCommand
             throw new RuntimeException("English caption must be present.");
         }
 
-        $caption = [ 'en' => trim($this->input->getOption('caption_en')) ];
+        $caption = ['en' => trim($this->input->getOption('caption_en'))];
         if ($this->input->getOption('caption_cs') !== null) {
             $caption['cs'] = trim($this->input->getOption('caption_cs'));
         }
@@ -145,7 +142,7 @@ class AddQuestionTemplate extends BaseCommand
             }
         }
 
-        return [ $type, $data ];
+        return [$type, $data];
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -167,7 +164,7 @@ class AddQuestionTemplate extends BaseCommand
             // prepare question data
             $caption = $this->getCaption();
             $captionJson = json_encode($caption);
-            [ $type, $data ] = $this->getQuestionData();
+            [$type, $data] = $this->getQuestionData();
             $dataJson = $data === null ? '' : json_encode($data);
 
             if (

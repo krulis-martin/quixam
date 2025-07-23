@@ -4,26 +4,22 @@ declare(strict_types=1);
 
 namespace App\Console;
 
-use App\Model\Entity\User;
 use App\Model\Repository\Users;
-use DateTime;
-use DateInterval;
-use Exception;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Nette\Security\Passwords;
+use Exception;
 
 /**
  * A console command that changes password of given user (with no checking).
  */
+#[AsCommand(name: 'users:passwd', description: 'Set password of given user.')]
 class SetPassword extends BaseCommand
 {
-    protected static $defaultName = 'users:passwd';
-
     /** @var Users */
     private $users;
 
@@ -39,7 +35,6 @@ class SetPassword extends BaseCommand
 
     protected function configure()
     {
-        $this->setName(self::$defaultName)->setDescription('Set password of given user.');
         $this->addArgument(
             'email',
             InputArgument::REQUIRED,

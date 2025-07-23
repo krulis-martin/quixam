@@ -5,28 +5,23 @@ declare(strict_types=1);
 namespace App\Console;
 
 use App\Model\Entity\TemplateTest;
-use App\Model\Entity\TemplateQuestion;
-use App\Model\Entity\TemplateQuestionsGroup;
 use App\Model\Repository\TemplateTests;
 use App\Model\Repository\TemplateQuestionsGroups;
-use DateTime;
-use DateInterval;
-use Exception;
-use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Exception;
+use RuntimeException;
 
 /**
  * A console command that soft-deletes given template group.
  */
+#[AsCommand(name: 'templates:deleteGroup', description: 'Soft-delete template questions group.')]
 class DeleteGroupTemplate extends BaseCommand
 {
-    protected static $defaultName = 'templates:deleteGroup';
-
     /** @var TemplateTests */
     private $templateTests;
 
@@ -44,7 +39,6 @@ class DeleteGroupTemplate extends BaseCommand
 
     protected function configure()
     {
-        $this->setName(self::$defaultName)->setDescription('Soft-delete template questions group.');
         $this->addArgument('test', InputArgument::REQUIRED, 'External ID of the test template.');
         $this->addArgument('externalId', InputArgument::REQUIRED, 'External ID of the template questions group.');
     }
@@ -56,7 +50,7 @@ class DeleteGroupTemplate extends BaseCommand
     protected function getTemplateTest(): TemplateTest
     {
         $testExternalId = $this->input->getArgument('test');
-        $test = $this->templateTests->findOneBy([ 'externalId' => $testExternalId ]);
+        $test = $this->templateTests->findOneBy(['externalId' => $testExternalId]);
         if (!$test) {
             throw new RuntimeException("Test template '$testExternalId' does not exist.");
         }
@@ -72,7 +66,7 @@ class DeleteGroupTemplate extends BaseCommand
             $test = $this->getTemplateTest();
 
             $groupId = $input->getArgument('externalId');
-            $group = $this->templateQuestionsGroups->findOneBy([ 'externalId' => $groupId, 'test' => $test->getId() ]);
+            $group = $this->templateQuestionsGroups->findOneBy(['externalId' => $groupId, 'test' => $test->getId()]);
 
             if (!$group) {
                 $output->writeln("Questions group '$groupId' does not exist.");

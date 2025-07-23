@@ -7,21 +7,21 @@ namespace App\Console;
 use App\Model\Entity\User;
 use App\Model\Repository\Users;
 use App\Model\Repository\EnrollmentRegistrations;
-use Exception;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Exception;
 
 /**
  * A console command that creates a new user (without password).
  */
+#[AsCommand(name: 'users:add', description: 'Add new user.')]
 class AddUser extends BaseCommand
 {
-    protected static $defaultName = 'users:add';
-
     /** @var Users */
     protected $users;
 
@@ -37,7 +37,6 @@ class AddUser extends BaseCommand
 
     protected function configure()
     {
-        $this->setName(self::$defaultName)->setDescription('Add new user.');
         $this->addArgument('email', InputArgument::REQUIRED, 'Email (which is also used as local login name)');
         $this->addOption('firstName', null, InputOption::VALUE_OPTIONAL, 'First name of the user.');
         $this->addOption('lastName', null, InputOption::VALUE_OPTIONAL, 'Last name of the user.');
