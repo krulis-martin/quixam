@@ -1,6 +1,8 @@
+/run_test.bat
 config/local.neon
 /!not-git
 /.vscode
 /vendor
 /log
 /temp
+
