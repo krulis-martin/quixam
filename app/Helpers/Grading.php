@@ -16,15 +16,16 @@ class Grading implements JsonSerializable, Iterator
 {
     use SmartObject;
 
-    private const BEST_COLOR = '#198754';   // bootstap success
+    private const BEST_COLOR = '#198754';   // bootstrap success
     private const MEDIUM_COLOR = '#ffc107'; // bootstrap warning
     private const WORST_COLOR = '#6c757d';  // bootstrap secondary
     private const FAIL_COLOR = '#dc3545';   // bootstrap danger
 
     /**
      * Return a color formatted in CSS hexa RGB (6 chars - RRGGBB) with # prefix.
-     * @param array $color (as 3-component tupple r,g,b in ints 0-255)
+     * @param array $color (as 3-component tuple r,g,b in ints 0-255)
      * @return string '#rrggbb' in hex
+     * @phpstan-ignore method.unused
      */
     private static function cssColorFormat(array $color): string
     {

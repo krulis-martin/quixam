@@ -31,7 +31,7 @@ final class QuestionOrder extends BaseQuestion
     public static function schemaOfTemplate()
     {
         return Expect::structure([
-            'text' => BaseQuestion::schemaOfLocaizedText()->required(),
+            'text' => BaseQuestion::schemaOfLocalizedText()->required(),
             'minCount' => Expect::int(),
             'maxCount' => Expect::int(),
             'items' => Expect::listOf(QuestionOrderItem::schemaOfTemplate())->required(),
@@ -137,7 +137,7 @@ final class QuestionOrder extends BaseQuestion
                 $namedGroups[$item->getGroup()] = $namedGroups[$item->getGroup()] ?? [];
                 $namedGroups[$item->getGroup()][] = $item;
             } else {
-                $groups[] = [ $item ];
+                $groups[] = [$item];
             }
         }
 
@@ -247,7 +247,7 @@ final class QuestionOrder extends BaseQuestion
         $answer = null,
         ?bool $answerIsCorrect = null
     ): string {
-        $params = [ 'readonly' => true ];
+        $params = ['readonly' => true];
         if ($answerIsCorrect !== null) {
             $params['correctClass'] = $answerIsCorrect ? 'correct' : 'wrong';
         }

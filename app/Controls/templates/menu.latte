@@ -13,11 +13,11 @@
         <!--li class="nav-item">
           <a class="nav-link active" aria-current="page" href="">TODO</a>
         </li-->
-        {if $user}
+        {if $userData}
           <li class="nav-item">
             <a class="nav-link" href="{plink Dashboard:default}">{_locale.dashboard.title}</a>
           </li>
-          {if $user->getRole() === App\Model\Entity\User::ROLE_ADMIN}
+          {if $userData->getRole() === App\Model\Entity\User::ROLE_ADMIN}
             <li class="nav-item">
               <a class="nav-link" href="{plink Template:default}">{_locale.template.title}</a>
             </li>
@@ -38,17 +38,17 @@
         {/if}
       {/foreach}
 
-      {if $user}
+      {if $userData}
         <li class="nav-item">
           <a class="nav-link" href="{plink User:default}" title="{_locale.menu.user}">
-            {if $user->getRole() === App\Model\Entity\User::ROLE_ADMIN}
+            {if $userData->getRole() === App\Model\Entity\User::ROLE_ADMIN}
               <i class="fa-solid fa-user-tie fa-fw"></i>
-            {elseif $user->getRole() === App\Model\Entity\User::ROLE_TEACHER}
+            {elseif $userData->getRole() === App\Model\Entity\User::ROLE_TEACHER}
               <i class="fa-solid fa-user-graduate fa-fw"></i>
             {else}
               <i class="fa-solid fa-circle-user fa-fw"></i>
             {/if}
-            {$user->getFirstName()} {$user->getLastName()}
+            {$userData->getFirstName()} {$userData->getLastName()}
           </a>
         </li>
         <li class="nav-item">

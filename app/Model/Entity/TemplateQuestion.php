@@ -62,7 +62,7 @@ class TemplateQuestion
     protected $type;
 
     /**
-     * Localized caption (topic) of the quesion for making listings more memorable.
+     * Localized caption (topic) of the question for making listings more memorable.
      * @ORM\Column(type="string")
      */
     protected $caption;
@@ -105,7 +105,7 @@ class TemplateQuestion
 
         if ($caption) {
             if (!is_array($caption)) {
-                $caption = [ 'en' => (string)$caption ];
+                $caption = ['en' => (string)$caption];
             }
             $this->overwriteLocalizedProperty('caption', $caption);
         }

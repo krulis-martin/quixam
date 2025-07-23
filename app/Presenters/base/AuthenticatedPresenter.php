@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace App\Presenters;
 
 use App\Model\Entity\User;
-use Nette\Application\UI\Presenter;
-use Nette\Localization\ITranslator;
-use Contributte\Translation\LocalesResolvers\Session as TranslatorSessionResolver;
-use App\Controls\MenuControl;
 use ReflectionMethod;
 
 /**
@@ -42,7 +38,7 @@ class AuthenticatedPresenter extends BasePresenter
         $this->user = $this->getVerifiedLoggedUser();
         if (!$this->user) {
             $previousLink = base64_encode($this->link('this'));
-            $url = $this->link('Login:default', [ 'previousLink' => $previousLink ]);
+            $url = $this->link('Login:default', ['previousLink' => $previousLink]);
             $this->redirectUrl($url);
         }
 

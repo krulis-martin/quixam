@@ -98,7 +98,7 @@ final class DashboardPresenter extends AuthenticatedPresenter
 
         try {
             $this->testTerms->beginTransaction();
-            $this->testOrchestrator->evlauate($test);
+            $this->testOrchestrator->evaluate($test);
             $test->finishNow();
             $this->testTerms->persist($test);
             $this->testTerms->commit();
@@ -148,13 +148,13 @@ final class DashboardPresenter extends AuthenticatedPresenter
         $test = $this->getTest($id);
 
         // if the user is already enrolled -> just redirect
-        if ($this->enrolledUsers->findOneBy([ 'test' => $id, 'user' => $this->user->getId() ]) !== null) {
-            $this->finalizePost($this->link('Test:default', [ 'id' => $id ]));
+        if ($this->enrolledUsers->findOneBy(['test' => $id, 'user' => $this->user->getId()]) !== null) {
+            $this->finalizePost($this->link('Test:default', ['id' => $id]));
         }
 
         // check the registration
         $this->enrollmentRegistrations->reassociateUser($this->user);
-        $registration = $this->enrollmentRegistrations->findOneBy([ 'test' => $id, 'user' => $this->user->getId() ]);
+        $registration = $this->enrollmentRegistrations->findOneBy(['test' => $id, 'user' => $this->user->getId()]);
         if (!$registration) {
             $this->finalizePostError($this->translator->translate('locale.dashboard.error.notRegistered'));
         }
@@ -175,7 +175,7 @@ final class DashboardPresenter extends AuthenticatedPresenter
             $this->finalizePostError($this->translator->translate('locale.dashboard.error.instantiationFailure'));
         }
 
-        $this->finalizePost($this->link('Test:default', [ 'id' => $id ]));
+        $this->finalizePost($this->link('Test:default', ['id' => $id]));
     }
 
     /*
@@ -185,7 +185,7 @@ final class DashboardPresenter extends AuthenticatedPresenter
     public function renderDefault()
     {
         $this->template->locale = $this->selectedLocale;
-        $this->template->user = $this->user;
+        $this->template->userData = $this->user;
 
         $isSupervisor = $this->user->getRole() !== User::ROLE_STUDENT;
         $this->template->isSupervisor = $isSupervisor;
@@ -193,22 +193,22 @@ final class DashboardPresenter extends AuthenticatedPresenter
         $tests = [];
         if ($isSupervisor) {
             $supervisedTests = $this->user->getRole() === User::ROLE_ADMIN
-                ? $this->testTerms->findBy([ 'archivedAt' => null ], [ 'scheduledAt' => 'ASC' ])
+                ? $this->testTerms->findBy(['archivedAt' => null], ['scheduledAt' => 'ASC'])
                 : $this->testTerms->getTermsUserSupervises($this->user);
             foreach ($supervisedTests as $test) {
-                $tests[] = [ $test, 'supervised', null ];
+                $tests[] = [$test, 'supervised', null];
             }
         }
 
         $this->template->hasActiveTest = false;
-        foreach ($this->enrolledUsers->findBy([ 'user' => $this->user->getId() ]) as $enrolled) {
-            $tests[] = [ $enrolled->getTest(), 'enrolled', $enrolled ];
+        foreach ($this->enrolledUsers->findBy(['user' => $this->user->getId()]) as $enrolled) {
+            $tests[] = [$enrolled->getTest(), 'enrolled', $enrolled];
             if ($enrolled->getTest()->getFinishedAt() === null) {
                 $this->template->hasActiveTest = true;
             }
         }
-        foreach ($this->enrollmentRegistrations->findBy([ 'user' => $this->user->getId() ]) as $registered) {
-            $tests[] = [ $registered->getTest(), 'registered', $registered ];
+        foreach ($this->enrollmentRegistrations->findBy(['user' => $this->user->getId()]) as $registered) {
+            $tests[] = [$registered->getTest(), 'registered', $registered];
         }
         $this->template->tests = $tests;
     }
