@@ -9,7 +9,6 @@ use App\Helpers\QuestionFactory;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Criteria;
 use DateTime;
 
 /**
@@ -19,7 +18,7 @@ use DateTime;
  */
 class Question
 {
-    use CreateableEntity;
+    use CreatableEntity;
     use LocalizableEntity;
 
     /**
@@ -83,7 +82,7 @@ class Question
     protected $type;
 
     /**
-     * Localized caption (topic) of the quesion for making listings more memorable
+     * Localized caption (topic) of the question for making listings more memorable
      * (copied from question template).
      * @ORM\Column(type="string")
      */
@@ -108,7 +107,7 @@ class Question
         TemplateQuestion $templateQuestion,
         int $ordering,
         $data,
-        string $type = null
+        ?string $type = null
     ) {
         $this->createdAt = new DateTime();
         $this->answers = new ArrayCollection();

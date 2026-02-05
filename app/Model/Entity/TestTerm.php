@@ -8,7 +8,6 @@ use App\Helpers\Grading;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Criteria;
 use Gedmo\Mapping\Annotation as Gedmo;
 use DateTime;
 
@@ -22,8 +21,8 @@ use DateTime;
  */
 class TestTerm
 {
-    use CreateableEntity;
-    use DeleteableEntity;
+    use CreatableEntity;
+    use DeletableEntity;
     use LocalizableEntity;
 
     /**
@@ -136,7 +135,7 @@ class TestTerm
         $this->grading = $template->getGradingRaw(); // copy grading, so it is fixed in time
 
         if (!is_array($note)) {
-            $note = [ 'en' => (string)$note ];
+            $note = ['en' => (string)$note];
         }
         $this->overwriteNote($note);
     }
@@ -289,6 +288,6 @@ class TestTerm
 
     public function removeSupervisor(User $supervisor): void
     {
-        $this->supervisors->remove($supervisor);
+        $this->supervisors->removeElement($supervisor);
     }
 }

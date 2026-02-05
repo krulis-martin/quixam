@@ -8,12 +8,11 @@ use App\Helpers\Grading;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Criteria;
 use Gedmo\Mapping\Annotation as Gedmo;
 use DateTime;
 
 /**
- * Representes a template from which one type of tests is generated.
+ * Represents a template from which one type of tests is generated.
  * This entity roughly corresponds to a course.
  *
  * @ORM\Entity
@@ -24,8 +23,8 @@ use DateTime;
  */
 class TemplateTest
 {
-    use CreateableEntity;
-    use DeleteableEntity;
+    use CreatableEntity;
+    use DeletableEntity;
     use LocalizableEntity;
 
     /**
@@ -90,7 +89,7 @@ class TemplateTest
 
         if ($caption) {
             if (!is_array($caption)) {
-                $caption = [ 'en' => (string)$caption ];
+                $caption = ['en' => (string)$caption];
             }
             $this->overwriteCaption($caption);
         }

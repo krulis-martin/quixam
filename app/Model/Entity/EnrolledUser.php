@@ -7,7 +7,6 @@ namespace App\Model\Entity;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Criteria;
 use DateTime;
 
 /**
@@ -19,7 +18,7 @@ use DateTime;
  */
 class EnrolledUser
 {
-    use CreateableEntity;
+    use CreatableEntity;
 
     /**
      * @ORM\Id
@@ -65,7 +64,7 @@ class EnrolledUser
     protected $maxScore = null;
 
     /**
-     * When the ernolled user gets locked, no additional answers can be submitted by the corresponding user.
+     * When the enrolled user gets locked, no additional answers can be submitted by the corresponding user.
      * @ORM\Column(type="boolean")
      */
     protected $locked = false;

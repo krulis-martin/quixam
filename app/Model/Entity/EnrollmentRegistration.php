@@ -20,7 +20,7 @@ use DateTime;
  */
 class EnrollmentRegistration
 {
-    use CreateableEntity;
+    use CreatableEntity;
 
     /**
      * @ORM\Id
@@ -55,7 +55,7 @@ class EnrollmentRegistration
      * @param TestTerm $test
      * @param User|null $user
      */
-    public function __construct(TestTerm $test, User $user = null)
+    public function __construct(TestTerm $test, ?User $user = null)
     {
         $this->createdAt = new DateTime();
         $this->test = $test;
