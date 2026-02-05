@@ -13,8 +13,8 @@ class OrderByCollationInjectionMysqlWalker extends SqlWalker
     /**
      * Name of the hint, which holds the actual collation.
      */
-    const HINT_COLLATION = 'orderByCollationInjectionMysqlWalker.collation';
-    const HINT_COLLATION_FORBIDDEN_COLUMNS = 'orderByCollationInjectionMysqlWalker.forbiddenCols';
+    private const HINT_COLLATION = 'orderByCollationInjectionMysqlWalker.collation';
+    private const HINT_COLLATION_FORBIDDEN_COLUMNS = 'orderByCollationInjectionMysqlWalker.forbiddenCols';
 
     private function isForbidden($orderByItemTokens)
     {
@@ -40,7 +40,7 @@ class OrderByCollationInjectionMysqlWalker extends SqlWalker
 
         $tokens = explode(' ', $sql);
         if ($collation && count($tokens) > 1 && !$this->isForbidden($tokens)) {
-            // 'colname ASC|DESC' => 'colname COLLATE colation ASC|DESC'
+            // 'col-name ASC|DESC' => 'col-name COLLATE collation ASC|DESC'
             $direction = array_pop($tokens);
             array_push($tokens, 'COLLATE', $collation, $direction);
         }

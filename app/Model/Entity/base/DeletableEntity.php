@@ -7,7 +7,7 @@ namespace App\Model\Entity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
-trait DeleteableEntity
+trait DeletableEntity
 {
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -25,7 +25,7 @@ trait DeleteableEntity
         return $this->deletedAt !== null;
     }
 
-    // this is for special operations only, the deletedAt value is normally set by SoftDelete pluggin...
+    // this is for special operations only, the deletedAt value is normally set by SoftDelete plugin...
     public function setDeleted()
     {
         $this->deletedAt = new DateTime();
