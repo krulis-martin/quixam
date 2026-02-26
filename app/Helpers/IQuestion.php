@@ -29,12 +29,12 @@ interface IQuestion extends JsonSerializable
     public function getText(string $locale): string;
 
     /**
-     * Render internal content of the form where the user selectes the answer.
+     * Render internal content of the form where the user selects the answer.
      * @param Engine $latte engine for rendering latte templates (separately from the presenters)
      * @param string $locale selected locale
      * @param mixed $answer deserialized json structure sent over by the client
      *                      if not null, it will be used to pre-fill the last selected answer
-     * @return string raw HTML fragment which is pasted without excaping into the output
+     * @return string raw HTML fragment which is pasted without escaping into the output
      */
     public function renderFormContent(Engine $latte, string $locale, $answer = null): string;
 
@@ -44,9 +44,9 @@ interface IQuestion extends JsonSerializable
      * @param string $locale selected locale
      * @param mixed $answer deserialized json structure sent over by the client
      *                      the answer will be used for rendering (null = this question was not answered)
-     * @param bool|null $answerIsCorrect how the answer shold be displayed
-     *                                   (null = display it indiferently)
-     * @return string raw HTML fragment which is pasted without excaping into the output
+     * @param bool|null $answerIsCorrect how the answer should be displayed
+     *                                   (null = display it indifferently)
+     * @return string raw HTML fragment which is pasted without escaping into the output
      */
     public function renderResultContent(
         Engine $latte,

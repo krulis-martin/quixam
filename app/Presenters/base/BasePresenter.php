@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Presenters;
 
 use App\Controls\MenuControl;
-use App\Exceptions\BadRequestException;
 use App\Security\IExternalAuthenticator;
 use Nette\Application\UI\Presenter;
-use Nette\Localization\Translator;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\Checkbox;
+use Contributte\Translation\Translator;
 use Contributte\Translation\LocalesResolvers\Session as TranslatorSessionResolver;
 
 /**
@@ -33,10 +32,9 @@ class BasePresenter extends Presenter
     protected function startup()
     {
         parent::startup();
-
-        /** @phpstan-ignore-next-line */
         $this->selectedLocale = $this->translator->getLocale();
     }
+
     /*
      * Component factories
      */
@@ -86,9 +84,9 @@ class BasePresenter extends Presenter
 
     public static function formForBootstrap(Form $form): void
     {
+        /** @var \Nette\Forms\Rendering\DefaultFormRenderer */
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
-        /** @phpstan-ignore-line */
         $renderer->wrappers['pair']['container'] = 'div class="form-group row"';
         $renderer->wrappers['pair']['.error'] = 'has-danger';
         $renderer->wrappers['control']['container'] = 'div class="col-sm-9 pb-2"';

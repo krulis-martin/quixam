@@ -59,6 +59,7 @@ class EnrolledUser
 
     /**
      * Maximal possible number of points that can be scored in this test.
+     * This is valid only for regular scoring, negative scoring has no explicit maximum.
      * @ORM\Column(type="integer", nullable=true)
      */
     protected $maxScore = null;

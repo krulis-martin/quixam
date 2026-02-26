@@ -71,6 +71,8 @@ class Question
 
     /**
      * Maximal points awarded for this question (copied from the template group).
+     * Negative value means negative grading (counting mistakes instead of successes);
+     * negative grading may be also dependent on the question type.
      * @ORM\Column(type="integer")
      */
     protected $points;
