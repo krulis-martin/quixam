@@ -65,6 +65,8 @@ class TemplateQuestionsGroup
 
     /**
      * Points awarded for each question from this group.
+     * Negative value means negative grading (counting mistakes instead of successes);
+     * negative grading may be also dependent on the question type.
      * @ORM\Column(type="integer")
      */
     protected $points;

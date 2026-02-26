@@ -75,13 +75,23 @@ class TemplateTest
     private $gradingObj = null;
 
     /**
+     * @ORM\ManyToMany(targetEntity="User")
+     * @ORM\JoinTable(name="template_test_owner")
+     */
+    protected $owners;
+
+    /**
      * @param array|string $caption as a string with English caption or an array with [ locale => translation ]
      * @param string|null $externalId
      * @param string|null $courseId
-     * @param Grading $grading
+     * @param Grading|null $grading
      */
-    public function __construct($caption, ?string $externalId = null, ?string $courseId = null, Grading $grading = null)
-    {
+    public function __construct(
+        $caption,
+        ?string $externalId = null,
+        ?string $courseId = null,
+        ?Grading $grading = null
+    ) {
         $this->createdAt = new DateTime();
         $this->questionsGroups = new ArrayCollection();
         $this->externalId = $externalId;
@@ -96,6 +106,7 @@ class TemplateTest
 
         $this->gradingObj = $grading ?? new Grading();
         $this->grading = json_encode($this->gradingObj);
+        $this->owners = new ArrayCollection();
     }
 
     /*
