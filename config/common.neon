@@ -4,7 +4,13 @@ parameters:
 		port: 443
 		uri: '/cas'
 		certificate: ''
-    
+
+	accessTokens:
+    	verificationKey: null # this must be set in local config
+    	expiration: 86400  # 24 hours in seconds
+		leeway: 10 # leeway in seconds to account for clock skew when validating token expiration
+		usedAlgorithm: 'HS256'
+
 php:
 	date.timezone: Europe/Prague
 
