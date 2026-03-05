@@ -3,6 +3,7 @@ services:
   security.passwords: Nette\Security\Passwords(::PASSWORD_BCRYPT, [cost: 12])
   authenticator: App\Security\Authenticator
   - App\Security\CasAuthenticator(%casAuthenticator%)
+  - App\Security\AccessTokenManager(%accessTokens%)
   - App\Helpers\LatteDateFilter
   - App\Helpers\MarkdownFilter
 

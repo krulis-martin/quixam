@@ -24,7 +24,7 @@ class BaseException extends Exception
      */
     public function __construct(
         $msg = "Unexpected internal error",
-        $code = IResponse::S500_INTERNAL_SERVER_ERROR,
+        $code = IResponse::S500_InternalServerError,
         $previous = null
     ) {
         parent::__construct($msg, $code, $previous);

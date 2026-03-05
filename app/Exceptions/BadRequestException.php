@@ -19,6 +19,6 @@ class BadRequestException extends BaseException
      */
     public function __construct(string $msg = 'one or more parameters are missing')
     {
-        parent::__construct("Bad Request - $msg", IResponse::S400_BAD_REQUEST);
+        parent::__construct("Bad Request - $msg", IResponse::S400_BadRequest);
     }
 }
