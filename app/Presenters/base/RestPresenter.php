@@ -27,7 +27,7 @@ class RestPresenter extends Presenter
      * @inject
      * @var AccessTokenManager
      */
-    protected $accessTokenManager;
+    public $accessTokenManager;
 
     protected function startup()
     {

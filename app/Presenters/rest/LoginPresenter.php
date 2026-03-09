@@ -19,7 +19,7 @@ final class RestLoginPresenter extends RestPresenter
     public $registrations;
 
     /** @var Passwords @inject */
-    public $passwordsService;
+    public $passwords;
 
     /** @var LoggerInterface @inject **/
     public $logger;
@@ -37,7 +37,7 @@ final class RestLoginPresenter extends RestPresenter
         $req = $this->getRequest();
         $login = $req->getPost('login');
         $password = $req->getPost('password');
-        $expiration = $req->getPost('expiration');
+        $expiration = (int)$req->getPost('expiration');
 
         $user = $this->users->findByEmail($login);
         if (!$user || !$user->passwordsMatch($password, $this->passwords)) {
@@ -49,7 +49,7 @@ final class RestLoginPresenter extends RestPresenter
         $this->users->persist($user);
 
         // create an access token for the user
-        $token = $this->accessTokenManager->issueToken($user);
+        $token = $this->accessTokenManager->issueToken($user, $expiration);
 
         // return the token in the response
         $this->sendSuccessResponse($token);

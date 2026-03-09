@@ -14,6 +14,7 @@ final class RouterFactory
     public static function createRouter(): RouteList
     {
         $router = new RouteList();
+        $router->addRoute('rest/login', 'RestLogin:getToken');
         $router->addRoute('<presenter>/<action>[/<id>]', [
             'presenter' => 'Homepage',
             'action' => 'default',

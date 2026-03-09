@@ -99,7 +99,7 @@ class AccessTokenManager
      */
     public function issueToken(User $user, ?int $exp = null, array $payload = [])
     {
-        if ($exp === null) {
+        if (!$exp || $exp < 10 || $exp > $this->expiration) {
             $exp = $this->expiration;
         }
 
