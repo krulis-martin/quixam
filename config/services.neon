@@ -19,6 +19,7 @@ services:
       numeric: App\Helpers\Questions\QuestionNumeric,
       order: App\Helpers\Questions\QuestionOrder,
     ])
+  - App\Helpers\TemplatesActions
 
   # DB repositories
   - App\Model\Repository\Answers

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Helpers\TemplatesActions;
 use App\Model\Entity\TemplateTest;
-use App\Model\Repository\TemplateTests;
-use App\Model\Repository\TemplateQuestionsGroups;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,19 +21,14 @@ use RuntimeException;
 #[AsCommand(name: 'templates:deleteGroup', description: 'Soft-delete template questions group.')]
 class DeleteGroupTemplate extends BaseCommand
 {
-    /** @var TemplateTests */
-    private $templateTests;
-
-    /** @var TemplateQuestionsGroups */
-    private $templateQuestionsGroups;
+    /** @var TemplatesActions */
+    private $templatesActions;
 
     public function __construct(
-        TemplateTests $templateTests,
-        TemplateQuestionsGroups $templateQuestionsGroups
+        TemplatesActions $templatesActions,
     ) {
         parent::__construct();
-        $this->templateTests = $templateTests;
-        $this->templateQuestionsGroups = $templateQuestionsGroups;
+        $this->templatesActions = $templatesActions;
     }
 
     protected function configure()
@@ -50,7 +44,7 @@ class DeleteGroupTemplate extends BaseCommand
     protected function getTemplateTest(): TemplateTest
     {
         $testExternalId = $this->input->getArgument('test');
-        $test = $this->templateTests->findOneBy(['externalId' => $testExternalId]);
+        $test = $this->templatesActions->getTemplateTest($testExternalId);
         if (!$test) {
             throw new RuntimeException("Test template '$testExternalId' does not exist.");
         }
@@ -62,26 +56,19 @@ class DeleteGroupTemplate extends BaseCommand
         $this->input = $input;
         $this->output = $output;
 
+        $groupId = $input->getArgument('externalId');
         try {
             $test = $this->getTemplateTest();
-
-            $groupId = $input->getArgument('externalId');
-            $group = $this->templateQuestionsGroups->findOneBy(['externalId' => $groupId, 'test' => $test->getId()]);
-
-            if (!$group) {
+            if ($this->templatesActions->deleteGroup($test, $groupId)) {
+                $output->writeln("Questions group '$groupId' was deleted.");
+            } else {
                 $output->writeln("Questions group '$groupId' does not exist.");
-                return Command::SUCCESS;
             }
-
-            $this->templateQuestionsGroups->remove($group);
-            $this->templateQuestionsGroups->flush();
-            $output->writeln("Questions group '$groupId' was deleted.");
-
             return Command::SUCCESS;
         } catch (Exception $e) {
             $msg = $e->getMessage();
             $stderr = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
-            $stderr->writeln("Error: $msg");
+            $stderr->writeln("Deletion of group '$groupId' failed: $msg");
             return Command::FAILURE;
         }
     }
