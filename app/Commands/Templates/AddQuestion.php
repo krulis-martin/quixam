@@ -4,14 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Helpers\TemplatesActions;
 use App\Model\Entity\TemplateTest;
-use App\Model\Entity\TemplateQuestion;
 use App\Model\Entity\TemplateQuestionsGroup;
-use App\Model\Repository\TemplateTests;
-use App\Model\Repository\TemplateQuestions;
-use App\Model\Repository\TemplateQuestionsGroups;
-use App\Helpers\QuestionFactory;
-use App\Helpers\DynamicQuestion;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,29 +23,13 @@ use RuntimeException;
 #[AsCommand(name: 'templates:addQuestion', description: 'Add/update template question.')]
 class AddQuestionTemplate extends BaseCommand
 {
-    /** @var TemplateTests */
-    private $templateTests;
+    /** @var TemplatesActions */
+    private $templatesActions;
 
-    /** @var TemplateQuestions */
-    private $templateQuestions;
-
-    /** @var TemplateQuestionsGroups */
-    private $templateQuestionsGroups;
-
-    /** @var QuestionFactory */
-    private $questionFactory;
-
-    public function __construct(
-        TemplateTests $templateTests,
-        TemplateQuestions $templateQuestions,
-        TemplateQuestionsGroups $templateQuestionsGroups,
-        QuestionFactory $questionFactory
-    ) {
+    public function __construct(TemplatesActions $templatesActions)
+    {
         parent::__construct();
-        $this->templateTests = $templateTests;
-        $this->templateQuestions = $templateQuestions;
-        $this->templateQuestionsGroups = $templateQuestionsGroups;
-        $this->questionFactory = $questionFactory;
+        $this->templatesActions = $templatesActions;
     }
 
     protected function configure()
@@ -71,7 +50,7 @@ class AddQuestionTemplate extends BaseCommand
     protected function getTemplateTest(): TemplateTest
     {
         $testExternalId = $this->input->getArgument('test');
-        $test = $this->templateTests->findOneBy(['externalId' => $testExternalId]);
+        $test = $this->templatesActions->getTemplateTest($testExternalId);
         if (!$test) {
             throw new RuntimeException("Test template '$testExternalId' does not exist.");
         }
@@ -85,13 +64,17 @@ class AddQuestionTemplate extends BaseCommand
     protected function getTemplateQuestionsGroup(TemplateTest $test): TemplateQuestionsGroup
     {
         $groupEid = $this->input->getArgument('group');
-        $group = $this->templateQuestionsGroups->findOneBy(['test' => $test->getId(), 'externalId' => $groupEid]);
+        $group = $this->templatesActions->getTemplateGroup($test, $groupEid);
         if (!$group) {
             throw new RuntimeException("Template questions group '$groupEid' does not exist.");
         }
         return $group;
     }
 
+    /**
+     * Get caption options and assemble localized caption array.
+     * @return array [ 'en' => 'English caption', 'cs' => 'Czech caption', ... ]
+     */
     protected function getCaption(): array
     {
         if ($this->input->getOption('caption_en') === null) {
@@ -105,7 +88,11 @@ class AddQuestionTemplate extends BaseCommand
         return $caption;
     }
 
-    protected function getQuestionData()
+    /**
+     * Retrieves question data from a JSON file specified in input and checks its validity.
+     * @return array [ $type, $data ] pair
+     */
+    protected function getQuestionData(): array
     {
         $filePath = $this->input->getArgument('dataFile');
         if (!file_exists($filePath) || !is_file($filePath) || !is_readable($filePath)) {
@@ -113,34 +100,10 @@ class AddQuestionTemplate extends BaseCommand
         }
 
         $data = json_decode(file_get_contents($filePath), true);
-
         $type = $this->input->getOption('type') ?? '';
 
-        // smoke tests
-        if ($type) {
-            // regular (static) question
-            $questionData = $this->questionFactory->create($type);
-            for ($seed = 0; $seed < 20; ++$seed) {
-                $questionData->instantiate($data, $seed); // throws on error
-            }
-        } else {
-            // dynamic (generated question)
-            $dynamicQuestion = new DynamicQuestion($data, $this->questionFactory);
-            $res = DynamicQuestion::validateCode($dynamicQuestion->getCode());
-            if ($res !== true) {
-                foreach (is_array($res) ? $res : [] as $error) {
-                    echo "Code validation error: $error\n";
-                }
-                throw new RuntimeException("Code validation of dynamic question generator failed.");
-            }
-
-            $dynamicQuestion->generate(42);
-
-            for ($seed = 0; $seed < 20; ++$seed) {
-                $dynamicQuestion = new DynamicQuestion($data, $this->questionFactory);
-                $dynamicQuestion->generate($seed);
-            }
-        }
+        // smoke tests (we do not want to upload anything invalid)
+        $this->templatesActions->checkQuestionData($type, $data);
 
         return [$type, $data];
     }
@@ -149,47 +112,34 @@ class AddQuestionTemplate extends BaseCommand
     {
         $this->input = $input;
         $this->output = $output;
+        $questionId = $input->getArgument('externalId');
 
         try {
             $test = $this->getTemplateTest();
             $group = $this->getTemplateQuestionsGroup($test);
 
-            $questionId = $input->getArgument('externalId');
-            $question = $this->templateQuestions->findOneBy([
-                'externalId' => $questionId,
-                'test' => $test->getId(),
-                'questionsGroup' => $group->getId()
-            ]);
-
-            // prepare question data
-            $caption = $this->getCaption();
-            $captionJson = json_encode($caption);
             [$type, $data] = $this->getQuestionData();
-            $dataJson = $data === null ? '' : json_encode($data);
+            $res = $this->templatesActions->addQuestion(
+                $test,
+                $group,
+                $questionId,
+                $this->getCaption(),
+                $type,
+                $data,
+            );
 
-            if (
-                $question
-                && $question->getCaptionRaw() === $captionJson
-                && $question->getType() === $type
-                && $question->getDataRaw() === $dataJson
-            ) {
+            if ($res === null) {
+                $output->writeln("Creating new '$questionId' template question ...");
+            } elseif ($res === false) {
+                $output->writeln("Replacing existing '$questionId' template question ...");
+            } else {
                 $output->writeln("Nothing changed in question '$questionId', ending without update.");
-                return Command::SUCCESS;
             }
-
-            $output->writeln("Creating '$questionId' template question ...");
-            $newQuestion = new TemplateQuestion($group, $type, $caption, $data, $questionId, $question);
-            $this->templateQuestions->persist($newQuestion);
-
-            if (!empty($question)) {
-                $this->templateQuestions->remove($question);
-            }
-
             return Command::SUCCESS;
         } catch (Exception $e) {
             $msg = $e->getMessage();
             $stderr = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
-            $stderr->writeln("Error: $msg");
+            $stderr->writeln("Adding '$questionId' question template failed: $msg");
             return Command::FAILURE;
         }
     }

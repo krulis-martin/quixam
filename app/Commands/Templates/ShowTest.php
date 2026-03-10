@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Helpers\TemplatesActions;
 use App\Model\Entity\TemplateTest;
-use App\Model\Repository\TemplateTests;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,13 +21,13 @@ use RuntimeException;
 #[AsCommand(name: 'templates:showTest', description: 'Show template test structure.')]
 class ShowTemplateTest extends BaseCommand
 {
-    /** @var TemplateTests */
-    private $templateTests;
+    /** @var TemplatesActions */
+    private $templatesActions;
 
-    public function __construct(TemplateTests $templateTests)
+    public function __construct(TemplatesActions $templatesActions)
     {
         parent::__construct();
-        $this->templateTests = $templateTests;
+        $this->templatesActions = $templatesActions;
     }
 
     protected function configure()
@@ -42,7 +42,7 @@ class ShowTemplateTest extends BaseCommand
     protected function getTemplateTest(): TemplateTest
     {
         $testExternalId = $this->input->getArgument('externalId');
-        $test = $this->templateTests->findOneBy(['externalId' => $testExternalId]);
+        $test = $this->templatesActions->getTemplateTest($testExternalId);
         if (!$test) {
             throw new RuntimeException("Test template '$testExternalId' does not exist.");
         }
@@ -56,16 +56,7 @@ class ShowTemplateTest extends BaseCommand
 
         try {
             $test = $this->getTemplateTest();
-
-            $result = [];
-            foreach ($test->getQuestionGroups() as $group) {
-                $questions = [];
-                foreach ($group->getQuestions() as $question) {
-                    $questions[] = $question->getExternalId() ?? $question->getId();
-                }
-                $result[$group->getExternalId() ?? $group->getId()] = $questions;
-            }
-
+            $result = $this->templatesActions->getTemplateTestStructure($test);
             $output->writeln(json_encode($result));
 
             return Command::SUCCESS;

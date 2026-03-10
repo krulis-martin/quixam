@@ -52,7 +52,6 @@ class AccessTokenManager
      * Parse and validate a JWT token and extract the payload.
      * @param string $token The potential JWT token
      * @return AccessToken The decoded payload
-     * @throws ForbiddenRequestException
      * @throws InvalidAccessTokenException
      */
     public function decodeToken(string $token): AccessToken

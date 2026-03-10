@@ -15,9 +15,7 @@ use Nette\Http\IResponse;
  */
 class BaseException extends Exception
 {
-
     /**
-     * Constructor.
      * @param string $msg Error message
      * @param int $code Error code
      * @param Exception $previous Previous exception
