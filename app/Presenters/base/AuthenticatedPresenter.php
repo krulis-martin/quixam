@@ -56,7 +56,7 @@ class AuthenticatedPresenter extends BasePresenter
                 }
 
                 if (!$this->$checkMethod(...$args)) {
-                    $this->error("The user does not have sufficient priviledges to access selected content.", 403);
+                    $this->error("The user does not have sufficient privileges to access selected content.", 403);
                 }
             }
         }

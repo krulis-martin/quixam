@@ -7,13 +7,12 @@ namespace App\Presenters;
 use App\Model\Repository\Users;
 use App\Model\Repository\EnrollmentRegistrations;
 use App\Model\Entity\User;
-use App\Security\IExternalAuthenticator;
 use App\Security\Identity;
-use Nette;
 use Nette\Security\Passwords;
 use Nette\Security\AuthenticationException;
 use Psr\Log\LoggerInterface;
 use CAS_Exception;
+use Throwable;
 
 final class LoginPresenter extends BasePresenter
 {
@@ -142,7 +141,8 @@ final class LoginPresenter extends BasePresenter
                 $this->redirect('Login:default');
             }
         } catch (CAS_Exception $e) {
-            $this->logger->error("Unhandled exception: " . $e->getMessage(), [ 'exception' => $e ]);
+            $msg = ($e instanceof Throwable) ? $e->getMessage() : (string)$e;
+            $this->logger->error("Unhandled exception: $msg", ['exception' => $e]);
             $this->flashMessage($this->translator->translate('locale.login.error.externalAuthFailed'), "danger");
             $this->redirect('Login:default');
         }
@@ -150,5 +150,6 @@ final class LoginPresenter extends BasePresenter
 
     public function renderExternal(): void
     {
+        // nothing to render
     }
 }

@@ -7,10 +7,10 @@ namespace App\Presenters;
 use App\Model\Entity\User;
 use App\Security\AccessToken;
 use App\Security\AccessTokenManager;
-use App\Exceptions\BadRequestException;
 use Nette\Application\UI\Presenter;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
+use ReflectionMethod;
 
 /**
  * Base presenter for all REST API endpoints.
@@ -22,6 +22,8 @@ class RestPresenter extends Presenter
 
     /** @var AccessToken */
     protected $token = null;
+
+    protected $body = null;
 
     /**
      * @inject
@@ -43,13 +45,37 @@ class RestPresenter extends Presenter
         ) {
             $body = file_get_contents('php://input');
             try {
-                $json = $body ? Json::decode($body, true) : [];
+                $this->body = $body ? Json::decode($body, true) : [];
             } catch (JsonException $e) {
-                throw new BadRequestException("Parsing of the JSON body failed: " . $e->getMessage());
+                $this->error("Parsing of the JSON body failed: " . $e->getMessage(), 400);
             }
+        }
 
-            if (!is_array($json)) {
-                throw new BadRequestException("A collection is expected as JSON body. Scalar value was given instead.");
+        if (!$this->user) {
+            $action = $this->getRequest()->getParameter('action');
+            if ($action === 'getToken') {
+                // this is the only exception in all REST endpoints
+                return; // skip the checks
+            }
+            $this->error("The endpoint requires valid authentication token.", 403);
+        }
+
+        if ($this->user->getRole() !== User::ROLE_ADMIN) {
+            // users (except for admin) should check the access permissions
+            // (if corresponding 'check' method exists)
+            $params = $this->getRequest()->getParameters();
+            $checkMethod = "check" . ucfirst($params['action'] ?? '');
+            if (method_exists($this, $checkMethod)) {
+                $args = [];
+                $refMethod = new ReflectionMethod($this, $checkMethod);
+                foreach ($refMethod->getParameters() as $p) {
+                    $name = $p->getName();
+                    $args[] = $params[$name] ?? null;
+                }
+
+                if (!$this->$checkMethod(...$args)) {
+                    $this->error("The user does not have sufficient privileges to access selected content.", 403);
+                }
             }
         }
     }

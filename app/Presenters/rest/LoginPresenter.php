@@ -34,10 +34,9 @@ final class RestLoginPresenter extends RestPresenter
     public function actionGetToken(): void
     {
         // verify the credentials
-        $req = $this->getRequest();
-        $login = $req->getPost('login');
-        $password = $req->getPost('password');
-        $expiration = (int)$req->getPost('expiration');
+        $login = $this->body['login'] ?? null;
+        $password = $this->body['password'] ?? null;
+        $expiration = (int)($this->body['expiration'] ?? 0);
 
         $user = $this->users->findByEmail($login);
         if (!$user || !$user->passwordsMatch($password, $this->passwords)) {
@@ -53,5 +52,18 @@ final class RestLoginPresenter extends RestPresenter
 
         // return the token in the response
         $this->sendSuccessResponse($token);
+    }
+
+    /**
+     * Refresh the access token. Newly created token is returned in the response.
+     */
+    public function actionRefreshToken(): void
+    {
+        try {
+            $newToken = $this->accessTokenManager->issueRefreshedToken($this->token);
+            $this->sendSuccessResponse($newToken);
+        } catch (AuthenticationException $e) {
+            throw new AuthenticationException('Invalid refresh token.');
+        }
     }
 }
