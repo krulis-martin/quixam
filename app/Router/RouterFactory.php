@@ -19,6 +19,12 @@ final class RouterFactory
         $router[] = new PostRoute('rest/login', 'RestLogin:getToken');
         $router[] = new PostRoute('rest/refresh', 'RestLogin:refreshToken');
 
+        $router[] = new GetRoute('rest/templates/test/<id>', 'RestTemplates:getTest');
+        $router[] = new PostRoute('rest/templates/test/<id>/group/<groupId>', 'RestTemplates:addGroup');
+        $router[] = new DeleteRoute('rest/templates/test/<id>/group/<groupId>', 'RestTemplates:deleteGroup');
+        $router[] = new PostRoute('rest/templates/test/<id>/question/<groupId>', 'RestTemplates:addQuestion');
+        $router[] = new DeleteRoute('rest/templates/test/<id>/question/<groupId>', 'RestTemplates:deleteQuestion');
+
         // routes for app presenters
         $router->addRoute('<presenter>/<action>[/<id>]', [
             'presenter' => 'Homepage',

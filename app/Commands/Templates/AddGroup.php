@@ -74,7 +74,7 @@ class AddGroupTemplate extends BaseCommand
      * @param string $key name of the option
      * @return int|null
      */
-    protected function getIntOption(string $key): ?int
+    protected function getIntOption(string $key, bool $positive = false): ?int
     {
         $value = $this->input->getOption($key);
         if ($value === null) {
@@ -86,7 +86,7 @@ class AddGroupTemplate extends BaseCommand
         }
 
         $value = (int)$value;
-        if ($value < 1) {
+        if ($positive && $value < 1) {
             throw new RuntimeException("Value of --$key is expected to be greater than 0, but '$value' was given.");
         }
 
@@ -102,8 +102,8 @@ class AddGroupTemplate extends BaseCommand
         try {
             $test = $this->getTemplateTest();
 
-            $ordering = $this->getIntOption('ordering');
-            $count = $this->getIntOption('count');
+            $ordering = $this->getIntOption('ordering', true);
+            $count = $this->getIntOption('count', true);
             $points = $this->getIntOption('points');
 
             $res = $this->templatesActions->addGroup($test, $groupId, $ordering, $count, $points);

@@ -175,4 +175,9 @@ class TemplateTest
         }
         return $this->gradingObj;
     }
+
+    public function isOwner(User $user): bool
+    {
+        return $this->owners->contains($user);
+    }
 }

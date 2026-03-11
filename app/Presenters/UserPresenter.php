@@ -31,14 +31,14 @@ final class UserPresenter extends AuthenticatedPresenter
         $form->addPassword('passwordNew', $this->translator->translate('locale.user.password.labelNew'))
             ->setRequired($this->translator->translate('locale.user.password.required'))
             ->addRule(
-                $form::MIN_LENGTH,
+                Form::MinLength,
                 $this->translator->translate('locale.user.password.minLength', ['length' => 5]),
                 5
             );
 
         $form->addPassword('passwordVerify', $this->translator->translate('locale.user.password.labelVerify'))
             ->setRequired($this->translator->translate('locale.user.password.required2'))
-            ->addRule($form::EQUAL, $this->translator->translate('locale.user.password.match'), $form['passwordNew'])
+            ->addRule(Form::Equal, $this->translator->translate('locale.user.password.match'), $form['passwordNew'])
             ->setOmitted();
 
         $form->addSubmit(

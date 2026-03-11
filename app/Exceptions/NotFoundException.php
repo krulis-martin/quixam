@@ -23,7 +23,7 @@ class NotFoundException extends BaseException
     ) {
         parent::__construct(
             "Not Found - $msg",
-            IResponse::S404_NOT_FOUND,
+            IResponse::S404_NotFound,
             $previous
         );
     }
