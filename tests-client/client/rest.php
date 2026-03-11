@@ -64,6 +64,11 @@ final class RestApiClient
     }
 
     /**
+     * Logs in with the given credentials and returns the JWT access token.
+     * @param string $login User login (local username)
+     * @param string $password User password
+     * @param int|null $expirationSeconds Optional requested token expiration length in seconds.
+     *                                    If null, the server default will be used.
      * @return string JWT access token
      */
     public function loginAndGetToken(string $login, string $password, ?int $expirationSeconds = null): string
@@ -86,6 +91,11 @@ final class RestApiClient
         return $token;
     }
 
+    /**
+     * Refreshes the current authentication token and returns the new token.
+     * The current token must be valid and not expired, otherwise an exception will be thrown.
+     * @return string New JWT access token
+     */
     public function refreshToken(): string
     {
         $data = $this->post('/rest/refresh');
@@ -200,7 +210,6 @@ final class RestApiClient
 
         $data = json_decode($responseBody, true);
         if (!is_array($data)) {
-            echo $responseBody . "\n";
             $snippet = substr($responseBody, 0, 512);
             throw new RuntimeException("Unexpected non-JSON response (HTTP {$httpCode}): {$snippet}");
         }

@@ -5,3 +5,5 @@ config/local.neon
 /vendor
 /log
 /temp
+/tests-client/.auth-token
+/tests-client/config.yaml

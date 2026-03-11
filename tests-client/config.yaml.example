@@ -1,0 +1,8 @@
+# Base path of the Quixam web application.
+url: https://<your-quixam-domain>/
+
+# The user to authenticate with (local login name). If not set, the login script will prompt for it.
+login: user@example.com
+
+# Path to the file where the authentication token will be stored.
+token_file: ./.auth-token
