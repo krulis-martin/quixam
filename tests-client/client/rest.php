@@ -42,25 +42,25 @@ final class RestApiClient
     /**
      * @return array<string,mixed>
      */
-    public function post(string $endpoint, array $fields = []): array
+    public function post(string $endpoint, array $query = [], ?array $body = null): array
     {
-        return $this->request('POST', $endpoint, $fields);
+        return $this->request('POST', $endpoint, $query, $body);
     }
 
     /**
      * @return array<string,mixed>
      */
-    public function put(string $endpoint, array $fields = []): array
+    public function put(string $endpoint, array $query = [], mixed $body = null, ?string $contentType = null): array
     {
-        return $this->request('PUT', $endpoint, $fields);
+        return $this->request('PUT', $endpoint, $query, $body, $contentType);
     }
 
     /**
      * @return array<string,mixed>
      */
-    public function delete(string $endpoint, array $fields = []): array
+    public function delete(string $endpoint, array $query = []): array
     {
-        return $this->request('DELETE', $endpoint, $fields);
+        return $this->request('DELETE', $endpoint, $query);
     }
 
     /**
@@ -76,7 +76,7 @@ final class RestApiClient
             $postFields['expiration'] = (string)$expirationSeconds;
         }
 
-        $data = $this->request('POST', '/rest/login', $postFields);
+        $data = $this->post('/rest/login', [], $postFields);
         $token = $data['payload'] ?? null;
         if (!is_string($token) || $token === '') {
             throw new RuntimeException('Login succeeded but token is missing/invalid in response payload.');
@@ -86,37 +86,91 @@ final class RestApiClient
         return $token;
     }
 
+    public function refreshToken(): string
+    {
+        $data = $this->post('/rest/refresh');
+        $token = $data['payload'] ?? null;
+        if (!is_string($token) || $token === '') {
+            throw new RuntimeException('Token refresh succeeded but new token is missing/invalid in response payload.');
+        }
+
+        $this->authToken = $token;
+        return $token;
+    }
+
+    /**
+     * Builds the full URL for the given endpoint and query parameters.
+     * If the endpoint is an absolute URL, it is returned as is.
+     * @param string $endpoint Endpoint path (relative to base URL) or absolute URL
+     * @param array<string,mixed> $query Query parameters to be appended to the URL
+     * @return string Full URL for the request
+     */
+    private function buildUrl(string $endpoint, array $query = []): string
+    {
+        if (str_starts_with($endpoint, 'http://') || str_starts_with($endpoint, 'https://')) {
+            return $endpoint;
+        }
+
+        if ($endpoint === '') {
+            return $this->baseUrl;
+        }
+
+        $url = $this->baseUrl . '/' . ltrim($endpoint, '/');
+        if ($query !== []) {
+            $url .= '?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+        }
+        return $url;
+    }
+
+    private function prepareHeadersAndBody(string $method, mixed &$body, ?string $contentType): array
+    {
+        $headers = [
+            'Accept: application/json',
+            'User-Agent: Quixam tests-client',
+        ];
+        if ($this->authToken) {
+            $headers[] = 'Authorization: Bearer ' . $this->authToken;
+        }
+
+        if ($method !== 'GET' && $method !== 'DELETE') {
+            if ($body !== null && !$contentType) {
+                $contentType = 'application/json';
+                $body = json_encode($body);
+            }
+        } else {
+            $contentType = null;
+            $body = null;
+        }
+
+        if ($contentType) {
+            $headers[] = 'Content-Type: ' . $contentType;
+        }
+
+        return $headers;
+    }
+
     /**
      * @return array<string,mixed>
      */
-    private function request(string $method, string $endpoint, array $fields = []): array
-    {
+    private function request(
+        string $method,
+        string $endpoint,
+        array $query = [],
+        mixed $body = null,
+        ?string $contentType = null
+    ): array {
         $method = strtoupper($method);
         if (!in_array($method, ['GET', 'POST', 'PUT', 'DELETE'], true)) {
             throw new InvalidArgumentException("Unsupported HTTP method '{$method}'.");
         }
 
-        $url = $this->buildUrl($endpoint);
-        $body = http_build_query($fields, '', '&', PHP_QUERY_RFC3986);
-        if ($method === 'GET' && $body !== '') {
-            $url .= (str_contains($url, '?') ? '&' : '?') . $body;
-        }
+        $url = $this->buildUrl($endpoint, $query);
+        $headers = $this->prepareHeadersAndBody($method, $body, $contentType);
 
         $ch = curl_init($url);
         if ($ch === false) {
             throw new RuntimeException('Failed to initialize cURL.');
         }
-
-        $headers = [
-            'Accept: application/json',
-            'Content-Type: application/x-www-form-urlencoded',
-            'User-Agent: Quixam tests-client',
-        ];
-
-        if ($this->authToken) {
-            $headers[] = 'Authorization: Bearer ' . $this->authToken;
-        }
-
         $options = [
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_RETURNTRANSFER => true,
@@ -165,18 +219,5 @@ final class RestApiClient
         }
 
         return $data;
-    }
-
-    private function buildUrl(string $endpoint): string
-    {
-        if (str_starts_with($endpoint, 'http://') || str_starts_with($endpoint, 'https://')) {
-            return $endpoint;
-        }
-
-        if ($endpoint === '') {
-            return $this->baseUrl;
-        }
-
-        return $this->baseUrl . '/' . ltrim($endpoint, '/');
     }
 }
