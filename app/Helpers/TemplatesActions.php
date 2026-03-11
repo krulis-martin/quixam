@@ -10,6 +10,7 @@ use App\Model\Entity\TemplateQuestion;
 use App\Model\Repository\TemplateTests;
 use App\Model\Repository\TemplateQuestions;
 use App\Model\Repository\TemplateQuestionsGroups;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 /**
@@ -30,16 +31,22 @@ final class TemplatesActions
     /** @var QuestionFactory */
     private $questionFactory;
 
+    /** @var LoggerInterface */
+    private $logger;
+
+
     public function __construct(
         TemplateTests $templateTests,
         TemplateQuestions $templateQuestions,
         TemplateQuestionsGroups $templateQuestionsGroups,
-        QuestionFactory $questionFactory
+        QuestionFactory $questionFactory,
+        LoggerInterface $logger
     ) {
         $this->templateTests = $templateTests;
         $this->templateQuestions = $templateQuestions;
         $this->templateQuestionsGroups = $templateQuestionsGroups;
         $this->questionFactory = $questionFactory;
+        $this->logger = $logger;
     }
 
     /**
