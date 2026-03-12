@@ -132,10 +132,12 @@ final class TemplatesActions
         $this->templateQuestionsGroups->persist($newGroup);
 
         if (!empty($group)) {
+            $this->logger->info("Updating group '{$groupId}' in test '{$test->getExternalId()}'.");
             $this->templateQuestions->reconnectQuestions($group, $newGroup);
             $this->templateQuestionsGroups->remove($group);
             return false; // group was updated.
         } else {
+            $this->logger->info("Creating group '{$groupId}' in test '{$test->getExternalId()}'.");
             return null; // new group was created.
         }
     }
@@ -161,10 +163,14 @@ final class TemplatesActions
             $dynamicQuestion = new DynamicQuestion($data, $this->questionFactory);
             $res = DynamicQuestion::validateCode($dynamicQuestion->getCode());
             if ($res !== true) {
+                $errors = "";
                 foreach (is_array($res) ? $res : [] as $error) {
-                    echo "Code validation error: $error\n";
+                    $errors .= "Code validation error: $error\n";
                 }
-                throw new RuntimeException("Code validation of dynamic question generator failed.");
+                if ($errors) {
+                    $errors = "\n$errors";
+                }
+                throw new RuntimeException("Code validation of dynamic question generator failed.$errors");
             }
 
             for ($seed = 0; $seed < $thoroughness; ++$seed) {
@@ -216,9 +222,13 @@ final class TemplatesActions
         $this->templateQuestions->persist($newQuestion);
 
         if (!empty($question)) {
+            $this->logger->info("Updating question '{$questionId}' in group "
+                . "'{$group->getExternalId()}' of test '{$test->getExternalId()}'.");
             $this->templateQuestions->remove($question);
             return false; // question was updated.
         } else {
+            $this->logger->info("Creating question '{$questionId}' in group "
+                . "'{$group->getExternalId()}' of test '{$test->getExternalId()}'.");
             return null; // new question was created.
         }
     }
@@ -236,6 +246,7 @@ final class TemplatesActions
             return false;
         }
 
+        $this->logger->info("Deleting group '{$groupId}' from test '{$test->getExternalId()}'.");
         $this->templateQuestionsGroups->remove($group);
         $this->templateQuestionsGroups->flush();
         return true;
@@ -260,6 +271,8 @@ final class TemplatesActions
             return false;
         }
 
+        $this->logger->info("Deleting question '{$questionId}' from group "
+            . "'{$group->getExternalId()}' of test '{$test->getExternalId()}'.");
         $this->templateQuestions->remove($question);
         $this->templateQuestions->flush();
         return true;
