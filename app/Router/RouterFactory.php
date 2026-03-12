@@ -22,8 +22,8 @@ final class RouterFactory
         $router[] = new GetRoute('rest/templates/test/<id>', 'RestTemplates:getTest');
         $router[] = new PostRoute('rest/templates/test/<id>/group/<groupId>', 'RestTemplates:addGroup');
         $router[] = new DeleteRoute('rest/templates/test/<id>/group/<groupId>', 'RestTemplates:deleteGroup');
-        $router[] = new PostRoute('rest/templates/test/<id>/question/<groupId>', 'RestTemplates:addQuestion');
-        $router[] = new DeleteRoute('rest/templates/test/<id>/question/<groupId>', 'RestTemplates:deleteQuestion');
+        $router[] = new PostRoute('rest/templates/test/<id>/group/<groupId>/question/<questionId>', 'RestTemplates:addQuestion');
+        $router[] = new DeleteRoute('rest/templates/test/<id>/group/<groupId>/question/<questionId>', 'RestTemplates:deleteQuestion');
 
         // routes for app presenters
         $router->addRoute('<presenter>/<action>[/<id>]', [
