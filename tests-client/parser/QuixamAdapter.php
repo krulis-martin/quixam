@@ -15,8 +15,8 @@ class Adapter
     /** @var IApiClient */
     private $client;
 
-    /** @var string */
-    private $baseDir;
+    /** @var string|null */
+    private $baseDir = null;
 
     /** @var string|null */
     private $testId = null;
@@ -30,20 +30,26 @@ class Adapter
     /**
      * Initialize adapter by setting base dir where question files are and path to quixam instance.
      */
-    public function __construct(IApiClient $client, string $baseDir, string $quixamPath)
+    public function __construct(IApiClient $client, ?string $baseDir = null)
     {
         $this->client = $client;
 
-        $this->baseDir = realpath($baseDir);
-        if (!$this->baseDir || !is_dir($this->baseDir)) {
-            throw new RuntimeException("Base directory '$baseDir' not found.");
+        if ($baseDir) {
+            $this->baseDir = realpath($baseDir);
+            if (!$this->baseDir || !is_dir($this->baseDir)) {
+                throw new RuntimeException("Base directory '$baseDir' not found.");
+            }
         }
 
+        // the parser is initialize here, since it requires no configuration and can be used in the whole class
+        // in the future, this may be replaced with DI pattern, if needed
         $this->parser = new Parser();
     }
 
     /**
-     * Load yaml configuration for upload.
+     * Load yaml configuration of the test.
+     * It also sets the base path for the question files (base dir of the config file).
+     * @param string $config path to the yaml config file
      */
     public function loadConfig(string $config): void
     {
@@ -58,6 +64,8 @@ class Adapter
 
         $this->testId = $yaml['id'];
         $this->groups = $yaml['groups'];
+
+        $this->baseDir = realpath(dirname($config));
     }
 
     private static function getNumType(string $number)

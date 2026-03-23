@@ -34,7 +34,7 @@ try {
     $newToken = $api->refreshToken();
     $config->saveToken($newToken);
 
-    $quixam = new Quixam\Adapter($api, __DIR__, $argv[1]);
+    $quixam = new Quixam\Adapter($api);
     $quixam->loadConfig($argv[1]);
     $quixam->upload();
 } catch (Throwable $e) {
