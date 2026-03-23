@@ -26,10 +26,11 @@ interface IApiClient
      * @param string $testId External ID of the test template.
      * @param string $groupId External ID of the question group.
      * @param int $points Points assigned to the group.
+     * @param int $count Number of questions to select from the group.
      * @param int $ordering Ordering of the group within the test template.
      * @throws RuntimeException if the group creation/update fails.
      */
-    public function addGroup(string $testId, string $groupId, int $points, int $ordering): void;
+    public function addGroup(string $testId, string $groupId, int $points, int $count, int $ordering): void;
 
     /**
      * Adds/updates a question.
