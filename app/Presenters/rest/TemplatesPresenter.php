@@ -30,7 +30,7 @@ final class RestTemplatesPresenter extends RestPresenter
         if (!$test) {
             throw new NotFoundException("Test template '$externalId' does not exist.");
         }
-        if (!$test->isOwner($this->user)) {
+        if (!$this->user->isAdmin() && !$test->isOwner($this->user)) {
             throw new ForbiddenRequestException("You are not an owner of '$externalId' test template.");
         }
         return $test;
@@ -70,12 +70,12 @@ final class RestTemplatesPresenter extends RestPresenter
      */
     protected function getCaption(): array
     {
-        if ($this->body['caption_en'] ?? null === null) {
+        if (($this->body['caption_en'] ?? null) === null) {
             throw new BadRequestException("English caption must be present.");
         }
 
         $caption = ['en' => trim($this->body['caption_en'])];
-        if ($this->body['caption_cs'] ?? null !== null) {
+        if (($this->body['caption_cs'] ?? null) !== null) {
             $caption['cs'] = trim($this->body['caption_cs']);
         }
         return $caption;

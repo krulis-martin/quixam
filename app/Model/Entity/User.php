@@ -240,6 +240,11 @@ class User
         $this->role = $role;
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
     public function getLastAuthenticationAt(): ?DateTime
     {
         return $this->lastAuthenticationAt;
