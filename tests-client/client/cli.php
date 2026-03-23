@@ -78,16 +78,16 @@ final class CliApiClient implements IApiClient
     /**
      * Invokes add group via Quixam CLI.
      */
-    public function addGroup(string $testId, string $groupId, int $points, int $ordering): void
+    public function addGroup(string $testId, string $groupId, int $points, int $count, int $ordering): void
     {
         $args = [
             'templates:addGroup',
             '--points',
             $points,
+            '--count',
+            $count,
             '--ordering',
             $ordering,
-            '--count',
-            1,
             $testId,
             $groupId,
         ];

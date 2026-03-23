@@ -10,7 +10,7 @@ use InvalidArgumentException;
 /**
  * A REST API client for Quixam.
  */
-final class RestApiClient
+final class RestApiClient implements IApiClient
 {
     private string $baseUrl;
     private ?string $authToken;
@@ -49,9 +49,8 @@ final class RestApiClient
             $postFields['expiration'] = (string)$expirationSeconds;
         }
 
-        $data = $this->post('/rest/login', [], $postFields);
-        $token = $data['payload'] ?? null;
-        if (!is_string($token) || $token === '') {
+        $token = $this->post('/rest/login', [], $postFields);
+        if (!is_string($token) || strlen($token) < 32) {
             throw new RuntimeException('Login succeeded but token is missing/invalid in response payload.');
         }
 
@@ -66,9 +65,8 @@ final class RestApiClient
      */
     public function refreshToken(): string
     {
-        $data = $this->post('/rest/refresh');
-        $token = $data['payload'] ?? null;
-        if (!is_string($token) || $token === '') {
+        $token = $this->post('/rest/refresh');
+        if (!is_string($token) || strlen($token) < 32) {
             throw new RuntimeException('Token refresh succeeded but new token is missing/invalid in response payload.');
         }
 
@@ -350,5 +348,50 @@ final class RestApiClient
     private function delete(string $endpoint, array $query = []): mixed
     {
         return $this->request('DELETE', $endpoint, $query);
+    }
+
+    /*
+     * Implementation of IApiClient interface
+     */
+
+    public function getTestStructure(string $testId): ?array
+    {
+        return $this->get("/rest/templates/test/{$testId}");
+    }
+
+    public function addGroup(string $testId, string $groupId, int $points, int $count, int $ordering): void
+    {
+        $this->post(
+            "/rest/templates/test/{$testId}/group/{$groupId}",
+            [],
+            ['points' => $points, 'count' => $count, 'ordering' => $ordering]
+        );
+    }
+
+    public function addQuestion(
+        string $testId,
+        string $groupId,
+        string $questionId,
+        string $type,
+        string $caption_en,
+        string $caption_cs,
+        array $data
+    ): void {
+        $this->post("/rest/templates/test/{$testId}/group/{$groupId}/question/{$questionId}", [], [
+            'type' => $type,
+            'caption_en' => $caption_en,
+            'caption_cs' => $caption_cs,
+            'data' => $data,
+        ]);
+    }
+
+    public function deleteGroup(string $testId, string $groupId): void
+    {
+        $this->delete("/rest/templates/test/{$testId}/group/{$groupId}");
+    }
+
+    public function deleteQuestion(string $testId, string $groupId, string $questionId): void
+    {
+        $this->delete("/rest/templates/test/{$testId}/group/{$groupId}/question/{$questionId}");
     }
 }

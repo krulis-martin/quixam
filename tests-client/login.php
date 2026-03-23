@@ -4,6 +4,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/helpers/config.php';
+require_once __DIR__ . '/client/interface.php';
 require_once __DIR__ . '/client/rest.php';
 
 use Helpers\Config;
@@ -24,7 +25,7 @@ try {
         try {
             $newToken = $api->refreshToken();
             $config->saveToken($newToken);
-            echo "Token refreshed successfully.\n";
+            echo "Token refreshed successfully and saved in " . $config->tokenFile . ".\n";
             exit(0);
         } catch (Throwable $e) {
             echo "Existing token is invalid or expired: " . $e->getMessage() . "\n";

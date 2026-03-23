@@ -279,7 +279,8 @@ class Adapter
         foreach ($structure as $group => $questions) {
             echo "Uploading questions of $group ...\n";
             $points = $this->groups[$group];
-            $this->client->addGroup($this->testId, $group, $points, ++$ordering);
+            // at the moment, each group selects only one question (TODO make it configurable...)
+            $this->client->addGroup($this->testId, $group, $points, 1, ++$ordering);
             $this->uploadGroup($group, $questions, $current[$group] ?? []);
         }
     }
