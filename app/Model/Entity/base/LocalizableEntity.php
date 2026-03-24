@@ -4,12 +4,30 @@ declare(strict_types=1);
 
 namespace App\Model\Entity;
 
+use InvalidArgumentException;
+
 /**
  * Adds methods for manipulation with localized properties.
  * At present, the implementation uses JSON-encoding of an array [ locale => translation ].
  */
 trait LocalizableEntity
 {
+    /**
+     * Return entire localization structure as an associative array.
+     * @param string $name of the property that holds localized data
+     * @return array|null [ locale => translation ] or null if no value exists
+     */
+    public function getLocalizedStructure(string $name): ?array
+    {
+        $value = $this->$name;
+        if (!$value) {
+            return null;
+        }
+
+        $json = json_decode($value, true);
+        return $json && is_array($json) ? $json : null;
+    }
+
     /**
      * Retrieves localized value from a string property. If the translation does not exists, if fallbacks to defaults.
      * @param string $name of the property that holds localized data
@@ -19,13 +37,8 @@ trait LocalizableEntity
      */
     public function getLocalizedProperty(string $name, string $locale, bool $strict = false): ?string
     {
-        $value = $this->$name;
-        if (!$value) {
-            return null;
-        }
-
-        $json = json_decode($value, true);
-        if (!is_array($json) || !$json) {
+        $json = $this->getLocalizedStructure($name);
+        if (!$json) {
             return null;
         }
 
@@ -64,6 +77,14 @@ trait LocalizableEntity
      */
     public function overwriteLocalizedProperty(string $name, array $translations): void
     {
+        foreach ($translations as $locale => $value) {
+            if (!is_string($locale) || !in_array($locale, ['en', 'cs']) || !is_string($value)) {
+                throw new InvalidArgumentException(
+                    "Translations must be an array of [ locale => string ], where locale is 'en' or 'cs'"
+                );
+            }
+        }
+
         $this->$name = json_encode($translations);
     }
 }

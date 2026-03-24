@@ -11,7 +11,6 @@ use App\Security\Identity;
 use Nette\Security\Passwords;
 use Nette\Security\AuthenticationException;
 use Psr\Log\LoggerInterface;
-use CAS_Exception;
 use Throwable;
 
 final class LoginPresenter extends BasePresenter
@@ -140,8 +139,8 @@ final class LoginPresenter extends BasePresenter
             } else {
                 $this->redirect('Login:default');
             }
-        } catch (CAS_Exception $e) {
-            $msg = ($e instanceof Throwable) ? $e->getMessage() : (string)$e;
+        } catch (Throwable $e) {
+            $msg = $e->getMessage();
             $this->logger->error("Unhandled exception: $msg", ['exception' => $e]);
             $this->flashMessage($this->translator->translate('locale.login.error.externalAuthFailed'), "danger");
             $this->redirect('Login:default');

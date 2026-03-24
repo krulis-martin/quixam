@@ -6,8 +6,6 @@ namespace App\Model\Repository;
 
 use App\Model\Entity\TestTerm;
 use App\Model\Entity\User;
-use App\Model\Entity\EnrollmentRegistration;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -33,7 +31,7 @@ class TestTerms extends BaseSoftDeleteRepository
             ->where($qb->expr()->eq("eu.user", ":user"))
             ->andWhere($qb->expr()->isNull("tt.archivedAt"))
             ->orderBy('tt.scheduledAt');
-        $qb->setParameters([ 'user' => $user->getId() ]);
+        $qb->setParameters(['user' => $user->getId()]);
 
         if ($onlyActive) {
             $qb->andWhere($qb->expr()->isNull("tt.finishedAt"));
@@ -42,7 +40,8 @@ class TestTerms extends BaseSoftDeleteRepository
     }
 
     /**
-     * Retrieve a list of terms for which a user is registered.
+     * Retrieve a list of terms for which a user is (pre)registered.
+     * @param User $user
      * @return TestTerm[]
      */
     public function getTermsUserIsRegisteredFor(User $user): array
@@ -52,12 +51,13 @@ class TestTerms extends BaseSoftDeleteRepository
             ->where($qb->expr()->eq("er.user", ":user"))
             ->andWhere($qb->expr()->isNull("tt.archivedAt"))
             ->orderBy('tt.scheduledAt');
-        $qb->setParameters([ 'user' => $user->getId() ]);
+        $qb->setParameters(['user' => $user->getId()]);
         return $qb->getQuery()->getResult();
     }
 
     /**
      * Retrieve a list of terms which the user supervises.
+     * @param User $user
      * @return TestTerm[]
      */
     public function getTermsUserSupervises(User $user): array
@@ -66,7 +66,41 @@ class TestTerms extends BaseSoftDeleteRepository
         $qb->where(':uid MEMBER OF tt.supervisors')
             ->andWhere($qb->expr()->isNull("tt.archivedAt"))
             ->orderBy('tt.scheduledAt');
-        $qb->setParameters([ 'uid' => $user->getId()]);
+        $qb->setParameters(['uid' => $user->getId()]);
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Retrieve a list of terms which the user manages (is an owner of the template).
+     * Owner of the template may not be the supervisor of the term.
+     * @param User $user who owns the template
+     * @return TestTerm[]
+     */
+    public function getTermsUserManages(User $user): array
+    {
+        $qb = $this->createQueryBuilder('tt');
+        $qb->innerJoin("tt.template", "t")
+            ->where($qb->expr()->isMemberOf(':uid', 't.owners'))
+            ->andWhere($qb->expr()->isNull("tt.archivedAt"))
+            ->orderBy('tt.scheduledAt');
+        $qb->setParameters(['uid' => $user->getId()]);
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Retrieve a list of terms which the user supervises or manages.
+     * @param User $user
+     * @return TestTerm[]
+     */
+    public function getTermsUserSupervisesOrManages(User $user): array
+    {
+        $qb = $this->createQueryBuilder('tt');
+        $qb->innerJoin("tt.template", "t")
+            ->where($qb->expr()->isMemberOf(':uid', 't.owners'))
+            ->orWhere($qb->expr()->isMemberOf(':uid', 'tt.supervisors'))
+            ->andWhere($qb->expr()->isNull("tt.archivedAt"))
+            ->orderBy('tt.scheduledAt');
+        $qb->setParameters(['uid' => $user->getId()]);
         return $qb->getQuery()->getResult();
     }
 }
