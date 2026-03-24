@@ -60,7 +60,7 @@ class RestPresenter extends Presenter
             $this->error("The endpoint requires valid authentication token.", 403);
         }
 
-        if ($this->user->getRole() !== User::ROLE_ADMIN) {
+        if (!$this->user->isAdmin()) {
             // users (except for admin) should check the access permissions
             // (if corresponding 'check' method exists)
             $params = $this->getRequest()->getParameters();

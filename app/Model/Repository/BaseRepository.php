@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Model\Repository;
 
 use App\Exceptions\NotFoundException;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

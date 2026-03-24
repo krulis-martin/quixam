@@ -31,6 +31,11 @@ final class RouterFactory
             'RestTemplates:deleteQuestion'
         );
 
+        $router[] = new GetRoute('rest/terms', 'RestTerms:default');
+        $router[] = new PostRoute('rest/terms/<testId>', 'RestTerms:addTerm');
+        $router[] = new DeleteRoute('rest/term/<id>', 'RestTerms:removeTerm');
+        $router[] = new PostRoute('rest/term/<id>/users', 'RestTerms:registerUsers');
+
         // routes for app presenters
         $router->addRoute('<presenter>/<action>[/<id>]', [
             'presenter' => 'Homepage',

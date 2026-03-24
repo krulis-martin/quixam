@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use DateTime;
+use JsonSerializable;
 
 /**
  * An instance of a test which is taken at given time and place.
@@ -19,7 +20,7 @@ use DateTime;
  * @ORM\Entity
  * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  */
-class TestTerm
+class TestTerm implements JsonSerializable
 {
     use CreatableEntity;
     use DeletableEntity;
@@ -289,5 +290,35 @@ class TestTerm
     public function removeSupervisor(User $supervisor): void
     {
         $this->supervisors->removeElement($supervisor);
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'externalId' => $this->getExternalId(),
+            'templateId' => $this->getTemplate()->getId(),
+            'templateExternalId' => $this->getTemplate()->getExternalId(),
+            'supervisors' => $this->getSupervisors()->map(
+                function (User $user) {
+                    return [
+                        'id' => $user->getId(),
+                        'externalId' => $user->getExternalId(),
+                        'firstName' => $user->getFirstName(),
+                        'lastName' => $user->getLastName(),
+                        'email' => $user->getEmail()
+                    ];
+                }
+            )->toArray(),
+            'scheduledAt' => $this->getScheduledAt()?->getTimestamp(),
+            'startedAt' => $this->getStartedAt()?->getTimestamp(),
+            'finishedAt' => $this->getFinishedAt()?->getTimestamp(),
+            'archivedAt' => $this->getArchivedAt()?->getTimestamp(),
+            'location' => $this->getLocation(),
+            'note' => $this->getLocalizedStructure('note'),
+            'enrolledCount' => $this->getEnrolledUsers()->count(),
+            'registrationCount' => $this->getRegistrations()->count(),
+            'grading' => $this->getGrading()->jsonSerialize(),
+        ];
     }
 }
