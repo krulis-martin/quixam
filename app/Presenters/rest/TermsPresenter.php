@@ -47,12 +47,20 @@ final class RestTermsPresenter extends RestPresenter
     /**
      * Return all terms the user manages or supervises.
      */
-    public function actionDefault(): void
+    public function actionDefault(?string $testId = null): void
     {
         if ($this->user->isAdmin()) {
-            $terms = $this->terms->findBy(['archivedAt' => null]);
+            $criteria = ['archivedAt' => null];
+            if ($testId) {
+                $testTemplate = $this->templateTests->findOneBy(['externalId' => $testId]);
+                if (!$testTemplate) {
+                    throw new NotFoundException("Test template with ID $testId not found.");
+                }
+                $criteria['template'] = $testTemplate;
+            }
+            $terms = $this->terms->findBy($criteria);
         } else {
-            $terms = $this->terms->getTermsUserSupervisesOrManages($this->user);
+            $terms = $this->terms->getTermsUserSupervisesOrManages($this->user, $testId);
         }
         $this->sendSuccessResponse($terms);
     }
@@ -60,7 +68,7 @@ final class RestTermsPresenter extends RestPresenter
     public function checkAddTerm(string $testId): void
     {
         /** @var TemplateTest|null $test */
-        $test = $this->templateTests->findOneBy(['externalId' => $testId, 'archivedAt' => null]);
+        $test = $this->templateTests->findOneBy(['externalId' => $testId]);
         if (!$test) {
             throw new NotFoundException("Test template with ID $testId not found.");
         }
@@ -114,7 +122,7 @@ final class RestTermsPresenter extends RestPresenter
             if ($term->getStartedAt() !== null || $term->getArchivedAt() !== null) {
                 throw new BadRequestException("Only terms that have not started or been archived can be updated.");
             }
-            if ($term->getTemplate()->getId() !== $testId) {
+            if ($term->getTemplate()->getExternalId() !== $testId) {
                 throw new BadRequestException("External ID $externalId is already used by another term.");
             }
 
@@ -127,7 +135,7 @@ final class RestTermsPresenter extends RestPresenter
             $term->removeAllSupervisors(); // so they can be re-filled later
         } else {
             // create new
-            $testTemplate = $this->templateTests->findOneBy(['externalId' => $testId, 'archivedAt' => null]);
+            $testTemplate = $this->templateTests->findOneBy(['externalId' => $testId]);
             try {
                 $term = new TestTerm($testTemplate, $scheduledAt, $location, $externalId, $note);
             } catch (Throwable $e) {

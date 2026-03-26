@@ -92,15 +92,23 @@ class TestTerms extends BaseSoftDeleteRepository
      * @param User $user
      * @return TestTerm[]
      */
-    public function getTermsUserSupervisesOrManages(User $user): array
+    public function getTermsUserSupervisesOrManages(User $user, ?string $testId = null): array
     {
         $qb = $this->createQueryBuilder('tt');
         $qb->innerJoin("tt.template", "t")
-            ->where($qb->expr()->isMemberOf(':uid', 't.owners'))
-            ->orWhere($qb->expr()->isMemberOf(':uid', 'tt.supervisors'))
-            ->andWhere($qb->expr()->isNull("tt.archivedAt"))
+            ->where($qb->expr()->isNull("tt.archivedAt"))
+            ->andWhere($qb->expr()->orX(
+                $qb->expr()->isMemberOf(':uid', 't.owners'),
+                $qb->expr()->isMemberOf(':uid', 'tt.supervisors')
+            ))
             ->orderBy('tt.scheduledAt');
-        $qb->setParameters(['uid' => $user->getId()]);
+
+        if ($testId) {
+            $qb->andWhere($qb->expr()->eq("tt.externalId", ":testId"));
+            $qb->setParameter('testId', $testId);
+        }
+
+        $qb->setParameter('uid', $user->getId());
         return $qb->getQuery()->getResult();
     }
 }
