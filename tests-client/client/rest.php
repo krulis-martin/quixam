@@ -6,6 +6,7 @@ namespace Quixam;
 
 use RuntimeException;
 use InvalidArgumentException;
+use DateTime;
 
 /**
  * A REST API client for Quixam.
@@ -20,6 +21,10 @@ final class RestApiClient implements IApiClient
         $this->baseUrl = rtrim($baseUrl, '/');
         $this->authToken = $authToken;
     }
+
+    /*
+     * Authentication-related methods
+     */
 
     public function setAuthToken(?string $authToken): void
     {
@@ -72,93 +77,6 @@ final class RestApiClient implements IApiClient
 
         $this->authToken = $token;
         return $token;
-    }
-
-    /**
-     * Get the structure of a test template by its external ID.
-     * @param string $id external ID of the test template
-     * @return array<string,mixed> structured representation of the test template
-     */
-    public function getTemplateTest(string $id): array
-    {
-        return $this->get("/rest/templates/test/{$id}");
-    }
-
-    /**
-     * Add a new question group to the test template or update an existing one.
-     * @param string $testId external ID of the test template
-     * @param string $groupId external ID of the question group
-     * @param int|null $points number of points awarded for each question in this group (optional)
-     * @param int|null $count number of questions selected from this group (optional)
-     * @param int|null $ordering an index used for sorting the groups when the test is being assembled (optional)
-     * @return array<string,bool> array with two flags ('created' and 'updated')
-     *                            indicating whether the group was created or updated
-     */
-    public function addTemplateGroup(
-        string $testId,
-        string $groupId,
-        ?int $points = null,
-        ?int $count = null,
-        ?int $ordering = null
-    ): array {
-        $body = [];
-        if ($points !== null) {
-            $body['points'] = $points;
-        }
-        if ($count !== null) {
-            $body['count'] = $count;
-        }
-        if ($ordering !== null) {
-            $body['ordering'] = $ordering;
-        }
-        return $this->post("/rest/templates/test/{$testId}/group/{$groupId}", [], $body);
-    }
-
-    /**
-     * Delete a question group from the test template.
-     * @param string $testId external ID of the test template
-     * @param string $groupId external ID of the question group
-     * @return bool true if the group was deleted, false if it did not exist
-     */
-    public function deleteTemplateGroup(string $testId, string $groupId): bool
-    {
-        return (bool)$this->delete("/rest/templates/test/{$testId}/group/{$groupId}");
-    }
-
-    /**
-     * Add a new question to a question group within the test template or update an existing one.
-     * @param string $testId external ID of the test template
-     * @param string $groupId external ID of the question group
-     * @param string $questionId external ID of the question
-     * @param string $type type identifier of the question
-     * @param mixed $data question data (type-specific, will be JSON-encoded)
-     * @return array<string,bool> array with two flags ('created' and 'updated')
-     *                            indicating whether the question was created or updated
-     */
-    public function addTemplateQuestion(
-        string $testId,
-        string $groupId,
-        string $questionId,
-        string $type,
-        mixed $data
-    ): array {
-        $body = [
-            'type' => $type,
-            'data' => $data,
-        ];
-        return $this->post("/rest/templates/test/{$testId}/group/{$groupId}/question/{$questionId}", [], $body);
-    }
-
-    /**
-     * Delete a question from a question group within the test template.
-     * @param string $testId external ID of the test template
-     * @param string $groupId external ID of the question group
-     * @param string $questionId external ID of the question
-     * @return bool true if the question was deleted, false if it did not exist
-     */
-    public function deleteTemplateQuestion(string $testId, string $groupId, string $questionId): bool
-    {
-        return (bool)$this->delete("/rest/templates/test/{$testId}/group/{$groupId}/question/{$questionId}");
     }
 
     /*
@@ -393,5 +311,68 @@ final class RestApiClient implements IApiClient
     public function deleteQuestion(string $testId, string $groupId, string $questionId): void
     {
         $this->delete("/rest/templates/test/{$testId}/group/{$groupId}/question/{$questionId}");
+    }
+
+    /*
+     * Additional methods that will be added to the IApiClient in the future (now available only via RestApiClient)
+     */
+
+    /**
+     * Fetch all terms associated with a specific test template (manageable by the user).
+     * @param string|null $testId external ID of the test template (optional)
+     * @return array list of terms
+     */
+    public function getTerms(?string $testId = null): array
+    {
+        return $this->get('/rest/terms', $testId ? ['testId' => $testId] : []);
+    }
+
+    /**
+     * Add a new term based on the given test template. If a term with the same external ID already exists,
+     * it will be updated instead. The term must not have started or been archived.
+     * @param string $testId external ID of the test template
+     * @param string $externalId external ID of the term
+     * @param string|null $location where the term is held (optional)
+     * @param DateTime|null $scheduledAt when the term is scheduled (optional)
+     * @param array $supervisors list of supervisors (externalIDs or emails) for the term (optional)
+     * @param string|null $noteEn English note for the term (optional)
+     * @param string|null $noteCs Czech note for the term (optional)
+
+     */
+    public function addTerm(
+        string $testId,
+        string $externalId,
+        ?string $location = null,
+        ?DateTime $scheduledAt = null,
+        array $supervisors = [],
+        ?string $noteEn = null,
+        ?string $noteCs = null
+    ): void {
+        foreach ($supervisors as &$s) {
+            $s = [(filter_var($s, FILTER_VALIDATE_EMAIL) ? 'email' : 'externalId') => $s];
+        }
+        $body = [
+            'externalId' => $externalId,
+            'location' => $location,
+            'scheduledAt' => $scheduledAt?->getTimestamp(),
+            'supervisors' => $supervisors,
+        ];
+        if ($noteEn !== null) {
+            $body['note']['en'] = $noteEn;
+        }
+        if ($noteCs !== null) {
+            $body['note']['cs'] = $noteCs;
+        }
+
+        $this->post("/rest/terms/{$testId}", [], $body);
+    }
+
+    /**
+     * Remove a term by its ID.
+     * @param string $termId ID of the term to remove
+     */
+    public function removeTerm(string $termId): void
+    {
+        $this->delete("/rest/term/{$termId}");
     }
 }
