@@ -35,6 +35,9 @@ final class Config
         if (!str_starts_with($this->tokenFile, '/')) {
             $this->tokenFile = realpath(dirname($configFile)) . '/' . $this->tokenFile;
         }
+        if (file_exists($this->tokenFile)) {
+            $this->tokenFile = realpath($this->tokenFile);
+        }
     }
 
     public function __isset(string $name): bool
