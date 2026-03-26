@@ -375,4 +375,15 @@ final class RestApiClient implements IApiClient
     {
         $this->delete("/rest/term/{$termId}");
     }
+
+    /**
+     * Register users for a term.
+     * @param string $termId ID of the term
+     * @param array $users list of users to register; each user is identified by an associative array with
+     *                     at least one of the keys "id", "externalId", or "email" is present
+     */
+    public function registerUsers(string $termId, array $users): void
+    {
+        $this->post("/rest/term/{$termId}/users", [], ['users' => $users]);
+    }
 }

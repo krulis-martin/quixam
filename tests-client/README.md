@@ -12,6 +12,12 @@ git sparse-checkout set tests-client
 git checkout main
 ```
 
+This text explains how to use the scripts for test management:
+
+- `login.php` -- performs authentication and saves the obtained token to a file
+- `upload.php` -- uploads a test template (groups and questions) from a local directory
+- `test-terms.php` -- uploads test terms from local CSV file
+
 ## Initialization and authentication
 
 All main scripts are in the root of this folder and they all require `config.yaml` file present in the same directory. Use `config.yaml.example` as a template and fill in the required values, most importantly the URL of your Quixam instance.

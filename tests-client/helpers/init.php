@@ -11,6 +11,8 @@ use Quixam\RestApiClient;
 
 try {
     $config = new Config(__DIR__ . '/../config.yaml');
+    echo "Setting timezone to " . $config->timezone . " ...\n";
+    date_default_timezone_set($config->timezone);
     echo "Quixam REST API URL: " . $config->url . "\n";
     $api = new RestApiClient($config->url, $config->getToken());
 } catch (Throwable $e) {

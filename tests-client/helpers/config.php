@@ -12,6 +12,7 @@ final class Config
     private string $url;
     private ?string $login = null;
     private string $tokenFile;
+    private string $timezone = 'UTC';
 
     public function __construct(string $configFile)
     {
@@ -24,6 +25,7 @@ final class Config
         $this->url = $config['url'] ?? '';
         $this->login = $config['login'] ?? null;
         $this->tokenFile = $config['token_file'] ?? '';
+        $this->timezone = $config['timezone'] ?? 'UTC';
 
         if (empty($this->url)) {
             throw new InvalidArgumentException("Config key 'url' is required.");

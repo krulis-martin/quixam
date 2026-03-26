@@ -6,3 +6,6 @@ login: user@example.com
 
 # Path to the file where the authentication token will be stored.
 token_file: ./.auth-token
+
+# Your local time zone (https://www.php.net/manual/en/timezones.php)
+timezone: Europe/Prague
