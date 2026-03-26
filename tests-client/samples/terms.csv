@@ -1,0 +1,4 @@
+externalId,location,scheduledAt,supervisors,note_en,note_cs
+t1234,"Aula #1",@1774394280,teacher1@school.edu teacher2@school.edu,"Early term","Předtermín"
+t5678,"Hall 3",2026-03-25 13:42,,"No comment",
+t5678,"Labs 2",14.3.2026 15:00,TID-9876,,,
