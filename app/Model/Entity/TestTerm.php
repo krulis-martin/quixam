@@ -292,6 +292,11 @@ class TestTerm implements JsonSerializable
         $this->supervisors->removeElement($supervisor);
     }
 
+    public function removeAllSupervisors(): void
+    {
+        $this->supervisors->clear();
+    }
+
     public function jsonSerialize(): array
     {
         return [

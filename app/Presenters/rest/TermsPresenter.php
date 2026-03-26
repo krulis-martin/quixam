@@ -71,7 +71,8 @@ final class RestTermsPresenter extends RestPresenter
     }
 
     /**
-     * Add a new term based on given test template.
+     * Add a new term based on given test template. If the term exists (identified by external ID),
+     * update it instead. The term must not have started or been archived.
      * @param string $testId external ID of the test template
      * POST parameters:
      * - externalId (?string): external ID of the term (optional)
@@ -91,6 +92,7 @@ final class RestTermsPresenter extends RestPresenter
         $location = !empty($this->body['location']) ? trim($this->body['location']) : '';
         $note = $this->body['note'] ?? null;
 
+        // get the supervisors first, so we are sure they exist
         $supervisors = [];
         foreach ($this->body['supervisors'] ?? [] as $u) {
             if (!is_array($u) || count($u) !== 1 || !in_array(array_keys($u)[0], ['id', 'email', 'externalId'])) {
@@ -105,15 +107,37 @@ final class RestTermsPresenter extends RestPresenter
             );
         }
 
-        // create the term
-        $test = $this->templateTests->findOneBy(['externalId' => $testId, 'archivedAt' => null]);
-        try {
-            $term = new TestTerm($test, $scheduledAt, $location, $externalId, $note);
-            foreach ($supervisors as $s) {
-                $term->addSupervisor($s);
+        // create or update the term
+        $term = $externalId ? $this->terms->findOneBy(['externalId' => $externalId]) : null;
+        if ($term) {
+            // update existing
+            if ($term->getStartedAt() !== null || $term->getArchivedAt() !== null) {
+                throw new BadRequestException("Only terms that have not started or been archived can be updated.");
             }
-        } catch (Throwable $e) {
-            throw new BadRequestException("Invalid input data: " . $e->getMessage());
+            if ($term->getTemplate()->getId() !== $testId) {
+                throw new BadRequestException("External ID $externalId is already used by another term.");
+            }
+
+            $term->setScheduledAt($scheduledAt);
+            $term->setLocation($location);
+            if (!is_array($note)) {
+                $note = ['en' => (string)$note];
+            }
+            $term->overwriteNote($note);
+            $term->removeAllSupervisors(); // so they can be re-filled later
+        } else {
+            // create new
+            $testTemplate = $this->templateTests->findOneBy(['externalId' => $testId, 'archivedAt' => null]);
+            try {
+                $term = new TestTerm($testTemplate, $scheduledAt, $location, $externalId, $note);
+            } catch (Throwable $e) {
+                throw new BadRequestException("Invalid input data: " . $e->getMessage());
+            }
+        }
+
+        // fill in the supervisors
+        foreach ($supervisors as $s) {
+            $term->addSupervisor($s);
         }
 
         $this->terms->persist($term);
