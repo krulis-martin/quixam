@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Model\Repository;
 
 use App\Model\Entity\EnrollmentRegistration;
+use App\Model\Entity\TestTerm;
 use App\Model\Entity\User;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -22,7 +22,7 @@ class EnrollmentRegistrations extends BaseRepository
     /**
      * Try to associate all registrations which do not have the user set yet
      * using their externalIds (primarily) and their emails (as a fallback).
-     * @param User $user being reassociated
+     * @param User $user being re-associated
      */
     public function reassociateUser(User $user)
     {
@@ -49,5 +49,28 @@ class EnrollmentRegistrations extends BaseRepository
         $qb->setParameter('user', $user->getId());
         $qb->setParameter('email', $user->getEmail());
         return $qb->getQuery()->getResult();
+    }
+
+    public function findOrCreateRegistration(
+        TestTerm $term,
+        ?User $user,
+        ?string $externalId = null,
+        ?string $email = null
+    ): EnrollmentRegistration {
+        $registration = null;
+        if ($user) {
+            $registration = $this->findOneBy(['test' => $term, 'user' => $user]);
+        }
+        if (!$registration && $externalId) {
+            $registration = $this->findOneBy(['test' => $term, 'externalId' => $externalId]);
+        }
+        if (!$registration && $email) {
+            $registration = $this->findOneBy(['test' => $term, 'email' => $email]);
+        }
+
+        if (!$registration) {
+            $registration = new EnrollmentRegistration($term, $user);
+        }
+        return $registration;
     }
 }

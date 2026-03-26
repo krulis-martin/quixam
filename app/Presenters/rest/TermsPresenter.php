@@ -205,11 +205,19 @@ final class RestTermsPresenter extends RestPresenter
 
         // prepare registration entities from the data in the body
         $registrations = [];
-        foreach ($this->body['supervisors'] ?? [] as $u) {
-            if (!is_array($u) || count($u) !== 1 || !in_array(array_keys($u)[0], ['id', 'email', 'externalId'])) {
+        foreach ($this->body['users'] ?? [] as $u) {
+            if (!$u || !is_array($u)) {
                 throw new BadRequestException(
-                    "User is identified by an array with exactly one of the keys 'id', 'email', or 'externalId'"
+                    "User is identified by an array with at least one of the keys 'id', 'email', or 'externalId'"
                 );
+            }
+
+            foreach (array_keys($u) as $key) {
+                if (!in_array($key, ['id', 'email', 'externalId'])) {
+                    throw new BadRequestException(
+                        "User is identified by an array with at least one of the keys 'id', 'email', or 'externalId'"
+                    );
+                }
             }
 
             $user = $this->users->findByMulti(
@@ -223,11 +231,18 @@ final class RestTermsPresenter extends RestPresenter
                 );
             }
 
-            $reg = new EnrollmentRegistration($term, $user);
-            if (!empty($u['externalId'])) {
+            if ($user && $term->getEnrolledUsers()->contains($user)) {
+                continue; // skipping, the user is already enrolled
+            }
+
+            // create or update the registration
+            $externalId = $u['externalId'] ?? null;
+            $email = $u['email'] ?? null;
+            $reg = $this->enrollmentRegistrations->findOrCreateRegistration($term, $user, $externalId, $email);
+            if ($externalId) {
                 $reg->setExternalId($u['externalId']);
             }
-            if (!empty($u['email'])) {
+            if ($email) {
                 $reg->setEmail($u['email']);
             }
             $registrations[] = $reg;

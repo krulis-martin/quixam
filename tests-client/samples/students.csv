@@ -1,0 +1,4 @@
+externalId,email,name,surname
+s1234,student1@some-mail.com,John,Doe
+,student2@some-mail.com,Jane,Smith
+s5678,,,,

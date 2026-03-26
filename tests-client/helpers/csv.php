@@ -7,6 +7,8 @@ namespace Helpers;
 use RuntimeException;
 use InvalidArgumentException;
 use Throwable;
+use DateTime;
+use DateTimeZone;
 use Iterator;
 
 final class Csv implements Iterator
@@ -47,7 +49,11 @@ final class Csv implements Iterator
             }
         } elseif (class_exists($type)) {
             try {
-                return new $type($value);
+                $obj = new $type($value);
+                if ($obj instanceof DateTime) {
+                    $obj->setTimezone(new DateTimeZone(date_default_timezone_get()));
+                }
+                return $obj;
             } catch (Throwable $e) {
                 throw new RuntimeException("Error creating instance of '$type' from '$value' on line $lineNumber: "
                     . $e->getMessage());
@@ -75,9 +81,9 @@ final class Csv implements Iterator
 
         $rows = [];
         if (($header = fgetcsv($fp, 0, $delimiter)) !== false) {
-            foreach ($header as $idx => &$name) {
-                $name = trim($name);
-                if (!$name) {
+            foreach ($header as $idx => &$nameRef) {
+                $nameRef = trim($nameRef);
+                if (!$nameRef) {
                     throw new RuntimeException("Column [$idx] in CSV file '$csvFile' has an empty name.");
                 }
             }

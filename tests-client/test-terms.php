@@ -14,7 +14,7 @@ if (PHP_SAPI !== 'cli' || realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE
 // Verify arguments, or print usage and exit
 if ($argc != 3) {
     echo "Usage: php test-terms.php <test-template-external-id> <path_to_csv_file>\n";
-    echo "Invalid number of arguments ({$argc}).\n";
+    echo "Invalid number of arguments.\n";
     exit(1);
 }
 if (!file_exists($argv[2]) || !is_readable($argv[2]) || !is_file($argv[2])) {
