@@ -61,14 +61,15 @@ final class TemplatePresenter extends AuthenticatedPresenter
 
     public function checkTest(string $id): bool
     {
-        //$template
-        return $this->user->getRole() === User::ROLE_TEACHER;
+        $template = $this->templateTests->get($id);
+        return $this->user->getRole() === User::ROLE_TEACHER &&
+            $template?->isOwner($this->user);
     }
 
     public function renderTest(string $id): void
     {
         $this->template->locale = $this->selectedLocale;
-        $this->template->tests = $this->templateTests->findAll();
+        $this->template->test = $this->templateTests->get($id);
     }
 
     public function checkQuestion(string $id): bool
