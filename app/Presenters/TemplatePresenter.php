@@ -54,6 +54,20 @@ final class TemplatePresenter extends AuthenticatedPresenter
     public function renderDefault(): void
     {
         $this->template->locale = $this->selectedLocale;
+        $this->template->tests = $this->user->getRole() === User::ROLE_TEACHER
+            ? $this->templateTests->getTemplatesUserOwns($this->user)
+            : $this->templateTests->findBy([], ['courseId' => 'ASC', 'externalId' => 'ASC', 'createdAt' => 'ASC']);
+    }
+
+    public function checkTest(string $id): bool
+    {
+        //$template
+        return $this->user->getRole() === User::ROLE_TEACHER;
+    }
+
+    public function renderTest(string $id): void
+    {
+        $this->template->locale = $this->selectedLocale;
         $this->template->tests = $this->templateTests->findAll();
     }
 
