@@ -8,6 +8,7 @@ use App\Model\Repository\TemplateTests;
 use App\Model\Repository\TemplateQuestions;
 use App\Model\Entity\TemplateTest;
 use App\Model\Entity\TemplateQuestion;
+use App\Model\Entity\User;
 use App\Helpers\TestOrchestrator;
 use Nette;
 use Nette\Application\UI\Form;
@@ -40,25 +41,40 @@ final class TemplatePresenter extends AuthenticatedPresenter
         $previous = $question;
         do {
             $question = $previous;
-            $previous = $this->templateQuestions->findOneByEvenIfDeleted([ 'createdFrom' => $question->getId() ]);
+            $previous = $this->templateQuestions->findOneByEvenIfDeleted(['createdFrom' => $question->getId()]);
         } while ($previous);
         return $question;
     }
 
     public function checkDefault(): bool
     {
-        return false; // only admin is accepted
+        return $this->user->getRole() === User::ROLE_TEACHER; // no students
     }
 
     public function renderDefault(): void
     {
         $this->template->locale = $this->selectedLocale;
-        $this->template->tests = $this->templateTests->findAll();
+        $this->template->tests = $this->user->getRole() === User::ROLE_TEACHER
+            ? $this->templateTests->getTemplatesUserOwns($this->user)
+            : $this->templateTests->findBy([], ['courseId' => 'ASC', 'externalId' => 'ASC', 'createdAt' => 'ASC']);
+    }
+
+    public function checkTest(string $id): bool
+    {
+        $template = $this->templateTests->get($id);
+        return $this->user->getRole() === User::ROLE_TEACHER &&
+            $template?->isOwner($this->user);
+    }
+
+    public function renderTest(string $id): void
+    {
+        $this->template->locale = $this->selectedLocale;
+        $this->template->test = $this->templateTests->get($id);
     }
 
     public function checkQuestion(string $id): bool
     {
-        return false; // only admin is accepted
+        return $this->user->getRole() === User::ROLE_TEACHER; // no students
     }
 
     public function renderQuestion(string $id, int $seed = 0): void

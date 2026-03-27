@@ -1,0 +1,68 @@
+{block content}
+
+<h1>
+  <i class="fa-solid fa-scroll fa-fw text-muted"></i>
+  {block title}{_locale.template.title}{/block}:
+  {if $test}
+  {$test->getCaption($locale)} (<code>{$test->getExternalId()}</code>)
+  {else}
+  ???
+  {/if}
+</h1>
+
+<div n:if="!$test" class="alert alert-warning mt-4">
+  {_locale.template.wrongTestId}
+</div>
+
+<table class="table mt-4 align-middle" n:if="$test">
+  <tbody n:foreach="$test->getQuestionGroups() as $group">
+    <tr class="bg-light">
+      <th><i class="fa-solid fa-cubes text-muted"></i></th>
+      <th colspan="2">
+        {$group->getOrdering()}.
+        <code>{$group->getExternalId()}</code>
+      </th>
+      <td colspan="2" class="text-end text-muted">
+        {_locale.template.points}: {$group->getPoints()}
+      </td>
+    </tr>
+    <tr n:foreach="$group->getQuestions() as $question">
+      <td></td>
+      <td>
+        {if $question->getType() === 'single'}
+          <i class="fa-regular fa-circle-dot fa-fw text-muted" title="{_locale.template.type.single}"></i>
+        {elseif $question->getType() === 'multi'}
+          <i class="fa-regular fa-square-check fa-fw text-muted" title="{_locale.template.type.multi}"></i>
+        {elseif $question->getType() === 'numeric'}
+          <i class="fa-solid fa-hashtag fa-fw text-muted" title="{_locale.template.type.numeric}"></i>
+        {elseif $question->getType() === 'order'}
+          <i class="fa-solid fa-arrow-down-short-wide fa-fw text-muted" title="{_locale.template.type.order}"></i>
+        {elseif $question->getType() === ''}
+          <i class="fa-solid fa-gears fa-fw text-muted" title="{_locale.template.type.generated}"></i>
+        {else}
+          <i class="fa-regular fa-circle-question fa-fw text-muted" title="{_locale.template.type.unknown}"></i>
+        {/if}
+      </td>
+      <td class="text-nowrap"><code>{$question->getExternalId()}</code></td>
+      <td class="w-100 {$question->isDisabled() ? 'text-muted'}">
+        <i n:if="$question->isDisabled()" class="fa-solid fa-lock fa-fw text-muted"></i>
+        {$question->getCaption($locale)}
+      </td>
+      <td class="text-nowrap text-end">
+        <a class="btn btn-primary btn-sm" n:href=":question id => $question->getId()">
+          <i class="fa-solid fa-magnifying-glass fa-fw"></i>
+          {_locale.template.preview}
+        </a>
+        <a n:if="!$question->isDisabled()" class="btn btn-danger btn-sm" n:href="SetDisabled! id => $question->getId(), disabled: true" data-ajax="POST">
+          <i class="fa-solid fa-lock fa-fw"></i>
+          {_locale.template.disableButton}
+        </a>
+        <a n:if="$question->isDisabled()" class="btn btn-success btn-sm" n:href="SetDisabled! id => $question->getId(), disabled: false" data-ajax="POST">
+          <i class="fa-solid fa-lock-open fa-fw"></i>
+          {_locale.template.enableButton}
+        </a>
+
+      </td>
+    </tr>
+  </tbody>
+</table>

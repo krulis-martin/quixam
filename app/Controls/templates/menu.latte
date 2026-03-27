@@ -17,7 +17,7 @@
           <li class="nav-item">
             <a class="nav-link" href="{plink Dashboard:default}">{_locale.dashboard.title}</a>
           </li>
-          {if $userData->getRole() === App\Model\Entity\User::ROLE_ADMIN}
+          {if $userData->getRole() === App\Model\Entity\User::ROLE_ADMIN || $userData->getRole() === App\Model\Entity\User::ROLE_TEACHER}
             <li class="nav-item">
               <a class="nav-link" href="{plink Template:default}">{_locale.template.title}</a>
             </li>
