@@ -6,4 +6,4 @@ config/local.neon
 /log
 /temp
 /tests-client/.auth-token
-/tests-client/config.yaml
+/tests-client/config.yaml*

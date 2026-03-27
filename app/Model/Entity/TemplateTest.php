@@ -176,6 +176,13 @@ class TemplateTest
         return $this->gradingObj;
     }
 
+    public function addOwner(User $user): void
+    {
+        if (!$this->owners->contains($user)) {
+            $this->owners->add($user);
+        }
+    }
+
     public function isOwner(User $user): bool
     {
         return $this->owners->contains($user);
