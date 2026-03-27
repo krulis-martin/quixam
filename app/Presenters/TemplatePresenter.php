@@ -8,6 +8,7 @@ use App\Model\Repository\TemplateTests;
 use App\Model\Repository\TemplateQuestions;
 use App\Model\Entity\TemplateTest;
 use App\Model\Entity\TemplateQuestion;
+use App\Model\Entity\User;
 use App\Helpers\TestOrchestrator;
 use Nette;
 use Nette\Application\UI\Form;
@@ -40,14 +41,14 @@ final class TemplatePresenter extends AuthenticatedPresenter
         $previous = $question;
         do {
             $question = $previous;
-            $previous = $this->templateQuestions->findOneByEvenIfDeleted([ 'createdFrom' => $question->getId() ]);
+            $previous = $this->templateQuestions->findOneByEvenIfDeleted(['createdFrom' => $question->getId()]);
         } while ($previous);
         return $question;
     }
 
     public function checkDefault(): bool
     {
-        return false; // only admin is accepted
+        return $this->user->getRole() === User::ROLE_TEACHER; // no students
     }
 
     public function renderDefault(): void
@@ -58,7 +59,7 @@ final class TemplatePresenter extends AuthenticatedPresenter
 
     public function checkQuestion(string $id): bool
     {
-        return false; // only admin is accepted
+        return $this->user->getRole() === User::ROLE_TEACHER; // no students
     }
 
     public function renderQuestion(string $id, int $seed = 0): void
