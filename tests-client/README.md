@@ -98,3 +98,15 @@ php ./register-students.php startrek t1234 ./samples/students.csv
 Where `startrek` is the external ID of the test template and `t1234` is the external ID of the term (from the sample file [samples/terms.csv](samples/terms.csv)).
 
 The script is incremental: it will not delete any existing registrations, but it will add new ones and update existing ones. Registrations may be removed from the UI. Students who are already enrolled in the term will be skipped, so it is safe to run the script during the test (before it finishes).
+
+## Administrators' stuff
+
+AS mentioned at the beginning, the test templates must be created by an administrator beforehand. A template entity must be inserted in `template_test` table and the template owners must be associated via the `template_test_owner` table.
+
+This can be done easily by CLI interface, namely the `db:fill` command. It takes a yaml file with a list of entities (the format was inspired by [Alice fixtures](https://github.com/nelmio/alice)). An example of such file is provided in [samples/db-startrek-template.yaml](samples/db-startrek-template.yaml). You can modify it as needed and upload it as:
+
+```bash
+php ./bin/console db:fill ./path/to/modified/db-startrek-template.yaml
+```
+
+Most notably, you need to change the email address in the `@User(user@example.com)` construct. This is a reference to the user entity, which is searched by email. The user is used in the `addOwner` action, which adds the user as an owner of the template, so you need to provide the email of a teacher who is already registered in the system (have a record in `user` table).

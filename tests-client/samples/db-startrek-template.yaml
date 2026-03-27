@@ -1,0 +1,7 @@
+- startrek:
+  - TemplateTest:
+    - { 'cs': 'Star Trek', 'en': 'Star Trek' }
+    - startrek
+    - startrek
+  - addOwner:
+    - '@User(user@example.com)'
