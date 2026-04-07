@@ -39,7 +39,7 @@ class LocalizedEntity
      * Internal method for schema validation/normalization.
      * @param mixed $schema whatever can be accepted as nette schema construct
      * @param mixed $data to be verified and normalized
-     * @return mixed normalized data structure (if it passes valiadtion)
+     * @return mixed normalized data structure (if it passes validation)
      */
     public static function normalize($schema, $data)
     {
@@ -51,7 +51,7 @@ class LocalizedEntity
     }
 
     /**
-     * Internal function for loading and validtaing localized text.
+     * Internal function for loading and validating localized text.
      * @param array $json deserialized question/template structure to be loaded
      */
     protected function loadText(array $json, $errorPrefix)

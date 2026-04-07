@@ -53,6 +53,7 @@ class EnrolledUser
 
     /**
      * Total points scored in this test.
+     * Null = not graded yet (may be used to withhold the results from the user in manual grading).
      * @ORM\Column(type="integer", nullable=true)
      */
     protected $score = null;

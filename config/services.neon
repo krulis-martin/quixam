@@ -18,6 +18,7 @@ services:
       multi: App\Helpers\Questions\QuestionMulti,
       numeric: App\Helpers\Questions\QuestionNumeric,
       order: App\Helpers\Questions\QuestionOrder,
+      text: App\Helpers\Questions\QuestionText,
     ])
   - App\Helpers\TemplatesActions
 

@@ -1,0 +1,19 @@
+{if !empty($graded)}
+<div class="text-{$graded}">{$answer|markdown}</div>
+{else}
+<textarea name="answer" class="form-control" rows="5" n:attr="maxlength: $maxLength">{$answer}</textarea>
+{/if}
+
+
+{if $type === "radio"}
+<script type="text/javascript">
+$(() => {
+    const validate = () => {
+        $("#saveButton").prop('disabled', $("input[name='answer']").val().trim().length == 0);
+    }
+    
+    $("input[name='answer']").change(validate);
+    validate();
+});
+</script>
+{/if}

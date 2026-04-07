@@ -73,9 +73,10 @@ interface IQuestion extends JsonSerializable
     /**
      * Check whether given answer is the correct answer for this particular question instance.
      * @param mixed $answer deserialized json structure sent over by the client
-     * @return bool true if the answer is a correct one
+     * @return bool|null true if the answer is a correct one, null if the answer cannot be evaluated automatically
+     *                   (the question is configured for manual grading by the teacher)
      */
-    public function isAnswerCorrect($answer): bool;
+    public function isAnswerCorrect($answer): ?bool;
 
     /**
      * Return a correct answer in the format, that is accepted by isAnswerValid and isAnswerCorrect.

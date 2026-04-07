@@ -114,9 +114,9 @@ abstract class BaseChoiceQuestion extends BaseQuestion
     /**
      * @param Engine $latte engine for rendering latte templates (separately from the presenters)
      * @param array $params common parameters for the template
-     * @return string raw HTML fragment which is pasted without excaping into the output
+     * @return string raw HTML fragment which is pasted without escaping into the output
      */
-    protected function renderChoicesTeplate(Engine $latte, array $params = []): string
+    protected function renderChoicesTemplate(Engine $latte, array $params = []): string
     {
         $options = [];
         foreach ($this->answers as $option) {
@@ -135,13 +135,13 @@ abstract class BaseChoiceQuestion extends BaseQuestion
         parent::load($json);
 
         if (!array_key_exists('answers', $json) || !is_array($json['answers'])) {
-            throw new QuestionException("Corrupted question data, propery 'answers' is missing or has invalid value.");
+            throw new QuestionException("Corrupted question data, property 'answers' is missing or has invalid value.");
         }
 
         $this->answers = $this->loadAnswers($json['answers'], 'Corrupted question data');
 
         if (!array_key_exists('correct', $json) || !$this->isAnswerValid($json['correct'])) {
-            throw new QuestionException("Corrupted question data, propery 'correct' is missing or has invalid value.");
+            throw new QuestionException("Corrupted question data, property 'correct' is missing or has invalid value.");
         }
         $this->correct = $json['correct'];
     }
