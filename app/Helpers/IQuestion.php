@@ -56,6 +56,16 @@ interface IQuestion extends JsonSerializable
     ): string;
 
     /**
+     * Render HTML content displayed when the correct answer is presented to the **teacher**.
+     * This method is used for teachers preview and manual grading (to compare real answer with the correct one)
+     * and for template preview (to check the question template is working).
+     * @param Engine $latte engine for rendering latte templates (separately from the presenters)
+     * @param string $locale selected locale
+     * @return string raw HTML fragment which is pasted without escaping into the output
+     */
+    public function renderCorrectContent(Engine $latte, string $locale): string;
+
+    /**
      * Process data sent over from a form and create an answer structure.
      * @param array $postData everything sent over in POST request
      * @return mixed a structure representing an answer (does not have to be valid, if the post data are corrupted)
@@ -83,4 +93,12 @@ interface IQuestion extends JsonSerializable
      * @return mixed
      */
     public function getCorrectAnswer();
+
+    /**
+     * Indicates whether the question uses random seed to generate its content.
+     * If true, the instance of the question is slightly different for each enrolled user.
+     * False means that the question is the same for all users and can be rendered without a seed.
+     * @return bool
+     */
+    public function useRandomSeed(): bool;
 }

@@ -27,9 +27,10 @@ final class QuestionText extends BaseQuestion
     private ?string $regex = null;
 
     /**
-     * String with possible correct answer used as an example (for teachers).
+     * Localized correct answer used as an example (for teachers).
+     * @var array|string|null
      */
-    private string $correct = '';
+    private $correct = null;
 
     /**
      * Assembles nette validation schema for question template data.
@@ -125,10 +126,10 @@ final class QuestionText extends BaseQuestion
      */
     private function renderTextTemplate(Engine $latte, string $locale, $answer, array $params = []): string
     {
-        $params['type'] = 'radio';
         $params['locale'] = $locale;
-        $params['answers'] = $answer !== null ? [$answer] : [];
-        return $this->renderChoicesTemplate($latte, $params);
+        $params['answer'] = $answer !== null ? (string)$answer : '';
+        $params['maxLength'] = $this->maxLength;
+        return $latte->renderToString(__DIR__ . '/templates/text.latte', $params);
     }
 
     public function renderFormContent(Engine $latte, string $locale, $answer = null): string
@@ -144,6 +145,12 @@ final class QuestionText extends BaseQuestion
     ): string {
         $params = ['graded' => $answerIsCorrect === null ? 'muted' : ($answerIsCorrect ? 'success' : 'danger')];
         return $this->renderTextTemplate($latte, $locale, $answer, $params);
+    }
+
+    public function renderCorrectContent(Engine $latte, string $locale): string
+    {
+        $correctAnswer = self::getLocalizedText($this->correct, $locale);
+        return $this->renderTextTemplate($latte, $locale, $correctAnswer, ['correctSample' => true]);
     }
 
     public function processAnswerSubmit(array $postData)
@@ -168,6 +175,11 @@ final class QuestionText extends BaseQuestion
 
     public function getCorrectAnswer()
     {
-        return $this->correct;
+        return '';
+    }
+
+    public function useRandomSeed(): bool
+    {
+        return false; // open questions cannot be randomized
     }
 }

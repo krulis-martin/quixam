@@ -58,7 +58,7 @@ final class TestPresenter extends AuthenticatedPresenter
         if ($this->selectedUser && $this->user->getRole() !== User::ROLE_STUDENT) {
             $userId = $this->selectedUser;
         }
-        return $this->enrolledUsers->findOneBy([ 'test' => $id, 'user' => $userId ]);
+        return $this->enrolledUsers->findOneBy(['test' => $id, 'user' => $userId]);
     }
 
     /**
@@ -101,8 +101,8 @@ final class TestPresenter extends AuthenticatedPresenter
             }
 
             if ($enrolled->getTest()->getFinishedAt() !== null) {
-                // student cannot access old tests when writting a test
-                return !$this->testTerms->getTermsUserIsEnrolledFor($this->user, true); // true = only ative
+                // student cannot access old tests when writing a test
+                return !$this->testTerms->getTermsUserIsEnrolledFor($this->user, true); // true = only active
             }
 
             return true;
@@ -131,7 +131,7 @@ final class TestPresenter extends AuthenticatedPresenter
             $this->finalizePostError($this->translator->translate('locale.test.error.alreadyFinished'));
         }
 
-        $enrolledUser = $this->enrolledUsers->findOneBy([ 'test' => $id, 'user' => $this->user->getId() ]);
+        $enrolledUser = $this->enrolledUsers->findOneBy(['test' => $id, 'user' => $this->user->getId()]);
         if (!$enrolledUser || $enrolledUser->isLocked()) {
             $this->finalizePostError($this->translator->translate('locale.test.error.locked'));
         }
@@ -158,7 +158,7 @@ final class TestPresenter extends AuthenticatedPresenter
         $this->questions->persist($question);
 
         $next = $req->getPost('nextQuestion');
-        $this->finalizePost($this->link('default', [ 'id' => $id, 'question' => $next ? $next : null ]));
+        $this->finalizePost($this->link('default', ['id' => $id, 'question' => $next ? $next : null]));
     }
 
     /**
@@ -172,7 +172,7 @@ final class TestPresenter extends AuthenticatedPresenter
         }
 
         if (!$test->getFinishedAt()) {
-            $enrolledUser = $this->enrolledUsers->findOneBy([ 'test' => $id, 'user' => $this->user->getId() ]);
+            $enrolledUser = $this->enrolledUsers->findOneBy(['test' => $id, 'user' => $this->user->getId()]);
             if ($enrolledUser && !$enrolledUser->isLocked()) {
                 $enrolledUser->setLocked();
                 $this->enrolledUsers->persist($enrolledUser);
@@ -180,7 +180,7 @@ final class TestPresenter extends AuthenticatedPresenter
             }
         }
 
-        $this->finalizePost($this->link('default', [ 'id' => $id, 'question' => null ]));
+        $this->finalizePost($this->link('default', ['id' => $id, 'question' => null]));
     }
 
     /**
@@ -189,7 +189,7 @@ final class TestPresenter extends AuthenticatedPresenter
     public function handlePointsOverride(string $id, bool $override): void
     {
         if ($this->user->getRole() === User::ROLE_STUDENT) {
-            $this->error("The user does not have sufficient priviledges to perform this operation.", 403);
+            $this->error("The user does not have sufficient privileges to perform this operation.", 403);
         }
 
         $test = $this->testTerms->get($id);
@@ -224,7 +224,7 @@ final class TestPresenter extends AuthenticatedPresenter
         $enrolledUser->setScore($enrolledUser->getScore() + $newValue - $oldValue);
         $this->enrolledUsers->persist($enrolledUser);
 
-        $this->finalizePost($this->link('default', [ 'id' => $id, 'question' => $this->question ]));
+        $this->finalizePost($this->link('default', ['id' => $id, 'question' => $this->question]));
     }
 
     public function renderDefault(string $id)
@@ -276,7 +276,7 @@ final class TestPresenter extends AuthenticatedPresenter
                     $this->template->questionForm
                         = $questionData->renderFormContent($engine, $this->selectedLocale, $answerData);
                 } else {
-                    // readonly -> show the last submited answer (and correcntess if available)
+                    // readonly -> show the last submitted answer (and correctness if available)
                     $this->template->answerCorrect = $answerData !== null
                         ? $questionData->isAnswerCorrect($answerData) : null;
                     $this->template->questionResult
@@ -288,13 +288,11 @@ final class TestPresenter extends AuthenticatedPresenter
                         );
                 }
 
-                // teacher can see a correct anwer
+                // teacher can see a correct answer
                 if ($this->user->getRole() !== User::ROLE_STUDENT && empty($this->template->answerCorrect)) {
-                    $this->template->correctAnswer = $questionData->renderResultContent(
+                    $this->template->correctAnswer = $questionData->renderCorrectContent(
                         $engine,
                         $this->selectedLocale,
-                        $questionData->getCorrectAnswer(),
-                        true
                     );
                 }
             }

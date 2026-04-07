@@ -95,12 +95,11 @@ final class TemplatePresenter extends AuthenticatedPresenter
         $engine = $this->latteFactory->create();
 
         $this->template->text = $questionData->getText($this->selectedLocale);
-        $this->template->result = $questionData->renderResultContent(
+        $this->template->result = $questionData->renderCorrectContent(
             $engine,
             $this->selectedLocale,
-            $questionData->getCorrectAnswer(),
-            true
         );
+        $this->template->useRandomSeed = $questionData->useRandomSeed();
 
         if ($question->getDeletedAt()) {
             $this->template->currentQuestion = $this->getCurrentQuestion($question);

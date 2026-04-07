@@ -1,11 +1,20 @@
-{if !empty($graded)}
-<div class="text-{$graded}">{$answer|markdown}</div>
+{if !empty($correctSample)}
+    {if $answer}
+    <h5 class="mt-4">{_locale.templateQuestion.text.correctAnswerExample}:</h5>
+    <div class="bg-success-subtle border p-3 my-3 rounded">{$answer|markdown}</div>
+    {else}
+    <div class="border p-3 mt-4 rounded text-secondary opacity-50">
+      <i class="fa-solid fa-ban me-2"></i>
+      {_locale.templateQuestion.text.noCorrectAnswerExample}
+    </div>
+    {/if}
+{elseif !empty($graded)}
+    <div class="text-{$graded}">{$answer|markdown}</div>
 {else}
-<textarea name="answer" class="form-control" rows="5" n:attr="maxlength: $maxLength">{$answer}</textarea>
+    <textarea name="answer" class="form-control" rows="5" n:attr="maxlength: $maxLength">{$answer}</textarea>
 {/if}
 
 
-{if $type === "radio"}
 <script type="text/javascript">
 $(() => {
     const validate = () => {
@@ -16,4 +25,3 @@ $(() => {
     validate();
 });
 </script>
-{/if}

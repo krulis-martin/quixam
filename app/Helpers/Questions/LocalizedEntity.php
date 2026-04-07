@@ -18,7 +18,7 @@ class LocalizedEntity
 {
     use SmartObject;
 
-    /** @var array|null */
+    /** @var array|string|null */
     protected $text = null;
 
     /**
