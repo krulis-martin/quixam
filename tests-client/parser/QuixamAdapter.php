@@ -108,6 +108,176 @@ class Adapter
     }
 
     /**
+     * Prepare data for the choice questions (single and multi). These questions have a list of answers,
+     * and one (single), or a list of (multi) correct answer(s).
+     * The question is expected one mandatory parameter (number of answers).
+     * The answers are encoded in correct, answers, and optionally exclusiveAnswers sections.
+     * @param Question $question parsed question data
+     * @param array $json reference to the JSON data being prepared (will be updated)
+     */
+    private function prepareChoiceData(Question $question, array &$json): void
+    {
+        if (count($question->parameters) !== 1) {
+            throw new RuntimeException(
+                "The $question->type question expects exactly one parameter in the @question tag!"
+            );
+        }
+
+        if (!is_numeric($question->parameters[0]) || (int)$question->parameters[0] < 1) {
+            throw new RuntimeException(
+                "The parameter of $question->type question is expected to be a positive integer!"
+            );
+        }
+
+        $json['count'] = (int)$question->parameters[0];
+        $json['answers'] = $question->answers;
+        $json['correct'] = $question->correct;
+        if ($question->type === 'single') {
+            if (count($json['correct']) !== 1) {
+                throw new RuntimeException(
+                    "Question type '$question->type' is expected to have exactly one correct answer!"
+                );
+            }
+            $json['correct'] = reset($json['correct']);
+        }
+
+        // exclusive answers hold pairs of mutually exclusive correct-wrong answers (as indices into answers array)
+        $json['exclusive'] = $question->exclusiveAnswers;
+    }
+
+    /**
+     * Prepare data for numeric questions. The correct answers are encoded as question parameters.
+     * No other sections (except for text) are expected for numeric questions.
+     * @param Question $question parsed question data
+     * @param array $json reference to the JSON data being prepared (will be updated)
+     */
+    private function prepareNumericData(Question $question, array &$json): void
+    {
+        // numeric questions
+        $json['correct'] = [];
+        $formats = ['dec' => 0, 'hex' => 0, 'bin' => 0];
+        foreach ($question->parameters as $param) {
+            $json['correct'][] = self::parseNum($param);
+            $formats[self::getNumType($param)]++;
+        }
+        $json['correctInOrder'] = true;
+        $json['minCount'] = 1;
+        if ($question->type === 'num') {
+            $json['maxCount'] = 1; // only one number is allowed
+        }
+
+        if ($json['minCount'] > count($json['correct'])) {
+            throw new RuntimeException("At least " . $json['minCount']
+                . " numbers are required, but the correct answer has only " . count($json['correct']));
+        }
+        if (($json['maxCount'] ?? 10) < count($json['correct'])) {
+            throw new RuntimeException("At most " . $json['maxCount']
+                . " numbers are allowed, but the correct answer has " . count($json['correct']));
+        }
+
+        $json['bestFormat'] = self::greatestKey($formats);
+    }
+
+    /**
+     * Prepare data for the order question. The question is expected to have two numeric parameters:
+     * - min number of items to be ordered (positive integer)
+     * - max number of items to be ordered (positive integer)
+     * @param Question $question parsed question data
+     * @param array $json reference to the JSON data being prepared (will be updated)
+     */
+    private function prepareOrderData(Question $question, array &$json): void
+    {
+        if (
+            count($question->parameters) !== 2 || !is_numeric($question->parameters[0])
+            || !is_numeric($question->parameters[1])
+        ) {
+            throw new RuntimeException(
+                "Question type '$question->type' is expected to have exactly two numeric parameters (min, max)!"
+            );
+        }
+        $min = $json['minCount'] = self::parseNum($question->parameters[0]);
+        $max = $json['maxCount'] = self::parseNum($question->parameters[1]);
+        $json['items'] = $question->items;
+        $count = count($question->items);
+
+        // sanity checks
+        $mandatory = 0;
+        foreach ($question->items as $item) {
+            $mandatory += ($item['mandatory'] ?? false) ? 1 : 0;
+        }
+
+        if ($min < 1 || $max > $min || $max > $count) {
+            throw new RuntimeException(
+                "Invalid min-max limits [$min,$max] of order question. They must be within [1,$count] range."
+            );
+        }
+        if ($min > $mandatory) {
+            throw new RuntimeException(
+                "At least $min items are required, but the question has only $mandatory mandatory answers."
+            );
+        }
+        if ($max < $mandatory) {
+            throw new RuntimeException(
+                "At most $max items are allowed, but the question has $mandatory mandatory answers."
+            );
+        }
+    }
+
+    /**
+     * Prepare data for the text question. Text question has two optional parameters:
+     * - max length of the answer (positive integer)
+     * - regular expression that the answer must match (string)
+     * Optionally, it may contain one @correct section with a sample correct answer (string).
+     * It must not contain any other parameters or sections.
+     * @param Question $question parsed question data
+     * @param array $json reference to the JSON data being prepared (will be updated)
+     */
+    private function prepareTextData(Question $question, array &$json): void
+    {
+        if (count($question->parameters) > 2) {
+            throw new RuntimeException(
+                "Text question expects at most two parameters in the @question tag!"
+            );
+        }
+        if (count($question->parameters) >= 1) {
+            if (!is_numeric($question->parameters[0]) || (int)$question->parameters[0] < 1) {
+                throw new RuntimeException(
+                    "The first parameter (max length) of text question is expected to be a positive integer!"
+                );
+            }
+            $json['maxLength'] = (int)$question->parameters[0];
+        }
+
+        if (count($question->parameters) === 2) {
+            if (!is_string($question->parameters[1]) || !preg_match($question->parameters[1], '') === false) {
+                throw new RuntimeException(
+                    "The second parameter of text question is expected to be a valid regular expression!"
+                );
+            }
+            $json['regex'] = $question->parameters[1];
+        }
+
+        // the correct answer is optional for text questions, but if provided, it must be a string
+        if (count($question->correct) > 1) {
+            throw new RuntimeException("Text question is expected to have at most one correct answer!");
+        }
+
+        if (count($question->correct) === 1 && $question->correct[0]) {
+            $json['correct'] = $question->correct[0];
+        }
+    }
+
+    private const FORBIDDEN_SECTIONS = [
+        'dynamic' => ['answers', 'correct', 'exclusiveAnswers', 'items'],
+        'single' => ['code', 'items'],
+        'multi' => ['code', 'items'],
+        'num' => ['answers', 'correct', 'exclusiveAnswers', 'code', 'items'],
+        'nums' => ['answers', 'correct', 'exclusiveAnswers', 'code', 'items'],
+        'order' => ['answers', 'correct', 'exclusiveAnswers', 'code'],
+        'text' => ["answers", "exclusiveAnswers", "code", "items"]
+    ];
+
+    /**
      * Converts given question object into JSON data file as expected by Quixam API.
      * This is the most essential part of the adapter which handles the necessary data conversions
      * (adapting the question file format to API format).
@@ -116,8 +286,19 @@ class Adapter
      */
     private function prepareData(Question $question): array
     {
+        // basic checks that forbidden sections are empty
+        foreach (self::FORBIDDEN_SECTIONS['text'] ?? [] as $key) {
+            if (count($question->$key) > 0) {
+                throw new RuntimeException(
+                    "Question type '$question->type' is not expected to have any '$key' sections!"
+                );
+            }
+        }
+
+        // text is common to all
         $json = ['text' => $question->text];
 
+        // prepare remaining data based on the question type
         if ($question->type === 'dynamic') {
             $code = trim($question->getCode());
             if (!$code) {
@@ -125,61 +306,13 @@ class Adapter
             }
             $json['code'] = $code;
         } elseif ($question->type === 'single' || $question->type === 'multi') {
-            // choice-based questions
-            if (count($question->parameters) !== 1) {
-                throw new RuntimeException(
-                    "The $question->type question expects exactly one parameter in the @question tag!"
-                );
-            }
-            $json['count'] = (int)$question->parameters[0];
-            $json['answers'] = $question->answers;
-            $json['correct'] = $question->correct;
-            if ($question->type === 'single') {
-                if (count($json['correct']) !== 1) {
-                    throw new RuntimeException(
-                        "Question type '$question->type' is expected to have exactly one correct answer!"
-                    );
-                }
-                $json['correct'] = reset($json['correct']);
-            }
-
-            $json['exclusive'] = $question->exclusiveAnswers;
+            $this->prepareChoiceData($question, $json);
         } elseif ($question->type === 'num' || $question->type === 'nums') {
-            // numeric questions
-            $json['correct'] = [];
-            $formats = ['dec' => 0, 'hex' => 0, 'bin' => 0];
-            foreach ($question->parameters as $param) {
-                $json['correct'][] = self::parseNum($param);
-                $formats[self::getNumType($param)]++;
-            }
-            $json['correctInOrder'] = true;
-            $json['minCount'] = 1;
-            if ($question->type === 'num') {
-                $json['maxCount'] = 1; // only one number is allowed
-            }
-
-            if ($json['minCount'] > count($json['correct'])) {
-                throw new RuntimeException("At least " . $json['minCount']
-                    . " numbers are required, but the correct answer has only " . count($json['correct']));
-            }
-            if (($json['maxCount'] ?? 10) < count($json['correct'])) {
-                throw new RuntimeException("At most " . $json['maxCount']
-                    . " numbers are allowed, but the correct answer has " . count($json['correct']));
-            }
-
-            $json['bestFormat'] = self::greatestKey($formats);
+            $this->prepareNumericData($question, $json);
         } elseif ($question->type === 'order') {
-            if (
-                count($question->parameters) !== 2 || !is_numeric($question->parameters[0])
-                || !is_numeric($question->parameters[1])
-            ) {
-                throw new RuntimeException(
-                    "Question type '$question->type' is expected to have exactly two numeric parameters (min, max)!"
-                );
-            }
-            $json['minCount'] = self::parseNum($question->parameters[0]);
-            $json['maxCount'] = self::parseNum($question->parameters[1]);
-            $json['items'] = $question->items;
+            $this->prepareOrderData($question, $json);
+        } elseif ($question->type === 'text') {
+            $this->prepareTextData($question, $json);
         } else {
             throw new RuntimeException("Question type '$question->type' is not supported yet!");
         }
@@ -202,6 +335,7 @@ class Adapter
             'num' => 'numeric',
             'nums' => 'numeric',
             'order' => 'order',
+            'text' => 'text',
             'dynamic' => '', // dynamic questions do not have a type
         ];
         if (!array_key_exists($question->type, $typeMappings)) {

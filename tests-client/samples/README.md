@@ -41,9 +41,14 @@ Example:
 
 ```
 @text
+@en
 What is the origin of the name "Bluetooth" that refers to the wireless technology standard for exchanging data over short distances?
+@cs
+Jaký je původ názvu "Bluetooth", který se vztahuje k bezdrátné technologii pro výměnu dat na krátké vzdálenosti?
 @/text
 ```
+
+Optionally, the question text may contain `@correct` section (which can be localized in the same way as `@text`) that contains an example of a correct (sample) answer. The correct answer is not used for grading, but may be used to guide teacher who will grade the question manually.
 
 ### Answers
 
@@ -83,7 +88,7 @@ All answer options are specified using `@item` tags instead of `@correct/@wrong`
 - _flags_ are encoded as sequence of chars (no whitespace), each char represents one flag:
   - `!` stands for _mandatory_ (this item is always present among the options when the question template is instantiated)
   - `+` stands for _preselected_ (if present in the question instance, the item is pre-selected into the initial blank answer as a suggestion for the user)
-- _group_ is a string identifier referring to a group to which the item belongs. The purpose of a group is to indicate that some items should be selected together (an entire group is either added or not added when the question is instantiated). Group identifiers must not consist only of flag characters (so we can distinguish whether flags are present or not).
+- _group_ is a string identifier referring to a group to which the item belongs. The purpose of a group is to indicate that some items should be selected together (an entire group is either added or not added when the question is instantiated). Group identifiers must not consist solely of flags' characters (so we can distinguish whether `<flags>` are present or not during parsing) -- i.e., `!+` is a bad group identifier, `!a+` is fine.
 
 ### Language variants
 
