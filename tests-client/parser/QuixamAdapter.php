@@ -64,6 +64,17 @@ class Adapter
 
         $this->testId = $yaml['id'];
         $this->groups = $yaml['groups'];
+        foreach ($this->groups as $group => $data) {
+            if (array_key_exists('points', $data) && !is_numeric($data['points'])) {
+                throw new RuntimeException("Group '$group' has invalid points value '{$data['points']}'.");
+            }
+            if (array_key_exists('count', $data) && !is_numeric($data['count'])) {
+                throw new RuntimeException("Group '$group' has invalid count value '{$data['count']}'.");
+            }
+            if (!array_key_exists('count', $data)) {
+                $this->groups[$group]['count'] = 1;
+            }
+        }
 
         $this->baseDir = realpath(dirname($config));
     }
@@ -258,12 +269,13 @@ class Adapter
         }
 
         // the correct answer is optional for text questions, but if provided, it must be a string
-        if (count($question->correct) > 1) {
+        if (count($question->correct) > 1 || count($question->correct) !== count($question->answers)) {
             throw new RuntimeException("Text question is expected to have at most one correct answer!");
         }
 
-        if (count($question->correct) === 1 && $question->correct[0]) {
-            $json['correct'] = $question->correct[0];
+        // if there is an answer, it is the correct answer
+        if (count($question->answers) === 1 && $question->answers[0]) {
+            $json['correct'] = $question->answers[0]; // copy of the correct answer
         }
     }
 
@@ -274,7 +286,7 @@ class Adapter
         'num' => ['answers', 'correct', 'exclusiveAnswers', 'code', 'items'],
         'nums' => ['answers', 'correct', 'exclusiveAnswers', 'code', 'items'],
         'order' => ['answers', 'correct', 'exclusiveAnswers', 'code'],
-        'text' => ["answers", "exclusiveAnswers", "code", "items"]
+        'text' => ["exclusiveAnswers", "code", "items"]
     ];
 
     /**
@@ -287,7 +299,7 @@ class Adapter
     private function prepareData(Question $question): array
     {
         // basic checks that forbidden sections are empty
-        foreach (self::FORBIDDEN_SECTIONS['text'] ?? [] as $key) {
+        foreach (self::FORBIDDEN_SECTIONS[$question->type] ?? [] as $key) {
             if (count($question->$key) > 0) {
                 throw new RuntimeException(
                     "Question type '$question->type' is not expected to have any '$key' sections!"
@@ -420,9 +432,15 @@ class Adapter
         $ordering = 0;
         foreach ($structure as $group => $questions) {
             echo "Uploading questions of $group ...\n";
-            $points = $this->groups[$group];
-            // at the moment, each group selects only one question (TODO make it configurable...)
-            $this->client->addGroup($this->testId, $group, $points, 1, ++$ordering);
+            $points = $this->groups[$group]['points'] ?? 1;
+            $count = $this->groups[$group]['count'] ?? 1;
+            if ($count > count($questions)) {
+                echo "Warning: group $group selects $count questions, but only " . count($questions)
+                    . " provided. Restricting selection to " . count($questions) . ".\n";
+                $count = count($questions);
+            }
+
+            $this->client->addGroup($this->testId, $group, $points, $count, ++$ordering);
             $this->uploadGroup($group, $questions, $current[$group] ?? []);
         }
     }
