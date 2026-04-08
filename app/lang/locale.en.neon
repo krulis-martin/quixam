@@ -205,6 +205,8 @@ templateQuestion.order.explain: "Drag and drop items between the two lists and t
 templateQuestion.order.emptyAnswer: "Drag items from the right part here."
 templateQuestion.text.correctAnswerExample: "Example of correct answer"
 templateQuestion.text.noCorrectAnswerExample: "No example of correct answer is provided for this question template."
+templateQuestion.text.MarkdownDisabled: "Markdown off"
+templateQuestion.text.MarkdownEnabled: "Markdown on"
 
 error.4xx.title: "Ooops..."
 error.4xx.description: "Your browser sent a request that this server could not understand or process."

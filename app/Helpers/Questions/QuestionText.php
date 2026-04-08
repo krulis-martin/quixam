@@ -143,7 +143,7 @@ final class QuestionText extends BaseQuestion
         $answer = null,
         ?bool $answerIsCorrect = null
     ): string {
-        $params = ['graded' => $answerIsCorrect === null ? 'muted' : ($answerIsCorrect ? 'success' : 'danger')];
+        $params = ['graded' => $answerIsCorrect === null ? 'secondary' : ($answerIsCorrect ? 'success' : 'danger')];
         return $this->renderTextTemplate($latte, $locale, $answer, $params);
     }
 

@@ -88,8 +88,13 @@ div.divisor > span {
     padding: 0 1rem 0.1rem;
 }
 
+textarea.form-control[name="answer"] {
+    height: calc(100vh - 36rem);
+    min-height: 6rem;
+}
+
 /*
- * Bootstrap overrided
+ * Bootstrap overrides
  */
 nav.navbar {
     background-color: #ffee99;
