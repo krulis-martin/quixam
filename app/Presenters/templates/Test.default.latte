@@ -41,8 +41,8 @@
   </strong>
 {/if}
 
-{if $test->getStartedAt() !== null}
 
+{if $test->getStartedAt() !== null}
   <nav class="my-3">
     <ul class="pagination">
       <li class="page-item {$selectedQuestionIdx === 0 ? 'disabled'}">
@@ -53,11 +53,12 @@
       <li n:foreach="$questions as $idx => $question"
         class="page-item {$idx === $selectedQuestionIdx ? 'active'}">
         {var $answerTmp = $idx !== $selectedQuestionIdx ? $question->getLastAnswer() : null}
+        {var $answerStyle = answerStyle($answerTmp, $test->getFinishedAt() !== null)}
         <a n:class="page-link,
           $answerTmp !== null ? 'bg-opacity-25 fw-bold',
-          $answerTmp !== null && (!$test->getFinishedAt() || $answerTmp->getPoints()) ? 'bg-success text-success',
-          $answerTmp !== null && $test->getFinishedAt() && !$answerTmp->getPoints() ? 'bg-danger text-danger'"
-          n:href="this question => $question->getId()">{$question->getOrdering()}</a>
+          $answerStyle ? ('bg-' . $answerStyle . ' text-' . $answerStyle)"
+          n:href="this question => $question->getId()"
+        >{$question->getOrdering()}</a>
       </li>
       {if $test->getFinishedAt() === null}
       <li class="page-item {$selectedQuestionIdx >= count($questions) ? 'active'}">
@@ -85,8 +86,9 @@
     {if $selectedQuestionIdx < count($questions)}
       &ndash; {$selectedQuestion->getCaption($locale)}
 
-      {if $test->getFinishedAt() !== null}
-        <span class="badge {$answer?->getPoints() ? 'bg-success' : 'bg-danger'} float-sm-end mt-1 ms-3 fs-6">
+      {if $test->getFinishedAt() !== null && $answer && $answer->getPoints() !== null}
+        {var $answerStyle = answerStyle($answer, true)}
+        <span class="badge bg-{$answerStyle} float-sm-end mt-1 ms-3 fs-6">
           {_locale.test.points}: {(int)$answer?->getPoints()} {_locale.test.pointsOf} {$selectedQuestion->getPoints()}
         </span>
       {else}
@@ -102,11 +104,15 @@
     {if $readonly}
       {if $test->getFinishedAt() !== null}
         {if $answer === null}
-          <div class="border rounded border-secondary text-muted p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.missingAnswer}</div>
-        {elseif $answerCorrect}
-          <div class="border rounded border-success text-success p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.correctAnswer}</div>
-        {else}
-          <div class="border rounded border-danger text-danger p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.wrongAnswer}</div>
+          <div class="border rounded border-secondary text-muted p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.answer.missing}</div>
+        {elseif $answer->getPoints() === null}
+          <div class="border rounded border-primary text-primary p-2 my-2"><i class="fa-regular fa-circle-question fa-fw"></i> {_locale.test.answer.waiting}</div>
+        {elseif hasAnswerFullPoints($answer)}
+          <div class="border rounded border-success text-success p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.answer.correct}</div>
+        {elseif hasAnswerPartialPoints($answer)}
+          <div class="border rounded border-warning text-warning p-2 my-2"><i class="fa-regular fa-circle-check fa-fw"></i> {_locale.test.answer.partial}</div>
+        {elseif hasAnswerNoPoints($answer)}
+          <div class="border rounded border-danger text-danger p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.answer.wrong}</div>
         {/if}
       {elseif $enrolledUser->isLocked()}
         <div class="border rounded border-info text-info p-2 my-2"><i class="fa-regular fa-hand fa-fw"></i> {_locale.test.enrolledUserLocked}</div>

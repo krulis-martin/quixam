@@ -47,25 +47,27 @@
       <td class="text-nowrap text-center">
         {foreach $questions[$enrolledUser->getUser()->getId()] ?? [] as $question}
           {var $answer = $question->getLastAnswer()}
-          <span class="badge fs-6 me-1 position-relative {$answer ? ($answer->isEvaluated() ? ($answer->getPoints() ? 'bg-success' : 'bg-danger') : 'bg-warning') : 'bg-secondary'}">
+          {var $answerStyle = answerStyle($answer, true)}
+          <a class="badge fs-6 me-1 position-relative text-decoration-none {$answerStyle ? ('text-bg-' . $answerStyle) : 'bg-light'}"
+            n:href="Test:default $test->getId(), selectedUser: $enrolledUser->getUser()->getId(), question => $question->getId()"
+          >
             {$question->getOrdering()}
             <span class="position-absolute top-0 start-100 translate-middle p-1 bg-primary rounded-pill text-smaller">
               {$question->getPoints()}
             </span>
-          </span>
+          </a>
         {/foreach}
       </td>
       
-      {if $test->getFinishedAt() && $enrolledUser->hasScore()}
-        <td class="text-nowrap text-center">
-          <strong>{$enrolledUser->hasScore() ? $enrolledUser->getScore() : '-'}</strong>
-          {if $enrolledUser->hasScore()}
-            {var $grading = $enrolledUser->getGrade()}
-            <span n:if="$grading !== null" class="d-inline-block text-white rounded px-1 ms-1"
-              style="background-color: {$enrolledUser->getGradeColor()|noescape}">{$grading}</span>
-          {/if}
-        </td>
-      {/if}
+      <td n:if="$test->getFinishedAt()" class="text-nowrap text-center">
+        <strong n:if="$enrolledUser->hasScore()">{$enrolledUser->getScore()}</strong>
+        <i n:if="!$enrolledUser->hasScore()" class="fa-solid fa-user-pen text-primary fa-beat" title="{_locale.enrolledUsers.pendingScore}"></i>
+        {if $enrolledUser->hasScore()}
+          {var $grading = $enrolledUser->getGrade()}
+          <span n:if="$grading !== null" class="d-inline-block text-white rounded px-1 ms-1"
+            style="background-color: {$enrolledUser->getGradeColor()|noescape}">{$grading}</span>
+        {/if}
+      </td>
 
       <td class="text-nowrap text-end w-0">
         <a n:href="Test:default $test->getId(), selectedUser: $enrolledUser->getUser()->getId()">{_locale.enrolledUsers.detail}</a>

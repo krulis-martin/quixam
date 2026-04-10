@@ -120,26 +120,40 @@ class TestOrchestrator
         $enrolledUsers = $test->getEnrolledUsers();
         $scores = [];
         foreach ($enrolledUsers as $user) {
-            $scores[$user->getId()] = 0;
+            $scores[$user->getId()] = 0; // sum for each user, null if the grading is not complete
         }
 
         // evaluate individual questions
         $questions = $this->questions->getQuestionsOfTest($test);
         foreach ($questions as $question) {
             $answer = $question->getLastAnswer();
+            $enrolledId = $question->getEnrolledUser()->getId();
             if ($answer) {
+                // find out whether the answer is correct...
                 $questionData = $question->getQuestion($this->questionFactory);
                 $correct = $questionData->isAnswerCorrect($answer->getAnswer());
-                $answer->setPoints($correct ? $question->getPoints() : 0);
-                $scores[$question->getEnrolledUser()->getId()] += $answer->getPoints();
+
+                if ($correct !== null) { // null = not graded automatically
+                    $answer->setPoints($correct ? $question->getPoints() : 0);
+
+                    // update score for the enrolled user, skip if the grading is not complete (null)
+                    if ($scores[$enrolledId] !== null) {
+                        $scores[$enrolledId] += $answer->getPoints();
+                    }
+                } else {
+                    $scores[$enrolledId] = null;
+                }
+
                 $this->answers->persist($answer);
             }
         }
 
         // update scores for enrolled users
         foreach ($enrolledUsers as $user) {
-            $user->setScore($scores[$user->getId()]);
-            $this->enrolledUsers->persist($user);
+            if ($scores[$user->getId()] !== null) { // skip if incomplete
+                $user->setScore($scores[$user->getId()]);
+                $this->enrolledUsers->persist($user);
+            }
         }
     }
 }

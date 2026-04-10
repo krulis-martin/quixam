@@ -36,7 +36,7 @@ $(() => {
             $("#saveButton").prop('disabled', textarea.val().trim().length == 0);
         }
 
-        textarea.change(validate);
+        textarea.on('input', validate);
         validate();
     }
 
