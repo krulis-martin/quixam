@@ -12,7 +12,9 @@
   <i class="fa-regular fa-user fa-fw text-muted"></i>
   {_locale.test.resultsOfUser}:
   {$selectedUser->getFirstName()} {$selectedUser->getLastName()}
-  <a n:href="Enrolled:default $test->getId()" class="float-md-end text-smaller mt-1"><i class="fa-solid fa-share-from-square fa-fw"></i> {_locale.test.backToEnrolled}</a>
+  <a n:href="Enrolled:default $test->getId()" class="float-md-end text-smaller text-decoration-none mt-1">
+    <i class="fa-solid fa-share-from-square fa-fw"></i> {_locale.test.backToEnrolled}
+  </a>
 </h4>
 {/if}
 
@@ -147,7 +149,8 @@
     {if !empty($correctAnswer)}
     <button class="btn btn-outline-danger btn-sm mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#correctAnswer"
       aria-expanded="false" aria-controls="collapseExample">
-      <i class="fa-regular fa-circle-check me-1"></i>
+      <i class="fa-solid fa-circle-chevron-down me-1 toggle-expanded"></i>
+      <i class="fa-solid fa-circle-chevron-right me-1 toggle-collapsed"></i>
       {_locale.test.correctAnswerButton}
     </button>
     <div class="collapse" id="correctAnswer">

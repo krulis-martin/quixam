@@ -5,22 +5,27 @@
   {block title}{_locale.enrolledUsers.title}{/block}
 </h1>
 
-<h4 class="mt-4">{$test->getCaption($locale)}, {$test->getScheduledAt()|ldate}</h4>
+<div class="my-3 p-3 border border-secondary rounded bg-light">
+  <h4>
+    <i class="fa-solid fa-list-check fa-fw text-muted me-2"></i>
+    {$test->getCaption($locale)}, {$test->getScheduledAt()|ldate}
+  </h4>
 
-<span class="d-inline-block me-4">
-  <span class="text-muted">{_locale.test.supervisors}:</span>
-  {foreach $test->getSupervisors() as $supervisor}{$supervisor->getFirstName()} {$supervisor->getLastName()}{sep}, {/sep}{/foreach}
-</span>
-<span class="d-inline-block me-4">
-  <span class="text-muted">{_locale.test.startedAt}:</span>
-  {$test->getStartedAt()|ldate}
-</span>
-{if $test->getFinishedAt() !== null}
-<span class="d-inline-block me-4">
-  <span class="text-muted">{_locale.test.finishedAt}:</span>
-  {$test->getFinishedAt()|ldate}
-</span>
-{/if}
+  <span class="d-inline-block me-4">
+    <span class="text-muted">{_locale.test.supervisors}:</span>
+    {foreach $test->getSupervisors() as $supervisor}{$supervisor->getFirstName()} {$supervisor->getLastName()}{sep}, {/sep}{/foreach}
+  </span>
+  <span class="d-inline-block me-4">
+    <span class="text-muted">{_locale.test.startedAt}:</span>
+    {$test->getStartedAt()|ldate}
+  </span>
+  {if $test->getFinishedAt() !== null}
+  <span class="d-inline-block me-4">
+    <span class="text-muted">{_locale.test.finishedAt}:</span>
+    {$test->getFinishedAt()|ldate}
+  </span>
+  {/if}
+</div>
 
 {if $enrolledUsers}
 <table class="table table-hover align-middle mt-4">
@@ -28,11 +33,10 @@
     </tr>
       <th class="text-nowrap">{_locale.enrolledUsers.lastName}</th>
       <th class="text-nowrap">{_locale.enrolledUsers.firstName}</th>
-      <th class="text-nowrap">{_locale.enrolledUsers.email}</th>
-      <th class="text-nowrap">{_locale.enrolledUsers.externalId}</th>
+      <th class="text-nowrap"></th>
       <th class="text-nowrap text-center">{_locale.enrolledUsers.answers}</th>
       {if $test->getFinishedAt()}
-        <th class="text-nowrap text-center">{_locale.enrolledUsers.points}</th>
+        <th class="text-center">{_locale.enrolledUsers.points}</th>
       {/if}
       <th></th>
     </tr>
@@ -41,8 +45,10 @@
     <tr n:foreach="$enrolledUsers as $idx => $enrolledUser">
       <td class="text-nowrap">{$enrolledUser->getUser()->getLastName()}</td>
       <td class="text-nowrap">{$enrolledUser->getUser()->getFirstName()}</td>
-      <td class="text-nowrap text-small"><a href="mailto:{$enrolledUser->getUser()->getEmail()}">{$enrolledUser->getUser()->getEmail()}</a></td>
-      <td class="text-nowrap">{$enrolledUser->getUser()->getExternalId()}</td>
+      <td class="text-nowrap text-smaller">
+        <a href="mailto:{$enrolledUser->getUser()->getEmail()}">{$enrolledUser->getUser()->getEmail()}</a><br>
+        {$enrolledUser->getUser()->getExternalId()}
+      </td>
       
       <td class="text-nowrap text-center">
         {foreach $questions[$enrolledUser->getUser()->getId()] ?? [] as $question}
@@ -70,19 +76,34 @@
       </td>
 
       <td class="text-nowrap text-end w-0">
-        <a n:href="Test:default $test->getId(), selectedUser: $enrolledUser->getUser()->getId()">{_locale.enrolledUsers.detail}</a>
+        <a n:href="Test:default $test->getId(), selectedUser: $enrolledUser->getUser()->getId()"
+          class="btn btn-sm btn-primary" title="{_locale.enrolledUsers.Detail}"
+        >
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </a>
 
-        <form method="POST" action="{link Lock! id: $enrolledUser->getId(), state: !$enrolledUser->isLocked()}"
+        {if $test->getFinishedAt() === null}
+        <form method="POST" action="{link Lock! id: $test->getId(), enrolledId: $enrolledUser->getId(), state: !$enrolledUser->isLocked()}"
           class="d-inline ms-1" data-ajax data-ajax-button="lockButton{$idx}">
-          <button id="lockButton{$idx}" type="submit" class="btn btn-sm btn-warning">
-            {if $enrolledUser->isLocked()}{_locale.enrolledUsers.unlock}{else}{_locale.enrolledUsers.lock}{/if}
+          <button id="lockButton{$idx}" type="submit"
+            class="btn btn-sm {$enrolledUser->isLocked() ? 'btn-danger' : 'btn-warning'}"
+            title="{($enrolledUser->isLocked() ? 'locale.enrolledUsers.unlock' : 'locale.enrolledUsers.lock')|translate}"
+          >
+            {if $enrolledUser->isLocked()}
+              <i class="fa-solid fa-lock-open"></i>
+            {else}
+              <i class="fa-solid fa-lock"></i>
+            {/if}
           </button>
         </form>
+        {/if}
 
-        <form method="POST" action="{link DeleteEnrolled! id: $enrolledUser->getId()}" class="d-inline ms-1"
+        <form method="POST" action="{link DeleteEnrolled! id: $test->getId(), enrolledId: $enrolledUser->getId()}" class="d-inline ms-1"
           data-ajax data-ajax-button="deleteEnrolledButton{$idx}"
           data-ajax-confirm="{_locale.enrolledUsers.deleteEnrolledWarning1}" data-ajax-confirm2="{_locale.enrolledUsers.deleteEnrolledWarning2}">
-          <button id="deleteEnrolledButton{$idx}" type="submit" class="btn btn-sm btn-danger">{_locale.enrolledUsers.deleteEnrolled}</button>
+          <button id="deleteEnrolledButton{$idx}" type="submit" class="btn btn-sm btn-danger" title="{_locale.enrolledUsers.deleteEnrolled}">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
         </form>
       </td>
     </tr>
@@ -125,8 +146,13 @@
         {/if}
       </td>
       <td class="text-nowrap w-0 text-end">
-        <form method="POST" action="{link DeleteRegistration! id: $registration->getId()}" class="d-inline" data-ajax data-ajax-button="deleteRegistrationButton{$idx}">
-          <button id="deleteRegistrationButton{$idx}" type="submit" class="btn btn-sm btn-danger">{_locale.enrolledUsers.deleteRegistration}</button>
+        <form method="POST" action="{link DeleteRegistration! id: $test->getId(), registrationId: $registration->getId()}"
+          class="d-inline" data-ajax data-ajax-button="deleteRegistrationButton{$idx}"
+        >
+          <button id="deleteRegistrationButton{$idx}" type="submit" class="btn btn-sm btn-danger">
+            <i class="fa-regular fa-circle-xmark me-1"></i>
+            {_locale.enrolledUsers.deleteRegistration}
+          </button>
         </form>
       </td>
     </tr>

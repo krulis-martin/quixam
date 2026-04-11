@@ -38,38 +38,43 @@ final class EnrolledPresenter extends AuthenticatedPresenter
 
     /**
      * Signal handler for AJAX call that locks or unlocks given enrolled user.
-     * @param string $id of the enrolled user
+     * @param string $enrolledId of the enrolled user
      * @param bool $state new locked state
      */
-    public function handleLock(string $id, bool $state): void
+    public function handleLock(string $id, string $enrolledId, bool $state): void
     {
-        $enrolledUser = $this->enrolledUsers->get($id);
+        $enrolledUser = $this->enrolledUsers->get($enrolledId);
         if (!$enrolledUser) {
             $this->finalizePostError("Enrolled user record no longer exists.");
         }
-        $testId = $enrolledUser->getTest()->getId();
+        if ($id !== $enrolledUser->getTest()->getId()) {
+            $this->finalizePostError("Test ID does not match.");
+        }
 
         $enrolledUser->setLocked($state);
         $this->enrolledUsers->persist($enrolledUser);
         $this->enrolledUsers->flush();
 
-        $this->finalizePost($this->link('default', [ 'id' => $testId ]));
+        $this->finalizePost($this->link('default', ['id' => $id]));
     }
 
     /**
      * Signal handler for AJAX call that removes enrolled user and the entire instance of the test.
-     * @param string $id of the enrolled user
+     * @param string $enrolledId of the enrolled user
      */
-    public function handleDeleteEnrolled(string $id): void
+    public function handleDeleteEnrolled(string $id, string $enrolledId): void
     {
-        $enrolledUser = $this->enrolledUsers->get($id);
+        $enrolledUser = $this->enrolledUsers->get($enrolledId);
         if (!$enrolledUser) {
             $this->finalizePostError("Enrolled user record no longer exists.");
         }
-        $testId = $enrolledUser->getTest()->getId();
+        if ($id !== $enrolledUser->getTest()->getId()) {
+            $this->finalizePostError("Test ID does not match.");
+        }
 
         $registration = $this->enrollmentRegistrations->findOneBy([
-            'test' => $testId, 'user' => $enrolledUser->getUser()->getId()
+            'test' => $id,
+            'user' => $enrolledUser->getUser()->getId()
         ]);
         if ($registration === null) {
             $registration = new EnrollmentRegistration($enrolledUser->getTest(), $enrolledUser->getUser());
@@ -83,25 +88,27 @@ final class EnrolledPresenter extends AuthenticatedPresenter
         $this->enrolledUsers->remove($enrolledUser);
         $this->enrolledUsers->flush();
 
-        $this->finalizePost($this->link('default', [ 'id' => $testId ]));
+        $this->finalizePost($this->link('default', ['id' => $id]));
     }
 
     /**
      * Signal handler for AJAX call that removes enrollment registration of a particular user.
-     * @param string $id of the registration
+     * @param string $registrationId of the registration
      */
-    public function handleDeleteRegistration(string $id): void
+    public function handleDeleteRegistration(string $id, string $registrationId): void
     {
-        $registration = $this->enrollmentRegistrations->get($id);
+        $registration = $this->enrollmentRegistrations->get($registrationId);
         if (!$registration) {
             $this->finalizePostError("Registration no longer exists.");
         }
-        $testId = $registration->getTest()->getId();
+        if ($id !== $registration->getTest()->getId()) {
+            $this->finalizePostError("Test ID does not match.");
+        }
 
         $this->enrollmentRegistrations->remove($registration);
         $this->enrollmentRegistrations->flush();
 
-        $this->finalizePost($this->link('default', [ 'id' => $testId ]));
+        $this->finalizePost($this->link('default', ['id' => $id]));
     }
 
     /**

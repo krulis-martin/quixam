@@ -130,6 +130,14 @@ a.navbar-brand > span {
     transform: translate(0, -2px);
 }
 
+*[data-bs-toggle=collapse][aria-expanded=false] .toggle-expanded {
+    display: none;
+}
+
+*[data-bs-toggle=collapse][aria-expanded=true] .toggle-collapsed {
+    display: none;
+}
+
 /*
  * Markdown
  */
