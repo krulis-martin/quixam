@@ -40,7 +40,11 @@
     {$test->getFinishedAt()|ldate}
   </span>
 {/if}
-{if $enrolledUser->hasScore()}
+
+{*
+ * Total test score
+ *}
+{if $canSeeResults && $enrolledUser->hasScore()}
   <strong class="d-inline-block float-lg-end">
     <span class="text-muted">{_locale.test.awardedPoints}:</span>
     {$enrolledUser->getScore()} {_locale.test.pointsOf} {$enrolledUser->getMaxScore()}
@@ -67,7 +71,7 @@
       <li n:foreach="$questions as $idx => $question"
         class="page-item {$idx === $selectedQuestionIdx ? 'active'}">
         {var $answerTmp = $idx !== $selectedQuestionIdx ? $question->getLastAnswer() : null}
-        {var $answerStyle = answerStyle($answerTmp, $test->getFinishedAt() !== null)}
+        {var $answerStyle = answerStyle($answerTmp, $canSeeResults)}
         <a n:class="page-link,
           $answerTmp !== null ? 'bg-opacity-25 fw-bold',
           $answerStyle ? ('bg-' . $answerStyle . ' text-' . $answerStyle)"
@@ -103,7 +107,7 @@
     {if $selectedQuestionIdx < count($questions)}
       &ndash; {$selectedQuestion->getCaption($locale)}
 
-      {if $test->getFinishedAt() !== null && $answer && $answer->getPoints() !== null}
+      {if $canSeeResults && $answer}
         {var $answerStyle = answerStyle($answer, true)}
         <span class="badge bg-{$answerStyle} float-sm-end mt-1 ms-3 fs-6">
           {_locale.test.points}: {(int)$answer?->getPoints()} {_locale.test.pointsOf} {$selectedQuestion->getPoints()}
@@ -126,7 +130,7 @@
       {*
        * Question correctness information
        *}
-      {if $test->getFinishedAt() !== null}
+      {if $canSeeResults}
         {if $answer === null}
           <div class="border rounded border-secondary text-muted p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.answer.missing}</div>
         {elseif $answer->getPoints() === null}
@@ -138,13 +142,15 @@
         {elseif hasAnswerNoPoints($answer)}
           <div class="border rounded border-danger text-danger p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.answer.wrong}</div>
         {/if}
+      {elseif $test->getFinishedAt() !== null && !$isSupervisor}
+        <div class="border rounded border-secondary text-muted p-2 my-2"><i class="fa-solid fa-user-graduate fa-fw fa-beat me-1"></i> {_locale.test.beingEvaluated}</div>
       {elseif $enrolledUser->isLocked()}
         <div class="border rounded border-info text-info p-2 my-2"><i class="fa-regular fa-hand fa-fw"></i> {_locale.test.enrolledUserLocked}</div>
       {/if}
 
       {$questionResult|noescape}
 
-      <div n:if="$test->getFinishedAt() !== null && $answer?->getPublicComment() && !$isSupervisor" class="card mt-3">
+      <div n:if="$canSeeResults && $answer?->getPublicComment() && !$isSupervisor" class="card mt-3">
         <div class="card-header">
           <i class="fa-solid fa-user-graduate opacity-50 me-2"></i>{_locale.test.studentFeedbackTitle}:
           <small n:if="$answer->getPoints() !== $answer->getAutoPoints()" class="float-end text-secondary opacity-75">

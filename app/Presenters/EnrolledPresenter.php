@@ -148,6 +148,5 @@ final class EnrolledPresenter extends AuthenticatedPresenter
         $this->template->questions = $this->questions->getQuestionsOfTestSorted($test);
 
         $this->template->onlineDateThreshold = new DateTime("15 minutes ago");
-        //$this->template->onlineDateThreshold->sub("15 minutes");
     }
 }

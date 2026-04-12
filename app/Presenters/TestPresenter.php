@@ -255,14 +255,9 @@ final class TestPresenter extends AuthenticatedPresenter
 
     public function renderDefault(string $id)
     {
+        $this->template->test = $test = $this->getTest($id);
         $this->template->locale = $this->selectedLocale;
         $this->template->isSupervisor = $this->user->getRole() !== User::ROLE_STUDENT;
-
-        $test = $this->testTerms->get($id);
-        if (!$test) {
-            $this->error("Test $id does not exist.", 404);
-        }
-        $this->template->test = $test;
 
         $enrolledUser = $this->getEnrolledUser($id);
         if (!$enrolledUser) {
@@ -287,12 +282,16 @@ final class TestPresenter extends AuthenticatedPresenter
             $this->template->previousQuestion = $selectedQuestionIdx > 0 ? $questions[$selectedQuestionIdx - 1] : null;
             $this->template->nextQuestion = $selectedQuestionIdx < count($questions) - 1
                 ? $questions[$selectedQuestionIdx + 1] : null;
+
             if ($selectedQuestionIdx < count($questions)) {
                 $this->template->selectedQuestion = $selectedQuestion = $questions[$selectedQuestionIdx];
                 $this->template->selectedQuestionId = $selectedQuestion->getId();
                 $questionData = $selectedQuestion->getQuestion($this->questionFactory);
                 $this->template->questionText = $questionData->getText($this->selectedLocale);
+                $this->template->canSeeResults = $this->user->getRole() !== User::ROLE_STUDENT
+                    || ($test->getFinishedAt() !== null && $enrolledUser->hasScore());
 
+                // render the answer/form
                 $engine = $this->latteFactory->create();
                 $answer = $selectedQuestion->getLastAnswer();
                 $answerData = $answer ? $answer->getAnswer() : null;
@@ -303,7 +302,7 @@ final class TestPresenter extends AuthenticatedPresenter
                         = $questionData->renderFormContent($engine, $this->selectedLocale, $answerData);
                 } else {
                     // readonly -> show the last submitted answer (and correctness if available)
-                    $this->template->answerCorrect = $answerData !== null
+                    $this->template->answerCorrect = $answerData !== null && $this->template->canSeeResults
                         ? $questionData->isAnswerCorrect($answerData) : null;
                     $this->template->questionResult
                         = $questionData->renderResultContent(
