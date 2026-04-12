@@ -156,4 +156,26 @@ class TestOrchestrator
             }
         }
     }
+
+    /**
+     * Re-calculate the score for a particular enrolled user.
+     * This is used when the points for a particular answer are changed.
+     * @param EnrolledUser $user for which the score should be updated
+     */
+    public function updateScore(EnrolledUser $user): void
+    {
+        $score = 0;
+        foreach ($user->getQuestions() as $question) {
+            $answer = $question->getLastAnswer();
+            if ($answer && $answer->isEvaluated()) {
+                $score += $answer->getPoints();
+            } else {
+                $score = null; // incomplete grading
+                break;
+            }
+        }
+
+        $user->setScore($score);
+        $this->enrolledUsers->persist($user);
+    }
 }

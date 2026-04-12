@@ -266,7 +266,7 @@ final class QuestionNumeric extends BaseQuestion
         return true;
     }
 
-    public function isAnswerCorrect($answer): ?bool
+    public function isAnswerCorrect($answer): bool
     {
         if (!$this->isAnswerValid($answer)) {
             return false;

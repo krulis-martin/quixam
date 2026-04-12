@@ -52,10 +52,8 @@ class FunctionsExtension extends Extension
             return 'success';
         } elseif ($answer->getPoints() > 0) {
             return 'warning';
-        } elseif ($answer->getPoints() <= 0) {
+        } else {
             return 'danger';
         }
-
-        return null;
     }
 }

@@ -6,12 +6,9 @@ namespace App\Presenters;
 
 use App\Model\Repository\TemplateTests;
 use App\Model\Repository\TemplateQuestions;
-use App\Model\Entity\TemplateTest;
 use App\Model\Entity\TemplateQuestion;
 use App\Model\Entity\User;
 use App\Helpers\TestOrchestrator;
-use Nette;
-use Nette\Application\UI\Form;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
 
 final class TemplatePresenter extends AuthenticatedPresenter

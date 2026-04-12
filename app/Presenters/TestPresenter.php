@@ -11,11 +11,11 @@ use App\Model\Repository\Questions;
 use App\Model\Repository\TestTerms;
 use App\Model\Entity\Answer;
 use App\Model\Entity\EnrolledUser;
-use App\Model\Entity\EnrollmentRegistration;
 use App\Model\Entity\Question;
+use App\Model\Entity\TestTerm;
 use App\Model\Entity\User;
 use App\Helpers\QuestionFactory;
-use Nette;
+use App\Helpers\TestOrchestrator;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
 
 final class TestPresenter extends AuthenticatedPresenter
@@ -41,11 +41,40 @@ final class TestPresenter extends AuthenticatedPresenter
     /** @var LatteFactory @inject */
     public $latteFactory;
 
+    /** @var TestOrchestrator @inject */
+    public $testOrchestrator;
+
     /** @persistent */
     public $question = null;
 
     /** @persistent */
     public $selectedUser = null;
+
+    /**
+     * Get the test term entity based on the presenter's parameters and perform additional checks.
+     * @param string $id test term ID
+     * @param bool|null $finished if true, the test must be finished; if false, the test must not be finished;
+     *                            if null, no check is performed
+     * @return TestTerm
+     */
+    private function getTest(string $id, ?bool $finished = null): TestTerm
+    {
+        $test = $this->testTerms->get($id);
+        if (!$test) {
+            $this->error("Test $id does not exist.", 404);
+        }
+
+        if ($finished !== null) {
+            if (!$finished && $test->getFinishedAt() !== null) {
+                $this->finalizePostError($this->translator->translate('locale.test.error.alreadyFinished'));
+            }
+            if ($finished && $test->getFinishedAt() === null) {
+                $this->finalizePostError($this->translator->translate('locale.test.error.notYetFinished'));
+            }
+        }
+
+        return $test;
+    }
 
     /**
      * Return enrolled user entity based on the presenter's parameters.
@@ -62,13 +91,26 @@ final class TestPresenter extends AuthenticatedPresenter
     }
 
     /**
+     * Get the question entity based on the presenter's parameters. Terminate if no question is selected.
+     * @return Question
+     */
+    private function getSelectedQuestion(): Question
+    {
+        $question = $this->question ? $this->questions->get($this->question) : null;
+        if (!$question) {
+            $this->finalizePostError("Unable to proceed since no question is selected.");
+        }
+        return $question;
+    }
+
+    /**
      * Get an index of "selected" question. If the question is selected explicitly by a query parameter,
      * or the index of the first question that do not have an answer.
      * @param array $questions all question of enrolled user for selected test
      * @param bool $testFinished if true, it targets first answered question instead (to better display results)
      * @return int index of the selected question, count($questions) of no question is selected
      */
-    private function getSelectedQuestion(array $questions, bool $testFinished): int
+    private function getSelectedQuestionIndex(array $questions, bool $testFinished): int
     {
         $res = count($questions);
         foreach ($questions as $idx => $question) {
@@ -88,7 +130,7 @@ final class TestPresenter extends AuthenticatedPresenter
     }
 
     /**
-     * Automatically invoked permissions check for the Default action.
+     * Automatically invoked permissions check for the Default action (and its signals).
      * @return bool true if the user has access to display default view
      */
     public function checkDefault(string $id): bool
@@ -122,25 +164,14 @@ final class TestPresenter extends AuthenticatedPresenter
      */
     public function handleSave(string $id): void
     {
-        $test = $this->testTerms->get($id);
-        if (!$test) {
-            $this->error("Test $id does not exist.", 404);
-        }
-
-        if ($test->getFinishedAt()) {
-            $this->finalizePostError($this->translator->translate('locale.test.error.alreadyFinished'));
-        }
+        $this->getTest($id, false); // false = test must not be finished yet
 
         $enrolledUser = $this->enrolledUsers->findOneBy(['test' => $id, 'user' => $this->user->getId()]);
         if (!$enrolledUser || $enrolledUser->isLocked()) {
             $this->finalizePostError($this->translator->translate('locale.test.error.locked'));
         }
 
-        // find the question to which the answer belongs to
-        if (!$this->question || !$this->questions->get($this->question)) {
-            $this->finalizePostError("Unable to save the answer when no question is selected.");
-        }
-        $question = $this->questions->get($this->question);
+        $question = $this->getSelectedQuestion();
         $questionData = $question->getQuestion($this->questionFactory);
 
         // get the answer and validate it
@@ -166,11 +197,7 @@ final class TestPresenter extends AuthenticatedPresenter
      */
     public function handleLockSelf(string $id): void
     {
-        $test = $this->testTerms->get($id);
-        if (!$test) {
-            $this->error("Test $id does not exist.", 404);
-        }
-
+        $test = $this->getTest($id);
         if (!$test->getFinishedAt()) {
             $enrolledUser = $this->enrolledUsers->findOneBy(['test' => $id, 'user' => $this->user->getId()]);
             if ($enrolledUser && !$enrolledUser->isLocked()) {
@@ -184,45 +211,44 @@ final class TestPresenter extends AuthenticatedPresenter
     }
 
     /**
-     * Handle the points override button.
+     * Handle the manual grading form submit.
      */
-    public function handlePointsOverride(string $id, bool $override): void
+    public function handlePointsOverride(string $id): void
     {
         if ($this->user->getRole() === User::ROLE_STUDENT) {
             $this->error("The user does not have sufficient privileges to perform this operation.", 403);
         }
 
-        $test = $this->testTerms->get($id);
-        if (!$test) {
-            $this->error("Test $id does not exist.", 404);
-        }
+        $this->getTest($id, true); // true = test must be finished
 
-        if (!$test->getFinishedAt()) {
-            $this->finalizePostError("The test is not finished yet!");
-        }
-
-        // find the question to which the answer belongs to
-        if (!$this->question || !$this->questions->get($this->question)) {
-            $this->finalizePostError("Unable to override points when no question is selected.");
-        }
-        $question = $this->questions->get($this->question);
-        if ($question->getLastAnswer() === null) {
+        // find the question and the answer being graded
+        $question = $this->getSelectedQuestion();
+        $answer = $question->getLastAnswer();
+        if ($answer === null) {
             $this->finalizePostError("Cannot override question with no answer.");
         }
-        $answer = $question->getLastAnswer();
 
         $enrolledUser = $this->getEnrolledUser($id);
         if (!$enrolledUser) {
             $this->finalizePostError("The enrolled user record is missing!");
         }
 
-        $oldValue = $answer->getPoints();
-        $newValue = $override ? $question->getPoints() : 0;
-        $answer->setPoints($newValue);
+        // get form data
+        $req = $this->getRequest();
+        $pointsOverride = trim($req->getPost('pointsOverride'));
+        if ($pointsOverride !== '' && !is_numeric($pointsOverride)) {
+            $this->finalizePostError("Invalid points override value.");
+        }
+
+        $publicComment = trim($req->getPost('publicComment'));
+        $privateComment = trim($req->getPost('privateComment'));
+
+        $answer->setPoints($pointsOverride !== '' ? (int)$pointsOverride : null, false); // false = not the auto-points
+        $answer->setPublicComment($publicComment);
+        $answer->setPrivateComment($privateComment);
         $this->answers->persist($answer);
 
-        $enrolledUser->setScore($enrolledUser->getScore() + $newValue - $oldValue);
-        $this->enrolledUsers->persist($enrolledUser);
+        $this->testOrchestrator->updateScore($enrolledUser);
 
         $this->finalizePost($this->link('default', ['id' => $id, 'question' => $this->question]));
     }
@@ -254,7 +280,7 @@ final class TestPresenter extends AuthenticatedPresenter
 
         if ($test->getStartedAt() !== null) {
             $questions = $enrolledUser->getQuestions()->toArray();
-            $selectedQuestionIdx = $this->getSelectedQuestion($questions, $test->getFinishedAt() !== null);
+            $selectedQuestionIdx = $this->getSelectedQuestionIndex($questions, $test->getFinishedAt() !== null);
 
             $this->template->questions = $questions;
             $this->template->selectedQuestionIdx = $selectedQuestionIdx;

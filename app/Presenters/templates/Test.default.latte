@@ -1,5 +1,9 @@
 {block content}
 
+
+{*
+ * Test and student information (header)
+ *}
 <h1>
   <i class="fa-solid fa-list-check fa-fw text-muted"></i>
   {_locale.test.title}:
@@ -18,6 +22,10 @@
 </h4>
 {/if}
 
+
+{*
+ * Additional test info (supervisors, start/finish time, student's points)
+ *}
 <span class="d-inline-block me-4">
   <span class="text-muted">{_locale.test.supervisors}:</span>
   {foreach $test->getSupervisors() as $supervisor}{$supervisor->getFirstName()} {$supervisor->getLastName()}{sep}, {/sep}{/foreach}
@@ -45,6 +53,10 @@
 
 
 {if $test->getStartedAt() !== null}
+
+  {*
+   * Navigation between questions
+   *}
   <nav class="my-3">
     <ul class="pagination">
       <li class="page-item {$selectedQuestionIdx === 0 ? 'disabled'}">
@@ -77,10 +89,13 @@
 
   <hr>
 
+  {*
+   * Question number and caption
+   *}
   <h3 class="mb-3">
     {block title}
       {if $selectedQuestionIdx < count($questions)}
-        {_locale.test.question} #{$selectedQuestion->getOrdering()}
+        <i class="fa-regular fa-circle-question me-2 opacity-50"></i>{_locale.test.question} #{$selectedQuestion->getOrdering()}
       {else}
         {_locale.test.completed.title}
       {/if}
@@ -99,11 +114,18 @@
     {/if}
   </h3>
 
-  {if $selectedQuestionIdx < count($questions)}
 
+  {if $selectedQuestionIdx < count($questions)}
+    {*
+     * Question text (with markdown)
+     *}
     <div class="bg-light border p-3 my-3 rounded">{$questionText|markdown}</div>
 
     {if $readonly}
+
+      {*
+       * Question correctness information
+       *}
       {if $test->getFinishedAt() !== null}
         {if $answer === null}
           <div class="border rounded border-secondary text-muted p-2 my-2"><i class="fa-regular fa-circle-xmark fa-fw"></i> {_locale.test.answer.missing}</div>
@@ -121,7 +143,23 @@
       {/if}
 
       {$questionResult|noescape}
+
+      <div n:if="$test->getFinishedAt() !== null && $answer?->getPublicComment() && !$isSupervisor" class="card mt-3">
+        <div class="card-header">
+          <i class="fa-solid fa-user-graduate opacity-50 me-2"></i>{_locale.test.studentFeedbackTitle}:
+          <small n:if="$answer->getPoints() !== $answer->getAutoPoints()" class="float-end text-secondary opacity-75">
+            {if $answer->getAutoPoints() !== null}{_locale.test.teacherChangedPoints}{else}{_locale.test.teacherSetPoints}{/if}
+            &nbsp;
+            {$answer->getAutoPoints()} <i class="fa-solid fa-right-long"></i> {$answer->getPoints()}
+          </small>
+        </div>
+        <div class="card-body">{$answer->getPublicComment()|markdown}</div>
+      </div>
     {else}
+
+      {*
+       * Question form (rendered separately, injected) with submit button
+       *}
       <form action="{link Save! question: $selectedQuestion->getId()}" method="POST" data-ajax data-ajax-button="saveButton">
         <input type="hidden" name="nextQuestion" value="{$nextQuestion?->getId()}">
 
@@ -146,12 +184,21 @@
       </form>
     {/if}
 
+
+    {*
+     * Correct answer hint for teachers
+     *}
     {if !empty($correctAnswer)}
     <button class="btn btn-outline-danger btn-sm mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#correctAnswer"
       aria-expanded="false" aria-controls="collapseExample">
-      <i class="fa-solid fa-circle-chevron-down me-1 toggle-expanded"></i>
-      <i class="fa-solid fa-circle-chevron-right me-1 toggle-collapsed"></i>
-      {_locale.test.correctAnswerButton}
+      <span class="toggle-expanded">
+        <i class="fa-solid fa-circle-chevron-down me-1"></i>
+        {_locale.test.correctAnswerButtonExpanded}
+      </span>
+      <span class="toggle-collapsed">
+        <i class="fa-solid fa-circle-chevron-right me-1"></i>
+        {_locale.test.correctAnswerButtonCollapsed}
+      </span>
     </button>
     <div class="collapse" id="correctAnswer">
       <div class="card card-body mt-2">
@@ -160,21 +207,62 @@
     </div>
     {/if}
 
-    {if $test->getFinishedAt() !== null && $answer && !$answerCorrect && $isSupervisor}
-      {if $answer->getPoints() === 0}
-        <a class="btn btn-success btn-sm mt-3" n:href="PointsOverride! question: $selectedQuestion->getId(), override: true" data-ajax="POST">
-          <i class="fa-solid fa-diagram-next fa-fw"></i>
-          {_locale.test.overridePoints}
-        </a>
-      {else}
-        <a class="btn btn-danger btn-sm mt-3" n:href="PointsOverride! question: $selectedQuestion->getId(), override: false" data-ajax="POST">
-          <i class="fa-solid fa-ban fa-fw"></i>
-          {_locale.test.cancelOverride}
-        </a>
-      {/if}
-    {/if}
+
+    {*
+     * Grading comments and points override
+     *}
+    <div n:if="$test->getFinishedAt() !== null && $answer && $isSupervisor" class="card card-body mt-2">
+      <form action="{link PointsOverride! question: $selectedQuestion->getId()}" method="POST" data-ajax data-ajax-button="gradingButton">
+
+      <div class="container mb-3">
+        <div class="row">
+          <div class="col">
+            <label class="form-label mt-2">
+              {_locale.test.studentFeedbackText}:
+              <i class="fa-brands fa-markdown ms-2 opacity-50" title="Markdown"></i>
+            </label>
+            <textarea name="publicComment" class="form-control" rows="4">{$answer->getPublicComment() ?? ''}</textarea>
+          </div>
+          <div class="col">
+            <label class="form-label mt-2">
+              {_locale.test.hiddenTeachersNote}:
+              <i class="fa-brands fa-markdown ms-2 opacity-50" title="Markdown"></i>
+            </label>
+            <textarea name="privateComment" class="form-control" rows="4">{$answer->getPrivateComment() ?? ''}</textarea>
+          </div>
+        </div>
+
+        <div class="row align-items-end mt-1">
+          <div class="col">
+            <label for="pointsOverride" class="form-label mt-2">
+              {if $answer->getAutoPoints() !== null}
+                {_locale.test.manualGrading.titleOverride} [{$answer->getAutoPoints()}]:
+              {else}
+                {_locale.test.manualGrading.title}:
+              {/if}
+            </label>
+            <input type="text" class="form-control" id="pointsOverride" name="pointsOverride" maxlength="10"
+              value="{$answer->getPoints() !== null ? (int)$answer->getPoints() : ''}"
+            >
+          </div>
+
+          <div class="col text-end">
+            <button class="btn btn-success mt-4" id="gradingButton" type="submit">
+              <i class="fa-solid fa-diagram-next fa-fw me-1"></i>
+              {_locale.test.manualGrading.SaveGrading}:
+            </button>
+          </div>
+        </div>
+      </div>
+
+      </form>
+    </div>
 
   {else}
+
+    {*
+     * Last page -- show test completion message and points-to-grade mapping
+     *}
     <p>
       {if $enrolledUser->isLocked()}
         {_locale.test.completed.message1Locked}
@@ -213,6 +301,38 @@
     </ul>
   {/if}
 
+
 {else}
+
+  {*
+   * Test has not started yet
+   *}
   <p class="my-4"><i class="fa-solid fa-triangle-exclamation fa-fw text-warning"></i> {_locale.test.hasNotStartedYet}</div>
+
+{/if}
+
+
+
+{*
+ * Validation scripts for points override input
+ *}
+{if $test->getFinishedAt() !== null && $answer && $isSupervisor}
+<script type="text/javascript">
+$(() => {
+    const pointsOverride = $("#pointsOverride");
+    const validatePoints = () => {
+        pointsOverride.removeClass('is-valid').removeClass('is-invalid');
+        $("#gradingButton").prop('disabled', false);
+
+        const value = pointsOverride.val();
+        if (value !== '' && !value.trim().match(/^(-?[0-9]+)$/)) {
+            pointsOverride.addClass('is-invalid');
+            $("#gradingButton").prop('disabled', true);
+        }
+    };
+
+    pointsOverride.on('input', validatePoints);
+    validate();
+});
+</script>
 {/if}

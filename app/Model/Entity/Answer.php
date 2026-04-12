@@ -142,7 +142,7 @@ class Answer
         return $this->autoPoints;
     }
 
-    public function setPoints(int $points, bool $auto = true): void
+    public function setPoints(?int $points, bool $auto = true): void
     {
         if ($this->evaluatedAt === null) {
             $this->evaluatedAt = new DateTime();

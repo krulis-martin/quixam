@@ -125,7 +125,7 @@ final class QuestionMulti extends BaseChoiceQuestion
         return true;
     }
 
-    public function isAnswerCorrect($answer): ?bool
+    public function isAnswerCorrect($answer): bool
     {
         if (!is_array($answer) || count($answer) !== count($this->correct)) {
             return false;

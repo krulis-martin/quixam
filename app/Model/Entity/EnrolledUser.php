@@ -123,7 +123,7 @@ class EnrolledUser
         return $this->score !== null && $this->maxScore !== null;
     }
 
-    public function setScore(int $score): void
+    public function setScore(?int $score): void
     {
         $this->score = $score;
     }
