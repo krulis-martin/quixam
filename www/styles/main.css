@@ -88,8 +88,13 @@ div.divisor > span {
     padding: 0 1rem 0.1rem;
 }
 
+textarea.form-control[name="answer"] {
+    height: calc(100vh - 36rem);
+    min-height: 6rem;
+}
+
 /*
- * Bootstrap overrided
+ * Bootstrap overrides
  */
 nav.navbar {
     background-color: #ffee99;
@@ -123,6 +128,14 @@ a.navbar-brand {
 
 a.navbar-brand > span {
     transform: translate(0, -2px);
+}
+
+*[data-bs-toggle=collapse][aria-expanded=false] .toggle-expanded {
+    display: none;
+}
+
+*[data-bs-toggle=collapse][aria-expanded=true] .toggle-collapsed {
+    display: none;
 }
 
 /*

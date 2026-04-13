@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helpers\Questions;
 
-use App\Helpers\IQuestion;
 use App\Helpers\QuestionException;
-use App\Helpers\Random;
-use Nette\Schema\Expect;
 use Latte\Engine;
 use Exception;
 
@@ -61,25 +58,25 @@ final class QuestionMulti extends BaseChoiceQuestion
     }
 
     /**
-     * Helper wrapper function for rendering multi-choice template. Prepares common paramters.
+     * Helper wrapper function for rendering multi-choice template. Prepares common parameters.
      * @param Engine $latte engine for rendering latte templates (separately from the presenters)
      * @param string $locale selected locale
      * @param mixed $answer deserialized json structure sent over by the client
      *                      if not null, it will be used to pre-fill the last selected answer
      * @param array $params common parameters for the template
-     * @return string raw HTML fragment which is pasted without excaping into the output
+     * @return string raw HTML fragment which is pasted without escaping into the output
      */
-    private function renderMultiChoicesTeplate(Engine $latte, string $locale, $answer, array $params = []): string
+    private function renderMultiChoicesTemplate(Engine $latte, string $locale, $answer, array $params = []): string
     {
         $params['type'] = 'checkbox';
         $params['locale'] = $locale;
         $params['answers'] = $answer !== null ? $answer : [];
-        return $this->renderChoicesTeplate($latte, $params);
+        return $this->renderChoicesTemplate($latte, $params);
     }
 
     public function renderFormContent(Engine $latte, string $locale, $answer = null): string
     {
-        return $this->renderMultiChoicesTeplate($latte, $locale, $answer);
+        return $this->renderMultiChoicesTemplate($latte, $locale, $answer);
     }
 
     public function renderResultContent(
@@ -88,8 +85,8 @@ final class QuestionMulti extends BaseChoiceQuestion
         $answer = null,
         ?bool $answerIsCorrect = null
     ): string {
-        $params = [ 'graded' => $answerIsCorrect === null ? 'muted' : ($answerIsCorrect ? 'success' : 'danger') ];
-        return $this->renderMultiChoicesTeplate($latte, $locale, $answer, $params);
+        $params = ['graded' => $answerIsCorrect === null ? 'muted' : ($answerIsCorrect ? 'success' : 'danger')];
+        return $this->renderMultiChoicesTemplate($latte, $locale, $answer, $params);
     }
 
     public function processAnswerSubmit(array $postData)

@@ -1,0 +1,53 @@
+{if !empty($correctSample)}
+    {if $answer}
+        <h5>{_locale.templateQuestion.text.correctAnswerExample}:</h5>
+        <div class="bg-success-subtle border p-3 my-2 rounded">{$answer|markdown}</div>
+    {else}
+        <div class="border p-3 mt-4 rounded text-secondary opacity-50">
+            <i class="fa-solid fa-ban me-2"></i>
+            {_locale.templateQuestion.text.noCorrectAnswerExample}
+        </div>
+    {/if}
+{elseif !empty($graded)}
+    <div id="answerText" class="mt-4">
+        <span>{_locale.app.Answer}:</span>
+        <button type="button" class="btn btn-outline-primary btn-sm float-end">
+            <i class="fa-solid fa-toggle-off me-2"></i>{_locale.templateQuestion.text.MarkdownDisabled}
+        </button>
+        <pre class="bg-{$graded}-subtle border p-3 my-3 rounded">{$answer}</pre>
+    </div>
+    <div id="answerMarkdown" class="mt-4" style="display: none;">
+        <span>{_locale.app.Answer}:</span>
+        <button type="button" class="btn btn-outline-primary btn-sm float-end">
+            <i class="fa-solid fa-toggle-on me-2"></i>{_locale.templateQuestion.text.MarkdownEnabled}
+        </button>
+        <div class="bg-{$graded}-subtle border p-3 my-3 rounded">{$answer|markdown}</div>
+    </div>
+{else}
+    <textarea name="answer" class="form-control" rows="5" n:attr="maxlength: $maxLength">{$answer}</textarea>
+{/if}
+
+
+<script type="text/javascript">
+$(() => {
+    const textarea = $("textarea[name='answer']");
+    if (textarea.length > 0) {
+        const validate = () => {
+            $("#saveButton").prop('disabled', textarea.val().trim().length == 0);
+        }
+
+        textarea.on('input', validate);
+        validate();
+    }
+
+    $("#answerText button").click(() => {
+        $("#answerText").hide();
+        $("#answerMarkdown").show();
+    });
+
+    $("#answerMarkdown button").click(() => {
+        $("#answerMarkdown").hide();
+        $("#answerText").show();
+    });
+});
+</script>

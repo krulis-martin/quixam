@@ -18,6 +18,10 @@
   {$question->getQuestionsGroup()->getPoints()}
 </span>
 <span class="d-inline-block me-4">
+  <span class="text-muted">{_locale.templateQuestion.count}:</span>
+  {$question->getQuestionsGroup()->getSelectCount()}
+</span>
+<span class="d-inline-block me-4">
   <span class="text-muted">{_locale.templateQuestion.createdAt}:</span>
   {$question->getCreatedAt()|ldate}
 </span>
@@ -43,6 +47,7 @@
   {_locale.templateQuestion.disabledInfo}
 </div>
 
+{if $useRandomSeed}
 <table class="mt-4">
   <tr>
     <th class="align-baseline pe-3 text-muted">{_locale.templateQuestion.randomSeed}:</th>
@@ -57,10 +62,12 @@
     </td>
   </tr>
 </table>
+{/if}
 
 <div class="bg-light border p-3 my-3 rounded">{$text|markdown}</div>
 {$result|noescape}
 
+{if $useRandomSeed}
 <script type="text/javascript">
 $(() => {
     const baseUrl = $("#seedForm").attr("action");
@@ -82,3 +89,4 @@ $(() => {
     $("#seedForm").submit(ev => ev.preventDefault());
 });
 </script>
+{/if}

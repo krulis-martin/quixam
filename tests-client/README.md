@@ -44,12 +44,13 @@ The structure of the test template `.yaml` file is as follows:
 ```yaml
 id: <template's-external-id>
 groups:
-  <group-name-1>: <count>
-  <group-name-2>: <count>
-  ...
+  <group-name-1>:
+    points: <points-for-each-question-in-this-group>
+    count: <number-of-questions-to-be-selected-from-this-group>
+  <group-name-2>: ...
 ```
 
-The `<group-name-X>` values are the identifiers of the groups, and they must match precisely the directory names, which must be located in the same directory as the `.yaml` file. The `<count>` values specify how many questions from the group will be used in the test (when a test instance is generated from the template). The number should be a positive integer that does not exceed the number of questions (i.e., files) in the group.
+The `<group-name-X>` values are the identifiers of the groups, and they must match precisely the directory names, which must be located in the same directory as the `.yaml` file. The `points` specifies, how many points each question in the group is worth. The `count` values specify how many questions from the group will be used in the test (when a test instance is generated from the template). The number should be a positive integer that does not exceed the number of questions (i.e., files) in the group. If the `count` is missing, it defaults to 1.
 
 ## Test terms
 

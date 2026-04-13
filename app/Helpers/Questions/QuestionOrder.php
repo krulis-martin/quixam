@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Helpers\Questions;
 
-use App\Helpers\IQuestion;
 use App\Helpers\QuestionException;
 use App\Helpers\Random;
 use Nette\Schema\Expect;
@@ -67,7 +66,7 @@ final class QuestionOrder extends BaseQuestion
         ?int $correctOrder,
         bool $mandatory = false,
         bool $preselected = false,
-        string $group = null
+        ?string $group = null
     ): QuestionOrderItem {
         $item = new QuestionOrderItem($text, $correctOrder, $mandatory, $preselected, $group);
         $this->items[] = $item;
@@ -125,7 +124,7 @@ final class QuestionOrder extends BaseQuestion
     }
 
     /**
-     * Helper function that splits items into groups (free items are pleace in single-item groups).
+     * Helper function that splits items into groups (free items are placed in single-item groups).
      * @return array[] array of groups, each group is an array of items
      */
     private static function splitInGroups(array $items): array

@@ -6,7 +6,6 @@ namespace App\Helpers\Questions;
 
 use Nette\Schema\Expect;
 use Nette\SmartObject;
-use Exception;
 use JsonSerializable;
 
 /**

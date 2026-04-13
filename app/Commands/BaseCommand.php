@@ -65,8 +65,8 @@ class BaseCommand extends Command
     }
 
     /**
-     * Perform a select inquery so the user chooses from given options.
-     * @param string $text of the inquery
+     * Perform a select inquiry so the user chooses from given options.
+     * @param string $text of the inquiry
      * @param array $options to choose from
      * @param callable|null $renderer explicit to-string converter for options
      * @return mixed selected option value
@@ -83,7 +83,7 @@ class BaseCommand extends Command
 
         if ($this->nonInteractive) {
             throw new RuntimeException(
-                "Unable preform the '$text' inquery in non-interactive mode. Operation aborted."
+                "Unable preform the '$text' inquiry in non-interactive mode. Operation aborted."
             );
         }
 
@@ -96,7 +96,7 @@ class BaseCommand extends Command
             $translateBack[$key] = $option;
         }
 
-        // make the inquery
+        // make the inquiry
         QuestionHelper::disableStty();
         /** @var QuestionHelper */
         $helper = $this->getHelper('question');

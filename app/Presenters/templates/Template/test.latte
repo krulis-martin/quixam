@@ -23,7 +23,8 @@
         <code>{$group->getExternalId()}</code>
       </th>
       <td colspan="2" class="text-end text-muted">
-        {_locale.template.points}: {$group->getPoints()}
+        <span class="me-3">{_locale.template.points}: {$group->getPoints()}</span>
+        <span>{_locale.template.count}: {$group->getSelectCount()}</span>
       </td>
     </tr>
     <tr n:foreach="$group->getQuestions() as $question">
@@ -37,6 +38,8 @@
           <i class="fa-solid fa-hashtag fa-fw text-muted" title="{_locale.template.type.numeric}"></i>
         {elseif $question->getType() === 'order'}
           <i class="fa-solid fa-arrow-down-short-wide fa-fw text-muted" title="{_locale.template.type.order}"></i>
+        {elseif $question->getType() === 'text'}
+          <i class="fa-solid fa-font fa-fw text-muted" title="{_locale.template.type.text}"></i>
         {elseif $question->getType() === ''}
           <i class="fa-solid fa-gears fa-fw text-muted" title="{_locale.template.type.generated}"></i>
         {else}

@@ -6,12 +6,9 @@ namespace App\Presenters;
 
 use App\Model\Repository\TemplateTests;
 use App\Model\Repository\TemplateQuestions;
-use App\Model\Entity\TemplateTest;
 use App\Model\Entity\TemplateQuestion;
 use App\Model\Entity\User;
 use App\Helpers\TestOrchestrator;
-use Nette;
-use Nette\Application\UI\Form;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
 
 final class TemplatePresenter extends AuthenticatedPresenter
@@ -95,12 +92,11 @@ final class TemplatePresenter extends AuthenticatedPresenter
         $engine = $this->latteFactory->create();
 
         $this->template->text = $questionData->getText($this->selectedLocale);
-        $this->template->result = $questionData->renderResultContent(
+        $this->template->result = $questionData->renderCorrectContent(
             $engine,
             $this->selectedLocale,
-            $questionData->getCorrectAnswer(),
-            true
         );
+        $this->template->useRandomSeed = $questionData->useRandomSeed();
 
         if ($question->getDeletedAt()) {
             $this->template->currentQuestion = $this->getCurrentQuestion($question);

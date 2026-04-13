@@ -6,11 +6,13 @@ services:
   - App\Security\AccessTokenManager(%accessTokens%)
   - App\Helpers\LatteDateFilter
   - App\Helpers\MarkdownFilter
+  - App\Helpers\FunctionsExtension
 
   nette.latteFactory:
     setup:
       - addFilter(ldate, @App\Helpers\LatteDateFilter)
       - addFilter(markdown, @App\Helpers\MarkdownFilter)
+      - addExtension(@App\Helpers\FunctionsExtension)
 
   - App\Helpers\TestOrchestrator
   - App\Helpers\QuestionFactory([
@@ -18,6 +20,7 @@ services:
       multi: App\Helpers\Questions\QuestionMulti,
       numeric: App\Helpers\Questions\QuestionNumeric,
       order: App\Helpers\Questions\QuestionOrder,
+      text: App\Helpers\Questions\QuestionText,
     ])
   - App\Helpers\TemplatesActions
 
