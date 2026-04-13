@@ -35,7 +35,7 @@ class Answer
 
     /**
      * The answer is JSON encoded and question-type specific.
-     * @ORM\Column(type="text", length=65535)
+     * @ORM\Column(type="text", length=65535, nullable=true)
      */
     protected $answer;
 
@@ -94,7 +94,7 @@ class Answer
     {
         $this->createdAt = new DateTime();
         $this->question = $question;
-        $this->answer = json_encode($answer);
+        $this->answer = $answer !== null ? json_encode($answer) : null;
         $this->ipAddress = $ipAddress;
     }
 
@@ -114,7 +114,12 @@ class Answer
 
     public function getAnswer()
     {
-        return json_decode($this->answer, true);
+        return $this->answer !== null ? json_decode($this->answer, true) : null;
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->answer === null;
     }
 
     public function isEvaluated(): bool

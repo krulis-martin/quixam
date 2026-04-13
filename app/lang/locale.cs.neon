@@ -221,6 +221,7 @@ templateQuestion.text.correctAnswerExample: "Příklad správné odpovědi"
 templateQuestion.text.noCorrectAnswerExample: "Pro tuto předlohu otázky není poskytnut žádný příklad správné odpovědi."
 templateQuestion.text.MarkdownDisabled: "Markdown vypnut"
 templateQuestion.text.MarkdownEnabled: "Markdown zapnut"
+templateQuestion.text.noAnswerGiven: "Žádná odpověď nebyla vložena."
 
 error.4xx.title: "Ooops..."
 error.4xx.description: "Váš prohlížeč poslal požadavek, kterému nerozumíme a neumíme jej zpracovat."

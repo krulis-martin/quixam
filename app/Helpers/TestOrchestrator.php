@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
+use App\Model\Entity\Answer;
 use App\Model\Entity\EnrolledUser;
 use App\Model\Entity\Question;
 use App\Model\Entity\TemplateQuestion;
@@ -126,25 +127,32 @@ class TestOrchestrator
         // evaluate individual questions
         $questions = $this->questions->getQuestionsOfTest($test);
         foreach ($questions as $question) {
-            $answer = $question->getLastAnswer();
             $enrolledId = $question->getEnrolledUser()->getId();
-            if ($answer) {
-                // find out whether the answer is correct...
-                $questionData = $question->getQuestion($this->questionFactory);
-                $correct = $questionData->isAnswerCorrect($answer->getAnswer());
+            $answer = $question->getLastAnswer();
+            if (!$answer) {
+                // make sure answer entity exist for every question and enrolled user
+                $answer = new Answer($question, null); // null = empty answer (placeholder)
+            }
 
-                if ($correct !== null) { // null = not graded automatically
-                    $answer->setPoints($correct ? $question->getPoints() : 0);
+            // find out whether the answer is correct...
+            $questionData = $question->getQuestion($this->questionFactory);
+            $correct = $questionData->isAnswerCorrect($answer->getAnswer());
 
-                    // update score for the enrolled user, skip if the grading is not complete (null)
-                    if ($scores[$enrolledId] !== null) {
-                        $scores[$enrolledId] += $answer->getPoints();
-                    }
-                } else {
-                    $scores[$enrolledId] = null;
+            if ($correct !== null) { // null = not graded automatically
+                $answer->setPoints($correct ? $question->getPoints() : 0);
+
+                // update score for the enrolled user, skip if the grading is not complete (null)
+                if ($scores[$enrolledId] !== null) {
+                    $scores[$enrolledId] += $answer->getPoints();
                 }
+            } else {
+                $scores[$enrolledId] = null;
+            }
 
-                $this->answers->persist($answer);
+            $this->answers->persist($answer);
+            if ($question->getLastAnswer() === null) {
+                $question->setLastAnswer($answer);
+                $this->questions->persist($question);
             }
         }
 

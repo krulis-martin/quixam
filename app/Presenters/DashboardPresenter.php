@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace App\Presenters;
 
 use App\Model\Entity\EnrolledUser;
-use App\Model\Entity\EnrollmentRegistration;
 use App\Model\Entity\TestTerm;
 use App\Model\Entity\User;
 use App\Model\Repository\EnrolledUsers;
 use App\Model\Repository\EnrollmentRegistrations;
 use App\Model\Repository\TestTerms;
 use App\Helpers\TestOrchestrator;
-use Nette;
 use Tracy\ILogger;
 use Exception;
 

@@ -221,6 +221,7 @@ templateQuestion.text.correctAnswerExample: "Example of correct answer"
 templateQuestion.text.noCorrectAnswerExample: "No example of correct answer is provided for this question template."
 templateQuestion.text.MarkdownDisabled: "Markdown off"
 templateQuestion.text.MarkdownEnabled: "Markdown on"
+templateQuestion.text.noAnswerGiven: "No answer given."
 
 error.4xx.title: "Ooops..."
 error.4xx.description: "Your browser sent a request that this server could not understand or process."
