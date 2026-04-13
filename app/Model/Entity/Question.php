@@ -72,7 +72,7 @@ class Question
     /**
      * Maximal points awarded for this question (copied from the template group).
      * Negative value means negative grading (counting mistakes instead of successes);
-     * negative grading may be also dependent on the question type.
+     * negative points are calculated per mistake (number of mistakes is determined by the question processor).
      * @ORM\Column(type="integer")
      */
     protected $points;

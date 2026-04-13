@@ -294,7 +294,7 @@ final class TestPresenter extends AuthenticatedPresenter
                 // render the answer/form
                 $engine = $this->latteFactory->create();
                 $answer = $selectedQuestion->getLastAnswer();
-                $answerData = $answer ? $answer->getAnswer() : null;
+                $answerData = $answer?->getAnswer();
                 $this->template->answer = $answer;
                 if (!$this->template->readonly) {
                     // still open -> show form
