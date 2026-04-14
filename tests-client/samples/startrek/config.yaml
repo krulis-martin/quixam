@@ -1,8 +1,17 @@
 id: startrek
 groups:
-  names:
+  episodes:
     points: 1
     count: 1
+  names:
+    points: 2
+    count: 2
   open:
     points: 3
+    count: 1
+  technical:
+    points: 3
+    count: 1
+  warp:
+    points: 5
     count: 1

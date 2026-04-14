@@ -225,14 +225,9 @@ class Adapter
             $mandatory += ($item['mandatory'] ?? false) ? 1 : 0;
         }
 
-        if ($min < 1 || $max > $min || $max > $count) {
+        if ($min < 1 || $min > $max || $max > $count) {
             throw new RuntimeException(
                 "Invalid min-max limits [$min,$max] of order question. They must be within [1,$count] range."
-            );
-        }
-        if ($min > $mandatory) {
-            throw new RuntimeException(
-                "At least $min items are required, but the question has only $mandatory mandatory answers."
             );
         }
         if ($max < $mandatory) {
@@ -441,7 +436,7 @@ class Adapter
         foreach ($structure as $group => $questions) {
             echo "Uploading questions of $group ...\n";
             $points = $this->groups[$group]['points'] ?? 1;
-            $pointsPerItem = (int)$this->groups[$group]['pointsPerItem'] ?? 0;
+            $pointsPerItem = (int)($this->groups[$group]['pointsPerItem'] ?? 0);
             $count = $this->groups[$group]['count'] ?? 1;
             if ($count > count($questions)) {
                 echo "Warning: group $group selects $count questions, but only " . count($questions)

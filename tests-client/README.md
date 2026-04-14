@@ -31,7 +31,7 @@ Logout is not implemented, but you can simply delete the token file.
 
 A test template instance must be created by the administrator beforehand in the database. The administrator will assign the **external ID** of the template and associate it with teachers who are the **owners**. Only owners can modify the template and add terms to it.
 
-The contents of the test template (question groups and questions) are synced using the `upload.php` script. The script takes one argument: the path to the test template `.yaml` file. The YAML file holds the main configuration (groups, points), while the individual questions are stored in individual `.md` files ([with additional custom tags](samples/README.md)). The additional files must be placed in the same directory as the `.yaml` file. Each group has a folder (with the same name as the group), and all its questions are stored there. An example of a complete test can be found in the [samples/startrek](samples/startrek) directory and can be uploaded as:
+The contents of the test template (question groups and questions) are synced using the `upload.php` script. The script takes one argument: the path to the test template `.yaml` file. The YAML file holds the main configuration (groups, points), while the individual questions are stored in individual `.md` files ([with additional custom tags](samples/README.md)) located directly in their respective group directories. The group directories must be placed in the same directory as the `.yaml` file. An example of a complete test can be found in the [samples/startrek](samples/startrek) directory and can be uploaded as:
 
 ```bash
 php ./upload.php ./samples/startrek/config.yaml
@@ -51,9 +51,9 @@ groups:
   <group-name-2>: ...
 ```
 
-The `<group-name-X>` values are the identifiers of the groups, and they must match precisely the directory names, which must be located in the same directory as the `.yaml` file. The `count` values specify how many questions from the group will be used in the test (when a test instance is generated from the template). The number should be a positive integer that does not exceed the number of questions (i.e., files) in the group. If the `count` is missing, it defaults to 1.
+The `<group-name-X>` values are the identifiers of the groups, and they must **match** precisely **the directory names**, which must be located in the same directory as the `.yaml` file. The `count` values specify how many questions from the group will be used in the test (when a test instance is generated from the template). The number should be a positive integer that does not exceed the number of questions (i.e., files) in the group. If the `count` is missing, it defaults to 1.
 
-The `points` and `pointsPerItem` are copied to each instantiated question of the group and the affect the grading as follows:
+The `points` and `pointsPerItem` are copied to each instantiated question of the group and they affect the grading as follows:
 
 - If the `pointsPerItem` is missing, null, or zero, the question is graded only as entirely correct or entirely wrong. If the `points` value is positive, the points are awarded for the correct answer. If the `points` value is negative, the points are awarded for the wrong answer (negative grading).
 - If the `pointsPerItem` is a non-zero integer, the question is graded per correct/wrong sub-item of the answer (please note, this is applicable only to some question types, like multi-choice questions). The `points` value is taken as the base/offset, and the `pointsPerItem` value is added to it for each correct item (if positive) or subtracted from it for each mistake (if negative).
