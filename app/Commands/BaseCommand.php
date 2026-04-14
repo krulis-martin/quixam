@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\Question as ConsoleQuestion;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use RuntimeException;
 
@@ -119,7 +119,7 @@ class BaseCommand extends Command
     {
         /** @var QuestionHelper */
         $helper = $this->getHelper('question');
-        $question = new Question($text, $default);
+        $question = new ConsoleQuestion($text, $default);
         if ($hidden) {
             $question->setHidden(true);
             $question->setHiddenFallback(false);

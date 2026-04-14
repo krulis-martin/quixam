@@ -87,7 +87,7 @@ class Parser
      * Tag-name invoked methods
      */
 
-    private function processTagQuestion(TextFile $file, Question $question, $params): void
+    private function processTagQuestion(TextFile $file, ParsedQuestion $question, $params): void
     {
         $paramTokens = preg_split('/\s+/', trim($params));
         $type = array_shift($paramTokens);
@@ -95,7 +95,7 @@ class Parser
         $file->next();
     }
 
-    private function processTagCorrect(TextFile $file, Question $question, $params): void
+    private function processTagCorrect(TextFile $file, ParsedQuestion $question, $params): void
     {
         $file->next(); // consume the opening tag
 
@@ -116,7 +116,7 @@ class Parser
         }
     }
 
-    private function processTagWrong(TextFile $file, Question $question, $params)
+    private function processTagWrong(TextFile $file, ParsedQuestion $question, $params)
     {
         $file->next(); // consume the opening tag
 
@@ -125,7 +125,7 @@ class Parser
         $question->appendWrong($answer);
     }
 
-    private function processTagCode(TextFile $file, Question $question, $params): void
+    private function processTagCode(TextFile $file, ParsedQuestion $question, $params): void
     {
         $file->next(); // consume the opening tag
 
@@ -150,7 +150,7 @@ class Parser
         }
     }
 
-    private function processTagItem(TextFile $file, Question $question, $params)
+    private function processTagItem(TextFile $file, ParsedQuestion $question, $params)
     {
         $paramTokens = preg_split('/\s+/', trim($params));
         $correctOrder = null;
@@ -182,12 +182,12 @@ class Parser
     /**
      * Parse a file and fill in a new question object.
      * @param TextFile $file to be parsed
-     * @return Question|null parsed data
+     * @return ParsedQuestion|null parsed data
      */
-    public function parseFile(TextFile $file): ?Question
+    public function parseFile(TextFile $file): ?ParsedQuestion
     {
         try {
-            $question = new Question();
+            $question = new ParsedQuestion();
             $file->rewind();
             while ($file->valid()) {
                 if ($this->isTag($file, $tag, $closing, $params)) {

@@ -4,7 +4,7 @@ namespace Quixam;
 
 use Parser\Parser;
 use Parser\TextFile;
-use Parser\Question;
+use Parser\ParsedQuestion;
 use RuntimeException;
 
 /**
@@ -68,6 +68,14 @@ class Adapter
             if (array_key_exists('points', $data) && !is_numeric($data['points'])) {
                 throw new RuntimeException("Group '$group' has invalid points value '{$data['points']}'.");
             }
+            if (
+                array_key_exists('pointsPerItem', $data) && !is_numeric($data['pointsPerItem'])
+                && $data['pointsPerItem'] !== null
+            ) {
+                throw new RuntimeException(
+                    "Group '$group' has invalid pointsPerItem value '{$data['pointsPerItem']}'."
+                );
+            }
             if (array_key_exists('count', $data) && !is_numeric($data['count'])) {
                 throw new RuntimeException("Group '$group' has invalid count value '{$data['count']}'.");
             }
@@ -123,10 +131,10 @@ class Adapter
      * and one (single), or a list of (multi) correct answer(s).
      * The question is expected one mandatory parameter (number of answers).
      * The answers are encoded in correct, answers, and optionally exclusiveAnswers sections.
-     * @param Question $question parsed question data
+     * @param ParsedQuestion $question parsed question data
      * @param array $json reference to the JSON data being prepared (will be updated)
      */
-    private function prepareChoiceData(Question $question, array &$json): void
+    private function prepareChoiceData(ParsedQuestion $question, array &$json): void
     {
         if (count($question->parameters) !== 1) {
             throw new RuntimeException(
@@ -146,7 +154,7 @@ class Adapter
         if ($question->type === 'single') {
             if (count($json['correct']) !== 1) {
                 throw new RuntimeException(
-                    "Question type '$question->type' is expected to have exactly one correct answer!"
+                    "ParsedQuestion type '$question->type' is expected to have exactly one correct answer!"
                 );
             }
             $json['correct'] = reset($json['correct']);
@@ -159,10 +167,10 @@ class Adapter
     /**
      * Prepare data for numeric questions. The correct answers are encoded as question parameters.
      * No other sections (except for text) are expected for numeric questions.
-     * @param Question $question parsed question data
+     * @param ParsedQuestion $question parsed question data
      * @param array $json reference to the JSON data being prepared (will be updated)
      */
-    private function prepareNumericData(Question $question, array &$json): void
+    private function prepareNumericData(ParsedQuestion $question, array &$json): void
     {
         // numeric questions
         $json['correct'] = [];
@@ -193,17 +201,17 @@ class Adapter
      * Prepare data for the order question. The question is expected to have two numeric parameters:
      * - min number of items to be ordered (positive integer)
      * - max number of items to be ordered (positive integer)
-     * @param Question $question parsed question data
+     * @param ParsedQuestion $question parsed question data
      * @param array $json reference to the JSON data being prepared (will be updated)
      */
-    private function prepareOrderData(Question $question, array &$json): void
+    private function prepareOrderData(ParsedQuestion $question, array &$json): void
     {
         if (
             count($question->parameters) !== 2 || !is_numeric($question->parameters[0])
             || !is_numeric($question->parameters[1])
         ) {
             throw new RuntimeException(
-                "Question type '$question->type' is expected to have exactly two numeric parameters (min, max)!"
+                "ParsedQuestion type '$question->type' is expected to have exactly two numeric parameters (min, max)!"
             );
         }
         $min = $json['minCount'] = self::parseNum($question->parameters[0]);
@@ -240,10 +248,10 @@ class Adapter
      * - regular expression that the answer must match (string)
      * Optionally, it may contain one @correct section with a sample correct answer (string).
      * It must not contain any other parameters or sections.
-     * @param Question $question parsed question data
+     * @param ParsedQuestion $question parsed question data
      * @param array $json reference to the JSON data being prepared (will be updated)
      */
-    private function prepareTextData(Question $question, array &$json): void
+    private function prepareTextData(ParsedQuestion $question, array &$json): void
     {
         if (count($question->parameters) > 2) {
             throw new RuntimeException(
@@ -293,16 +301,16 @@ class Adapter
      * Converts given question object into JSON data file as expected by Quixam API.
      * This is the most essential part of the adapter which handles the necessary data conversions
      * (adapting the question file format to API format).
-     * @param Question $question the question object to be uploaded
+     * @param ParsedQuestion $question the question object to be uploaded
      * @return array containing the JSON data
      */
-    private function prepareData(Question $question): array
+    private function prepareData(ParsedQuestion $question): array
     {
         // basic checks that forbidden sections are empty
         foreach (self::FORBIDDEN_SECTIONS[$question->type] ?? [] as $key) {
             if (count($question->$key) > 0) {
                 throw new RuntimeException(
-                    "Question type '$question->type' is not expected to have any '$key' sections!"
+                    "ParsedQuestion type '$question->type' is not expected to have any '$key' sections!"
                 );
             }
         }
@@ -326,7 +334,7 @@ class Adapter
         } elseif ($question->type === 'text') {
             $this->prepareTextData($question, $json);
         } else {
-            throw new RuntimeException("Question type '$question->type' is not supported yet!");
+            throw new RuntimeException("ParsedQuestion type '$question->type' is not supported yet!");
         }
 
         return $json;
@@ -336,10 +344,10 @@ class Adapter
      * Handles the necessary data conversions and preparations and invokes the addQuestion method of the client.
      * @param string $groupId external ID of the question group
      * @param string $questionId external ID of the question
-     * @param Question $question the question object to be uploaded
+     * @param ParsedQuestion $question the question object to be uploaded
      * @throws RuntimeException if the question type is not supported or if the question data is invalid
      */
-    private function addQuestion(string $groupId, string $questionId, Question $question): void
+    private function addQuestion(string $groupId, string $questionId, ParsedQuestion $question): void
     {
         $typeMappings = [
             'single' => 'single',
@@ -433,6 +441,7 @@ class Adapter
         foreach ($structure as $group => $questions) {
             echo "Uploading questions of $group ...\n";
             $points = $this->groups[$group]['points'] ?? 1;
+            $pointsPerItem = (int)$this->groups[$group]['pointsPerItem'] ?? 0;
             $count = $this->groups[$group]['count'] ?? 1;
             if ($count > count($questions)) {
                 echo "Warning: group $group selects $count questions, but only " . count($questions)
@@ -440,7 +449,7 @@ class Adapter
                 $count = count($questions);
             }
 
-            $this->client->addGroup($this->testId, $group, $points, $count, ++$ordering);
+            $this->client->addGroup($this->testId, $group, $points, $pointsPerItem, $count, ++$ordering);
             $this->uploadGroup($group, $questions, $current[$group] ?? []);
         }
     }

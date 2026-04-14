@@ -99,6 +99,7 @@ final class RestTemplatesPresenter extends RestPresenter
      * - points: number of points awarded for each question in this group (optional)
      * - count: number of questions selected from this group (optional)
      * - ordering: an index used for sorting the groups when the test is being assembled (optional)
+     * - pointsPerItem: number of points awarded for each item in this group (optional)
      */
     public function actionAddGroup(string $id, string $groupId): void
     {
@@ -106,8 +107,9 @@ final class RestTemplatesPresenter extends RestPresenter
         $ordering = $this->getIntParam('ordering', true);
         $count = $this->getIntParam('count', true);
         $points = $this->getIntParam('points');
+        $pointsPerItem = $this->getIntParam('pointsPerItem');
 
-        $res = $this->templatesActions->addGroup($test, $groupId, $ordering, $count, $points);
+        $res = $this->templatesActions->addGroup($test, $groupId, $ordering, $count, $points, $pointsPerItem);
         $this->sendSuccessResponse([
             'created' => $res === null,
             'updated' => $res === false,
