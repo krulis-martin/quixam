@@ -70,12 +70,24 @@ class Question
     protected $ordering;
 
     /**
-     * Maximal points awarded for this question (copied from the template group).
-     * Negative value means negative grading (counting mistakes instead of successes);
-     * negative points are calculated per mistake (number of mistakes is determined by the question processor).
+     * If points per item are not null, this is the base/offset to/from the points per item are added/subtracted.
+     * Otherwise, this is the total points awarded for the question.
+     * If positive, the points are awarded for the correct answer.
+     * If negative, the points are awarded for the mistakes (negative grading).
+     * Note: this is copied value from template group entity.
      * @ORM\Column(type="integer")
      */
     protected $points;
+
+    /**
+     * Points awarded for each question sub-item. The $points value is taken as the base/offset.
+     * In the case of negative value, points per item are subtracted from the base/offset for each mistake.
+     * In the case of positive value, points per item are added to the base/offset for each correct item.
+     * If null, the question is graded only as entirely correct or entirely wrong.
+     * Note: this is copied value from template group entity.
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected $pointsPerItem = null;
 
     /**
      * Type identifier (corresponds to the question processor class).
