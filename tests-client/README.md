@@ -31,7 +31,9 @@ Logout is not implemented, but you can simply delete the token file.
 
 A test template instance must be created by the administrator beforehand in the database. The administrator will assign the **external ID** of the template and associate it with teachers who are the **owners**. Only owners can modify the template and add terms to it.
 
-The contents of the test template (question groups and questions) are synced using the `upload.php` script. The script takes one argument: the path to the test template `.yaml` file. The YAML file holds the main configuration (groups, points), while the individual questions are stored in individual `.md` files ([with additional custom tags](samples/README.md)) located directly in their respective group directories. The group directories must be placed in the same directory as the `.yaml` file. An example of a complete test can be found in the [samples/startrek](samples/startrek) directory and can be uploaded as:
+The contents of the test template (question groups and questions) are synced using the `upload.php` script. The script takes one argument: the path to the test template `.yaml` file. The YAML file holds the main configuration (groups, points), while the individual questions are stored in individual `.md` files ([with additional custom tags](samples/README.md)) located directly in their respective group directories. The group directories must be placed in the same directory as the `.yaml` file. The question files may have any valid name (ending with `.md` extension), but the _hidden_ files (starting with a dot) are ignored. This can helpful for creating common includes or snippet files (that are included by others, but should not be processed by upload script as questions).
+
+An example of a complete test can be found in the [samples/startrek](samples/startrek) directory and can be uploaded as:
 
 ```bash
 php ./upload.php ./samples/startrek/config.yaml

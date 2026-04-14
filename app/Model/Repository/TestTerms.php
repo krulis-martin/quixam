@@ -104,7 +104,7 @@ class TestTerms extends BaseSoftDeleteRepository
             ->orderBy('tt.scheduledAt');
 
         if ($testId) {
-            $qb->andWhere($qb->expr()->eq("tt.externalId", ":testId"));
+            $qb->andWhere($qb->expr()->eq("t.externalId", ":testId"));
             $qb->setParameter('testId', $testId);
         }
 
