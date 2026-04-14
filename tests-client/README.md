@@ -45,12 +45,18 @@ The structure of the test template `.yaml` file is as follows:
 id: <template's-external-id>
 groups:
   <group-name-1>:
-    points: <points-for-each-question-in-this-group>
     count: <number-of-questions-to-be-selected-from-this-group>
+    points: <points-for-each-question-in-this-group>
+    pointsPerItem: <points-per-item-for-each-question-in-this-group>
   <group-name-2>: ...
 ```
 
-The `<group-name-X>` values are the identifiers of the groups, and they must match precisely the directory names, which must be located in the same directory as the `.yaml` file. The `points` specifies, how many points each question in the group is worth. The `count` values specify how many questions from the group will be used in the test (when a test instance is generated from the template). The number should be a positive integer that does not exceed the number of questions (i.e., files) in the group. If the `count` is missing, it defaults to 1.
+The `<group-name-X>` values are the identifiers of the groups, and they must match precisely the directory names, which must be located in the same directory as the `.yaml` file. The `count` values specify how many questions from the group will be used in the test (when a test instance is generated from the template). The number should be a positive integer that does not exceed the number of questions (i.e., files) in the group. If the `count` is missing, it defaults to 1.
+
+The `points` and `pointsPerItem` are copied to each instantiated question of the group and the affect the grading as follows:
+
+- If the `pointsPerItem` is missing, null, or zero, the question is graded only as entirely correct or entirely wrong. If the `points` value is positive, the points are awarded for the correct answer. If the `points` value is negative, the points are awarded for the wrong answer (negative grading).
+- If the `pointsPerItem` is a non-zero integer, the question is graded per correct/wrong sub-item of the answer (please note, this is applicable only to some question types, like multi-choice questions). The `points` value is taken as the base/offset, and the `pointsPerItem` value is added to it for each correct item (if positive) or subtracted from it for each mistake (if negative).
 
 ## Test terms
 

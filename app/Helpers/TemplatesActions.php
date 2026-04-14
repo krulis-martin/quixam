@@ -105,6 +105,7 @@ final class TemplatesActions
      * @param int|null $ordering An index used for sorting the groups when the test is being assembled.
      * @param int|null $count Number of questions selected from this group.
      * @param int|null $points Number of points awarded for each question in this group.
+     * @param int|null $pointsPerItem Points-per-item for each question in this group.
      * @return bool|null null = group needed to be created, false = group was updated, true = no changes made
      */
     public function addGroup(
@@ -112,12 +113,14 @@ final class TemplatesActions
         string $groupId,
         ?int $ordering = null,
         ?int $count = null,
-        ?int $points = null
+        ?int $points = null,
+        ?int $pointsPerItem = null,
     ): ?bool {
         $group = $this->templateQuestionsGroups->findOneBy(['externalId' => $groupId, 'test' => $test->getId()]);
         $ordering = $ordering ?? ($group ? $group->getOrdering() : self::getMaxOrdering($test));
         $count = $count ?? ($group ? $group->getSelectCount() : 1);
         $points = $points ?? ($group ? $group->getPoints() : 1);
+        $pointsPerItem = $pointsPerItem ?? ($group ? $group->getPointsPerItem() : 0);
 
         if (
             $group
@@ -128,7 +131,7 @@ final class TemplatesActions
             return true; // no update needed, the group already has the desired values.
         }
 
-        $newGroup = new TemplateQuestionsGroup($test, $ordering, $count, $points, $groupId, $group);
+        $newGroup = new TemplateQuestionsGroup($test, $ordering, $count, $points, $pointsPerItem, $groupId, $group);
         $this->templateQuestionsGroups->persist($newGroup);
 
         if (!empty($group)) {

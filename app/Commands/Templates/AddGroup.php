@@ -105,8 +105,9 @@ class AddGroupTemplate extends BaseCommand
             $ordering = $this->getIntOption('ordering', true);
             $count = $this->getIntOption('count', true);
             $points = $this->getIntOption('points');
+            $pointsPerItem = $this->getIntOption('pointsPerItem');
 
-            $res = $this->templatesActions->addGroup($test, $groupId, $ordering, $count, $points);
+            $res = $this->templatesActions->addGroup($test, $groupId, $ordering, $count, $points, $pointsPerItem);
             if ($res === null) {
                 $output->writeln("Creating new '$groupId' template group ...");
             } elseif ($res === false) {

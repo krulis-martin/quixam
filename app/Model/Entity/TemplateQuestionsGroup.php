@@ -78,11 +78,11 @@ class TemplateQuestionsGroup
      * The $points value is taken as the base/offset.
      * In the case of negative value, points per item are subtracted from the base/offset for each mistake.
      * In the case of positive value, points per item are added to the base/offset for each correct item.
-     * If null, the question is graded only as entirely correct or entirely wrong.
+     * If zero, the question is graded only as entirely correct or entirely wrong.
      * Note: this is copied value from template group entity.
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer")
      */
-    protected $pointsPerItem = null;
+    protected $pointsPerItem;
 
     /**
      * External identification of this questions group.
@@ -95,6 +95,7 @@ class TemplateQuestionsGroup
      * @param int $ordering
      * @param int $selectCount
      * @param int $points
+     * @param int $pointsPerItem
      * @param string|null $externalId
      * @param TemplateQuestionsGroup|null $createdFrom previous instance if new instance is a replacement
      */
@@ -103,6 +104,7 @@ class TemplateQuestionsGroup
         int $ordering,
         int $selectCount = 1,
         int $points = 1,
+        int $pointsPerItem = 0,
         ?string $externalId = null,
         ?TemplateQuestionsGroup $createdFrom = null
     ) {
@@ -111,6 +113,7 @@ class TemplateQuestionsGroup
         $this->ordering = $ordering;
         $this->selectCount = $selectCount;
         $this->points = $points;
+        $this->pointsPerItem = $pointsPerItem;
         $this->externalId = $externalId;
         $this->createdFrom = $createdFrom;
         $this->questions = new ArrayCollection();
@@ -148,6 +151,11 @@ class TemplateQuestionsGroup
     public function getPoints(): int
     {
         return $this->points;
+    }
+
+    public function getPointsPerItem(): int
+    {
+        return $this->pointsPerItem;
     }
 
     public function getExternalId(): ?string

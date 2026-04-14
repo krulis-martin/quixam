@@ -277,12 +277,18 @@ final class RestApiClient implements IApiClient
         return $this->get("/rest/templates/test/{$testId}");
     }
 
-    public function addGroup(string $testId, string $groupId, int $points, int $count, int $ordering): void
-    {
+    public function addGroup(
+        string $testId,
+        string $groupId,
+        int $points,
+        int $pointsPerItem,
+        int $count,
+        int $ordering
+    ): void {
         $this->post(
             "/rest/templates/test/{$testId}/group/{$groupId}",
             [],
-            ['points' => $points, 'count' => $count, 'ordering' => $ordering]
+            ['points' => $points, 'pointsPerItem' => $pointsPerItem, 'count' => $count, 'ordering' => $ordering]
         );
     }
 

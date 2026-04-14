@@ -83,11 +83,11 @@ class Question
      * Points awarded for each question sub-item. The $points value is taken as the base/offset.
      * In the case of negative value, points per item are subtracted from the base/offset for each mistake.
      * In the case of positive value, points per item are added to the base/offset for each correct item.
-     * If null, the question is graded only as entirely correct or entirely wrong.
+     * If zero, the question is graded only as entirely correct or entirely wrong.
      * Note: this is copied value from template group entity.
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer")
      */
-    protected $pointsPerItem = null;
+    protected $pointsPerItem;
 
     /**
      * Type identifier (corresponds to the question processor class).
@@ -130,6 +130,7 @@ class Question
         $this->templateQuestion = $templateQuestion;
         $this->ordering = $ordering;
         $this->points = $templateGroup->getPoints();
+        $this->pointsPerItem = $templateGroup->getPointsPerItem();
         $this->type = $type ?? $templateQuestion->getType();
         $this->caption = $templateQuestion->getCaptionRaw();
         $this->data = ($data === null) ? '' : json_encode($data);
@@ -182,6 +183,11 @@ class Question
     public function getPoints(): int
     {
         return $this->points;
+    }
+
+    public function getPointsPerItem(): int
+    {
+        return $this->pointsPerItem;
     }
 
     public function getType(): string

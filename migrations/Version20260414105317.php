@@ -21,8 +21,8 @@ final class Version20260414105317 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE answer CHANGE answer answer TEXT DEFAULT NULL');
-        $this->addSql('ALTER TABLE question ADD points_per_item INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE template_questions_group ADD points_per_item INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE question ADD points_per_item INT NOT NULL');
+        $this->addSql('ALTER TABLE template_questions_group ADD points_per_item INT NOT NULL');
     }
 
     public function down(Schema $schema): void
