@@ -44,17 +44,22 @@ final class QuestionMulti extends BaseChoiceQuestion
         $answers = $this->instantiateAnswers($templateJson);
 
         $this->answers = array_values($answers);
-        $keysIndex = array_flip(array_keys($answers));
-
-        $correct = [];
-        foreach ($templateJson['correct'] as $cKey) {
-            // include only sub-set of correct answers that were actually selected...
-            if (array_key_exists($cKey, $keysIndex)) {
-                $correct[$keysIndex[$cKey]] = true; // using it as key also deduplicates the correct answers
-            }
+        $this->correct = [];
+        foreach (array_keys($answers) as $key) {
+            $this->correct[$key] = false;
         }
 
-        $this->correct = array_keys($correct);
+        foreach ($templateJson['correct'] as $cKey) {
+            // include only sub-set of correct answers that were actually selected...
+            if (array_key_exists($cKey, $this->correct)) {
+                $this->correct[$cKey] = true; // using it as key also deduplicates the correct answers
+            }
+        }
+    }
+
+    public function getItemsCount(): int
+    {
+        return count($this->answers);
     }
 
     /**
@@ -127,16 +132,26 @@ final class QuestionMulti extends BaseChoiceQuestion
 
     public function isAnswerCorrect($answer): bool
     {
-        if (!is_array($answer) || count($answer) !== count($this->correct)) {
-            return false;
-        }
+        // DEPRECATED
+        return false;
+    }
 
-        foreach ($this->correct as $correct) {
-            if (!in_array($correct, $answer)) {
-                return false;
+    public function evaluateAnswer($answer): int
+    {
+        $answerIndex = [];
+        foreach (array_keys($this->correct) as $key) {
+            $answerIndex[$key] = false;
+        }
+        foreach ($answer as $a) {
+            if (array_key_exists($a, $answerIndex)) {
+                $answerIndex[$a] = true;
             }
         }
 
-        return true;
+        $mistakes = 0;
+        foreach ($this->correct as $key => $isCorrect) {
+            $mistakes += $answerIndex[$key] === $isCorrect ? 0 : 1;
+        }
+        return $mistakes;
     }
 }

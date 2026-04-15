@@ -99,4 +99,13 @@ final class QuestionSingle extends BaseChoiceQuestion
     {
         return $this->correct !== null && $this->correct === $answer;
     }
+
+    public function evaluateAnswer($answer): ?int
+    {
+        if ($this->correct === null) {
+            return null;
+        }
+
+        return $this->correct === $answer ? 0 : 1;
+    }
 }

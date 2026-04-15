@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Helpers\Questions;
 
-use App\Helpers\IQuestion;
 use App\Helpers\QuestionException;
 use App\Helpers\Random;
 use Nette\Schema\Expect;
@@ -19,7 +18,10 @@ abstract class BaseChoiceQuestion extends BaseQuestion
     /** @var array */
     protected $answers = [];
 
-    /** @var null|int|int[] */
+    /**
+     * Index of the correct answer or array representing map index -> correctness (bool)
+     * @var null|int|array<int, bool>
+     */
     protected $correct = null;
 
     /**
