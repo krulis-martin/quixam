@@ -215,4 +215,31 @@ class Question
         $question->load($this->getData());
         return $question;
     }
+
+    /**
+     * Compute number of points to be awarded for the answer with given number of mistakes and items count
+     * using internal grading parameters (points and pointsPerItem).
+     * @param int $mistakes number of mistakes in the answer (as returned by evaluateAnswer())
+     * @param int $itemsCount number of items in the question (as returned by getItemsCount())
+     * @return int number of points to be awarded for the answer (could be negative)
+     */
+    public function awardPointsForAnswer(int $mistakes, int $itemsCount): int
+    {
+        if ($this->pointsPerItem) {
+            $points = $this->points;
+            if ($this->pointsPerItem > 0) {
+                // positive grading: add points for each correct item
+                $points += $this->pointsPerItem * ($itemsCount - $mistakes);
+            } else {
+                // negative grading: subtract points for each mistake
+                $points += $this->pointsPerItem * $mistakes;
+            }
+        } else {
+            // binary grading: all or nothing
+            $points = ($mistakes === 0 && $this->points >= 0) ? $this->points // positive grading
+                : (($mistakes > 0 && $this->points < 0) ? $this->points : 0); // negative grading
+        }
+
+        return $points;
+    }
 }

@@ -290,6 +290,48 @@ final class QuestionNumeric extends BaseQuestion
         return true;
     }
 
+    public function evaluateAnswer($answer): int
+    {
+        $answerNums = array_map(function ($record) {
+            return $record['num'];
+        }, $answer);
+
+        $mistakes = 0;
+        if ($this->correctInOrder) {
+            // compare as lists (explicit positions)
+            foreach ($this->correct as $idx => $value) {
+                if (!array_key_exists($idx, $answerNums) || $answerNums[$idx] !== $value) {
+                    ++$mistakes;
+                }
+            }
+
+            if (count($answerNums) > count($this->correct)) {
+                $mistakes += count($answerNums) - count($this->correct); // extra answers are mistakes
+            }
+        } else {
+            // compare as sets (positions do not matter)
+            $correctSet = array_count_values($this->correct);
+            $answerSet = array_count_values($answerNums);
+            foreach ($answerSet as $num => $count) {
+                $correctSet[$num] = ($correctSet[$num] ?? 0) - $count;
+            }
+
+            $missing = 0;
+            $superfluous = 0;
+            foreach ($correctSet as $num => $count) {
+                if ($count > 0) {
+                    $missing += $count; // missing correct answers
+                } elseif ($count < 0) {
+                    $superfluous -= $count; // extra incorrect answers
+                }
+            }
+            // missing and superfluous answers pair each other, so the maximum of them is the number of mistakes
+            $mistakes = max($missing, $superfluous);
+        }
+
+        return $mistakes;
+    }
+
     public function getCorrectAnswer()
     {
         return array_map(function ($num) {

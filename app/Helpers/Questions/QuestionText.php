@@ -173,6 +173,16 @@ final class QuestionText extends BaseQuestion
         return (bool)preg_match($this->regex, $answer);
     }
 
+    public function evaluateAnswer($answer): ?int
+    {
+        if ($this->regex === null) {
+            return null; // open-text questions cannot be automatically graded
+        }
+
+        return preg_match($this->regex, $answer) ? 0 : 1;
+    }
+
+
     public function getCorrectAnswer()
     {
         return '';

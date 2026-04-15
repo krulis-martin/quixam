@@ -29,6 +29,13 @@ interface IQuestion extends JsonSerializable
     public function getText(string $locale): string;
 
     /**
+     * Return the number of independently-graded items in the question.
+     * Compact questions should return 1. Multi-choice questions should return the number of choices.
+     * This is also maximum that can be returned from evaluateAnswer(), which returns number of mistakes.
+     */
+    public function getItemsCount(): int;
+
+    /**
      * Render internal content of the form where the user selects the answer.
      * @param Engine $latte engine for rendering latte templates (separately from the presenters)
      * @param string $locale selected locale
@@ -81,12 +88,21 @@ interface IQuestion extends JsonSerializable
     public function isAnswerValid($answer): bool;
 
     /**
-     * Check whether given answer is the correct answer for this particular question instance.
+     * DEPRECATED Check whether given answer is the correct answer for this particular question instance.
      * @param mixed $answer deserialized json structure sent over by the client
      * @return bool|null true if the answer is a correct one, null if the answer cannot be evaluated automatically
      *                   (the question is configured for manual grading by the teacher)
      */
     public function isAnswerCorrect($answer): ?bool;
+
+    /**
+     * Evaluate the answer and return the number of mistakes (0 = fully correct, 1 = one mistake, etc.).
+     * @param mixed $answer deserialized json structure sent over by the client
+     * @return int|null [0, N] where N is the number of independently-graded items (returned by getItemsCount());
+     *                 null if the answer cannot be evaluated automatically
+     *                 (the question is configured for manual grading by the teacher)
+     */
+    public function evaluateAnswer($answer): ?int;
 
     /**
      * Return a correct answer in the format, that is accepted by isAnswerValid and isAnswerCorrect.

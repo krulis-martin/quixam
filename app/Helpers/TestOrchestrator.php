@@ -136,10 +136,11 @@ class TestOrchestrator
 
             // find out whether the answer is correct...
             $questionData = $question->getQuestion($this->questionFactory);
-            $correct = $questionData->isAnswerCorrect($answer->getAnswer());
+            // $correct = $questionData->isAnswerCorrect($answer->getAnswer());
+            $mistakes = $questionData->evaluateAnswer($answer->getAnswer());
 
-            if ($correct !== null) { // null = not graded automatically
-                $answer->setPoints($correct ? $question->getPoints() : 0);
+            if ($mistakes !== null) { // null = not graded automatically
+                $answer->setPoints($question->awardPointsForAnswer($mistakes, $questionData->getItemsCount()));
 
                 // update score for the enrolled user, skip if the grading is not complete (null)
                 if ($scores[$enrolledId] !== null) {

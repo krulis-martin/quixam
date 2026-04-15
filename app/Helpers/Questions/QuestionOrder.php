@@ -316,6 +316,40 @@ final class QuestionOrder extends BaseQuestion
         return true;
     }
 
+    public function evaluateAnswer($answer): int
+    {
+        if (!$this->isAnswerValid($answer)) {
+            return 1;
+        }
+
+        /*
+         * Current implementation treats the entire answer as either correct or incorrect
+         * This may change in the future if we decide on a good mistake metric for order questions.
+         */
+        $items = $this->items;
+        $selected = [];
+        foreach ($answer as $key) {
+            $selected[] = $items[$key];
+            unset($items[$key]);
+        }
+
+        foreach ($items as $item) {
+            if ($item->isCorrect()) {
+                return 1; // one of the correct items was not selected
+            }
+        }
+
+        $lastOrder = PHP_INT_MIN;
+        foreach ($selected as $item) {
+            if (!$item->isCorrect() || $item->getCorrectOrder() < $lastOrder) {
+                return 1;
+            }
+            $lastOrder = $item->getCorrectOrder();
+        }
+
+        return 0;
+    }
+
     public function getCorrectAnswer()
     {
         $items = [];
