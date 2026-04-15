@@ -47,9 +47,9 @@ class TestOrchestrator
      * @param string|null $type passed by a reference since dynamic questions will change it
      * @param mixed $data parsed JSON data from the question template
      * @param int $seed random initializer
-     * @return mixed structure with instantiated question data
+     * @return IQuestion structure with instantiated question data
      */
-    public function instantiateQuestionData(?string &$type, $data, int $seed)
+    public function instantiateQuestionData(?string &$type, $data, int $seed): IQuestion
     {
         if ($type) {
             // regular (static) question
@@ -100,7 +100,6 @@ class TestOrchestrator
                 $templateQuestion,
                 $ordering,
                 $data,
-                $type
             );
             $maxScore += $question->getPoints();
             $this->questions->persist($question);

@@ -14,6 +14,13 @@ use Exception;
  */
 final class QuestionText extends BaseQuestion
 {
+    public const TYPE = 'text';
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
     private const MAX_LENGTH_LIMIT = 65000; // max MySQL text length - some overhead for json encoding and escaping
 
     /**
@@ -141,9 +148,9 @@ final class QuestionText extends BaseQuestion
         Engine $latte,
         string $locale,
         $answer = null,
-        ?bool $answerIsCorrect = null
+        ?int $mistakes = null
     ): string {
-        $params = ['graded' => $answerIsCorrect === null ? 'secondary' : ($answerIsCorrect ? 'success' : 'danger')];
+        $params = ['graded' => $mistakes === null ? 'secondary' : ($mistakes === 0 ? 'success' : 'danger')];
         return $this->renderTextTemplate($latte, $locale, $answer, $params);
     }
 

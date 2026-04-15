@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use DateTime;
+use InvalidArgumentException;
 
 /**
  * An instance of one question in a particular test for a particular user.
@@ -109,20 +110,30 @@ class Question
     protected $data = '';
 
     /**
+     * Number of independently-graded items in the question (extracted from question data via IQuestion).
+     * @ORM\Column(type="integer")
+     */
+    protected $itemsCount = 1;
+
+    /**
      * @param EnrolledUser $enrolledUser
      * @param TemplateQuestionsGroup $templateGroup
      * @param TemplateQuestion $templateQuestion
      * @param int $ordering
-     * @param mixed $data (that will be serialized in JSON, typically an IQuestion object)
+     * @param IQuestion $questionData (that will be serialized in JSON, typically an IQuestion object)
      */
     public function __construct(
         EnrolledUser $enrolledUser,
         TemplateQuestionsGroup $templateGroup,
         TemplateQuestion $templateQuestion,
         int $ordering,
-        $data,
-        ?string $type = null
+        IQuestion $questionData,
     ) {
+        if ($questionData->getType() !== $templateQuestion->getType()) {
+            throw new InvalidArgumentException("Question data type '" . $questionData->getType()
+                . "' does not match the template question type '" . $templateQuestion->getType() . "'.");
+        }
+
         $this->createdAt = new DateTime();
         $this->answers = new ArrayCollection();
         $this->enrolledUser = $enrolledUser;
@@ -131,9 +142,10 @@ class Question
         $this->ordering = $ordering;
         $this->points = $templateGroup->getPoints();
         $this->pointsPerItem = $templateGroup->getPointsPerItem();
-        $this->type = $type ?? $templateQuestion->getType();
+        $this->type = $templateQuestion->getType();
         $this->caption = $templateQuestion->getCaptionRaw();
-        $this->data = ($data === null) ? '' : json_encode($data);
+        $this->data = json_encode($questionData);
+        $this->itemsCount = $questionData->getItemsCount();
     }
 
     /*
@@ -209,6 +221,11 @@ class Question
         return json_decode($this->data, true);
     }
 
+    public function getItemsCount(): int
+    {
+        return $this->itemsCount;
+    }
+
     public function getQuestion(QuestionFactory $factory): IQuestion
     {
         $question = $factory->create($this->getType());
@@ -220,16 +237,15 @@ class Question
      * Compute number of points to be awarded for the answer with given number of mistakes and items count
      * using internal grading parameters (points and pointsPerItem).
      * @param int $mistakes number of mistakes in the answer (as returned by evaluateAnswer())
-     * @param int $itemsCount number of items in the question (as returned by getItemsCount())
      * @return int number of points to be awarded for the answer (could be negative)
      */
-    public function awardPointsForAnswer(int $mistakes, int $itemsCount): int
+    public function awardPointsForAnswer(int $mistakes): int
     {
         if ($this->pointsPerItem) {
             $points = $this->points;
             if ($this->pointsPerItem > 0) {
                 // positive grading: add points for each correct item
-                $points += $this->pointsPerItem * ($itemsCount - $mistakes);
+                $points += $this->pointsPerItem * ($this->itemsCount - $mistakes);
             } else {
                 // negative grading: subtract points for each mistake
                 $points += $this->pointsPerItem * $mistakes;

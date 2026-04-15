@@ -15,6 +15,13 @@ use Exception;
  */
 final class QuestionOrder extends BaseQuestion
 {
+    public const TYPE = 'order';
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
     /** @var int|null */
     private $minCount = null;
 
@@ -244,11 +251,11 @@ final class QuestionOrder extends BaseQuestion
         Engine $latte,
         string $locale,
         $answer = null,
-        ?bool $answerIsCorrect = null
+        ?int $mistakes = null
     ): string {
         $params = ['readonly' => true];
-        if ($answerIsCorrect !== null) {
-            $params['correctClass'] = $answerIsCorrect ? 'correct' : 'wrong';
+        if ($mistakes !== null) {
+            $params['correctClass'] = $mistakes === 0 ? 'correct' : 'wrong';
         }
         return $this->renderOrderTemplate($latte, $locale, $answer, $params);
     }

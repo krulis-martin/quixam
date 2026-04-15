@@ -36,7 +36,7 @@ abstract class BaseQuestion extends LocalizedEntity implements IQuestion
     public function renderCorrectContent(Engine $latte, string $locale): string
     {
         // the default behavior is to use results rendered with the correct answer provided by the question
-        return $this->renderResultContent($latte, $locale, $this->getCorrectAnswer(), true);
+        return $this->renderResultContent($latte, $locale, $this->getCorrectAnswer(), 0);
     }
 
     public function useRandomSeed(): bool

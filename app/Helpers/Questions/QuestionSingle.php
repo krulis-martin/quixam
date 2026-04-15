@@ -13,6 +13,13 @@ use Exception;
  */
 final class QuestionSingle extends BaseChoiceQuestion
 {
+    public const TYPE = 'single';
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
     /**
      * Set the answers and the correct answer manually.
      * @param array $answers
@@ -78,9 +85,9 @@ final class QuestionSingle extends BaseChoiceQuestion
         Engine $latte,
         string $locale,
         $answer = null,
-        ?bool $answerIsCorrect = null
+        ?int $mistakes = null
     ): string {
-        $params = ['graded' => $answerIsCorrect === null ? 'muted' : ($answerIsCorrect ? 'success' : 'danger')];
+        $params = ['graded' => $mistakes === null ? 'muted' : ($mistakes === 0 ? 'success' : 'danger')];
         return $this->renderSingleChoicesTemplate($latte, $locale, $answer, $params);
     }
 
