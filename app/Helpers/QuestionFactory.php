@@ -15,12 +15,14 @@ class QuestionFactory
 
     public function __construct($knownQuestionTypes = [])
     {
-        $this->knownQuestionTypes = $knownQuestionTypes;
-        foreach ($this->knownQuestionTypes as $type => $qt) {
+        $this->knownQuestionTypes = [];
+        foreach ($knownQuestionTypes as $qt) {
             if (!in_array('App\Helpers\IQuestion', class_implements($qt))) {
-                throw new QuestionException("Configuration error. Registered question type '"
-                    . $type . "' is not represented by a regular implementation of IQuestion interface.");
+                throw new QuestionException("Configuration error. Registered question class '"
+                    . get_class($qt) . "' is not represented by a regular implementation of IQuestion interface.");
             }
+            $type = $qt->getType();
+            $this->knownQuestionTypes[$type] = $qt;
         }
     }
 

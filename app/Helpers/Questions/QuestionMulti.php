@@ -13,6 +13,13 @@ use Exception;
  */
 final class QuestionMulti extends BaseChoiceQuestion
 {
+    public const TYPE = 'multi';
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
     /**
      * Set the answers and the correct answers manually.
      * @param array $answers
@@ -88,9 +95,9 @@ final class QuestionMulti extends BaseChoiceQuestion
         Engine $latte,
         string $locale,
         $answer = null,
-        ?bool $answerIsCorrect = null
+        ?int $mistakes = null
     ): string {
-        $params = ['graded' => $answerIsCorrect === null ? 'muted' : ($answerIsCorrect ? 'success' : 'danger')];
+        $params = ['graded' => $mistakes === null ? 'muted' : ($mistakes === 0 ? 'success' : 'danger')];
         return $this->renderMultiChoicesTemplate($latte, $locale, $answer, $params);
     }
 

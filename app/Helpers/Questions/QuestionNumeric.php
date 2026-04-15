@@ -14,6 +14,13 @@ use Exception;
  */
 final class QuestionNumeric extends BaseQuestion
 {
+    public const TYPE = 'numeric';
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
     private const FORMAT_DEC = 'dec';
     private const FORMAT_HEX = 'hex';
     private const FORMAT_BIN = 'bin';
@@ -192,11 +199,11 @@ final class QuestionNumeric extends BaseQuestion
         Engine $latte,
         string $locale,
         $answer = null,
-        ?bool $answerIsCorrect = null
+        ?int $mistakes = null
     ): string {
         $params = ['readonly' => true];
-        if ($answerIsCorrect !== null) {
-            $params['inputClass'] = $answerIsCorrect ? 'text-success' : 'text-danger';
+        if ($mistakes !== null) {
+            $params['inputClass'] = $mistakes === 0 ? 'text-success' : 'text-danger';
         }
         return $this->renderNumericTemplate($latte, $answer, $params);
     }

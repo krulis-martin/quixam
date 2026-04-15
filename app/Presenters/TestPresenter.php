@@ -288,6 +288,7 @@ final class TestPresenter extends AuthenticatedPresenter
                 $this->template->selectedQuestionId = $selectedQuestion->getId();
                 $questionData = $selectedQuestion->getQuestion($this->questionFactory);
                 $this->template->questionText = $questionData->getText($this->selectedLocale);
+                $this->template->questionItemsCount = $questionData->getItemsCount();
                 $this->template->canSeeResults = $this->user->getRole() !== User::ROLE_STUDENT
                     || ($test->getFinishedAt() !== null && $enrolledUser->hasScore());
 
@@ -302,19 +303,22 @@ final class TestPresenter extends AuthenticatedPresenter
                         = $questionData->renderFormContent($engine, $this->selectedLocale, $answerData);
                 } else {
                     // readonly -> show the last submitted answer (and correctness if available)
-                    $this->template->answerCorrect = $answerData !== null && $this->template->canSeeResults
-                        ? $questionData->isAnswerCorrect($answerData) : null;
+
+                    //$this->template->answerCorrect = $answerData !== null && $this->template->canSeeResults
+                    //    ? $questionData->isAnswerCorrect($answerData) : null;
+                    $this->template->answerMistakes = $answerData !== null && $this->template->canSeeResults
+                        ? $questionData->evaluateAnswer($answerData) : null;
                     $this->template->questionResult
                         = $questionData->renderResultContent(
                             $engine,
                             $this->selectedLocale,
                             $answerData,
-                            $test->getFinishedAt() !== null ? $this->template->answerCorrect : null
+                            $this->template->canSeeResults ? $this->template->answerMistakes : null
                         );
                 }
 
                 // teacher can see a correct answer
-                if ($this->user->getRole() !== User::ROLE_STUDENT && empty($this->template->answerCorrect)) {
+                if ($this->user->getRole() !== User::ROLE_STUDENT && $this->template->answerMistakes !== 0) {
                     $this->template->correctAnswer = $questionData->renderCorrectContent(
                         $engine,
                         $this->selectedLocale,

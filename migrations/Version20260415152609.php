@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260414105317 extends AbstractMigration
+final class Version20260415152609 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,7 +21,7 @@ final class Version20260414105317 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE answer CHANGE answer answer TEXT DEFAULT NULL');
-        $this->addSql('ALTER TABLE question ADD points_per_item INT NOT NULL');
+        $this->addSql('ALTER TABLE question ADD points_per_item INT NOT NULL, ADD items_count INT NOT NULL');
         $this->addSql('ALTER TABLE template_questions_group ADD points_per_item INT NOT NULL');
     }
 
@@ -29,7 +29,7 @@ final class Version20260414105317 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('ALTER TABLE answer CHANGE answer answer TEXT NOT NULL');
-        $this->addSql('ALTER TABLE question DROP points_per_item');
+        $this->addSql('ALTER TABLE question DROP points_per_item, DROP items_count');
         $this->addSql('ALTER TABLE template_questions_group DROP points_per_item');
     }
 }

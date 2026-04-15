@@ -10,6 +10,12 @@ use JsonSerializable;
 interface IQuestion extends JsonSerializable
 {
     /**
+     * Return the type identifier of the question.
+     * It is used in the factory and in the question entity to remember, which class to instantiate.
+     */
+    public function getType(): string;
+
+    /**
      * Load question template data and generate an instance of the question using given random seed.
      * @param mixed $templateJson deserialized data from a template
      * @param int $seed used to initialize random generators
@@ -51,15 +57,14 @@ interface IQuestion extends JsonSerializable
      * @param string $locale selected locale
      * @param mixed $answer deserialized json structure sent over by the client
      *                      the answer will be used for rendering (null = this question was not answered)
-     * @param bool|null $answerIsCorrect how the answer should be displayed
-     *                                   (null = display it indifferently)
+     * @param int|null $mistakes number of mistakes in the answer (null = not graded, display it indifferently)
      * @return string raw HTML fragment which is pasted without escaping into the output
      */
     public function renderResultContent(
         Engine $latte,
         string $locale,
         $answer = null,
-        ?bool $answerIsCorrect = null
+        ?int $mistakes = null
     ): string;
 
     /**
