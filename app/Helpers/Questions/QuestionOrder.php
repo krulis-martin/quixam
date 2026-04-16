@@ -293,36 +293,6 @@ final class QuestionOrder extends BaseQuestion
         return true;
     }
 
-    public function isAnswerCorrect($answer): bool
-    {
-        if (!$this->isAnswerValid($answer)) {
-            return false;
-        }
-
-        $items = $this->items;
-        $selected = [];
-        foreach ($answer as $key) {
-            $selected[] = $items[$key];
-            unset($items[$key]);
-        }
-
-        foreach ($items as $item) {
-            if ($item->isCorrect()) {
-                return false; // one of the correct items was not selected
-            }
-        }
-
-        $lastOrder = PHP_INT_MIN;
-        foreach ($selected as $item) {
-            if (!$item->isCorrect() || $item->getCorrectOrder() < $lastOrder) {
-                return false;
-            }
-            $lastOrder = $item->getCorrectOrder();
-        }
-
-        return true;
-    }
-
     public function evaluateAnswer($answer): int
     {
         if (!$this->isAnswerValid($answer)) {

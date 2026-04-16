@@ -273,30 +273,6 @@ final class QuestionNumeric extends BaseQuestion
         return true;
     }
 
-    public function isAnswerCorrect($answer): bool
-    {
-        if (!$this->isAnswerValid($answer)) {
-            return false;
-        }
-
-        $correct = $this->correct;
-        $answerNums = array_map(function ($record) {
-            return $record['num'];
-        }, $answer);
-        if (!$this->correctInOrder) {
-            sort($correct, SORT_NUMERIC);
-            sort($answerNums, SORT_NUMERIC);
-        }
-
-        foreach ($correct as $idx => $value) {
-            if ($answerNums[$idx] !== $value) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     public function evaluateAnswer($answer): int
     {
         $answerNums = array_map(function ($record) {
