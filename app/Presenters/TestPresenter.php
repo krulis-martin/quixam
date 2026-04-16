@@ -277,6 +277,9 @@ final class TestPresenter extends AuthenticatedPresenter
             $questions = $enrolledUser->getQuestions()->toArray();
             $selectedQuestionIdx = $this->getSelectedQuestionIndex($questions, $test->getFinishedAt() !== null);
 
+            $this->template->canSeeResults = $this->user->getRole() !== User::ROLE_STUDENT
+                || ($test->getFinishedAt() !== null && $enrolledUser->hasScore());
+
             $this->template->questions = $questions;
             $this->template->selectedQuestionIdx = $selectedQuestionIdx;
             $this->template->previousQuestion = $selectedQuestionIdx > 0 ? $questions[$selectedQuestionIdx - 1] : null;
@@ -289,8 +292,6 @@ final class TestPresenter extends AuthenticatedPresenter
                 $questionData = $selectedQuestion->getQuestion($this->questionFactory);
                 $this->template->questionText = $questionData->getText($this->selectedLocale);
                 $this->template->questionItemsCount = $questionData->getItemsCount();
-                $this->template->canSeeResults = $this->user->getRole() !== User::ROLE_STUDENT
-                    || ($test->getFinishedAt() !== null && $enrolledUser->hasScore());
 
                 // render the answer/form
                 $engine = $this->latteFactory->create();
@@ -303,9 +304,6 @@ final class TestPresenter extends AuthenticatedPresenter
                         = $questionData->renderFormContent($engine, $this->selectedLocale, $answerData);
                 } else {
                     // readonly -> show the last submitted answer (and correctness if available)
-
-                    //$this->template->answerCorrect = $answerData !== null && $this->template->canSeeResults
-                    //    ? $questionData->isAnswerCorrect($answerData) : null;
                     $this->template->answerMistakes = $answerData !== null && $this->template->canSeeResults
                         ? $questionData->evaluateAnswer($answerData) : null;
                     $this->template->questionResult

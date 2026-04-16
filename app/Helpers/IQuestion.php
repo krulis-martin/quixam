@@ -93,14 +93,6 @@ interface IQuestion extends JsonSerializable
     public function isAnswerValid($answer): bool;
 
     /**
-     * DEPRECATED Check whether given answer is the correct answer for this particular question instance.
-     * @param mixed $answer deserialized json structure sent over by the client
-     * @return bool|null true if the answer is a correct one, null if the answer cannot be evaluated automatically
-     *                   (the question is configured for manual grading by the teacher)
-     */
-    public function isAnswerCorrect($answer): ?bool;
-
-    /**
      * Evaluate the answer and return the number of mistakes (0 = fully correct, 1 = one mistake, etc.).
      * @param mixed $answer deserialized json structure sent over by the client
      * @return int|null [0, N] where N is the number of independently-graded items (returned by getItemsCount());
@@ -110,7 +102,7 @@ interface IQuestion extends JsonSerializable
     public function evaluateAnswer($answer): ?int;
 
     /**
-     * Return a correct answer in the format, that is accepted by isAnswerValid and isAnswerCorrect.
+     * Return a correct answer in the format, that is accepted by isAnswerValid and evaluateAnswer.
      * @return mixed
      */
     public function getCorrectAnswer();

@@ -135,7 +135,6 @@ class TestOrchestrator
 
             // find out whether the answer is correct...
             $questionData = $question->getQuestion($this->questionFactory);
-            // $correct = $questionData->isAnswerCorrect($answer->getAnswer());
             $mistakes = $questionData->evaluateAnswer($answer->getAnswer());
 
             if ($mistakes !== null) { // null = not graded automatically

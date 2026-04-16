@@ -21,7 +21,7 @@ class QuestionFactory
                 throw new QuestionException("Configuration error. Registered question class '"
                     . get_class($qt) . "' is not represented by a regular implementation of IQuestion interface.");
             }
-            $type = $qt->getType();
+            $type = $qt::TYPE;
             $this->knownQuestionTypes[$type] = $qt;
         }
     }

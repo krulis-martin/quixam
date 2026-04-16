@@ -171,15 +171,6 @@ final class QuestionText extends BaseQuestion
         return is_string($answer) && mb_strlen($answer) <= $this->maxLength && strlen(json_encode($answer)) < 65535;
     }
 
-    public function isAnswerCorrect($answer): ?bool
-    {
-        if ($this->regex === null) {
-            return null; // open-text questions cannot be automatically graded
-        }
-
-        return (bool)preg_match($this->regex, $answer);
-    }
-
     public function evaluateAnswer($answer): ?int
     {
         if ($this->regex === null) {

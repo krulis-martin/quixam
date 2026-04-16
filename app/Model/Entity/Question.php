@@ -129,11 +129,6 @@ class Question
         int $ordering,
         IQuestion $questionData,
     ) {
-        if ($questionData->getType() !== $templateQuestion->getType()) {
-            throw new InvalidArgumentException("Question data type '" . $questionData->getType()
-                . "' does not match the template question type '" . $templateQuestion->getType() . "'.");
-        }
-
         $this->createdAt = new DateTime();
         $this->answers = new ArrayCollection();
         $this->enrolledUser = $enrolledUser;
@@ -142,7 +137,7 @@ class Question
         $this->ordering = $ordering;
         $this->points = $templateGroup->getPoints();
         $this->pointsPerItem = $templateGroup->getPointsPerItem();
-        $this->type = $templateQuestion->getType();
+        $this->type = $questionData->getType();
         $this->caption = $templateQuestion->getCaptionRaw();
         $this->data = json_encode($questionData);
         $this->itemsCount = $questionData->getItemsCount();
@@ -226,6 +221,12 @@ class Question
         return $this->itemsCount;
     }
 
+    /**
+     * Create an IQuestion object from the question data using the given factory.
+     * The $type property is used to determine which IQuestion implementation to create.
+     * @param QuestionFactory $factory
+     * @return IQuestion
+     */
     public function getQuestion(QuestionFactory $factory): IQuestion
     {
         $question = $factory->create($this->getType());
