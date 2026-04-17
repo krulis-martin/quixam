@@ -262,9 +262,25 @@
                 {_locale.test.manualGrading.title}:
               {/if}
             </label>
-            <input type="text" class="form-control" id="pointsOverride" name="pointsOverride" maxlength="10" autocomplete="off"
-              value="{$answer->getPoints() !== null ? (int)$answer->getPoints() : ''}"
-            >
+            <div class="input-group">
+              <input type="text" class="form-control" id="pointsOverride" name="pointsOverride" maxlength="10" autocomplete="off"
+                value="{$answer->getPoints() !== null ? (int)$answer->getPoints() : ''}"
+              >
+              <span class="input-group-text text-muted bg-warning-subtle" id="pointsOverrideWarning" style="display: none;">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                {_locale.test.manualGrading.range} [{$minPoints}..{$maxPoints}]
+              </span>
+
+              <button n:if="$answer->getAutoPoints()" class="btn btn-outline-primary" type="button" id="pointsOverrideReset" title="Reset">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+              <button class="btn btn-outline-primary" type="button" id="pointsOverrideSetMax" title="Maximum">
+                <i class="fa-solid fa-arrows-up-to-line"></i>
+              </button>
+              <button class="btn btn-outline-primary" type="button" id="pointsOverrideSetMin" title="Minimum">
+                <i class="fa-solid fa-arrows-down-to-line"></i>
+              </button>
+            </div>
           </div>
 
           <div class="col text-end">
@@ -341,19 +357,42 @@
 <script type="text/javascript">
 $(() => {
     const pointsOverride = $("#pointsOverride");
+
+    $("#pointsOverrideReset").click(() => {
+        pointsOverride.val({$answer->getAutoPoints() !== null ? (int)$answer->getAutoPoints() : ''});
+        validatePoints();
+    });
+    $("#pointsOverrideSetMax").click(() => {
+        pointsOverride.val({$maxPoints});
+        validatePoints();
+    });
+    $("#pointsOverrideSetMin").click(() => {
+        pointsOverride.val({$minPoints});
+        validatePoints();
+    });
+
     const validatePoints = () => {
         pointsOverride.removeClass('is-valid').removeClass('is-invalid');
         $("#gradingButton").prop('disabled', false);
+        $("#pointsOverrideWarning").hide();
 
         const value = pointsOverride.val();
         if (value !== '' && !value.trim().match(/^(-?[0-9]+)$/)) {
             pointsOverride.addClass('is-invalid');
             $("#gradingButton").prop('disabled', true);
+        } else {
+            const minPoints = {$minPoints};
+            const maxPoints = {$maxPoints};
+            const intValue = parseInt(value.trim());
+            if (intValue < minPoints || intValue > maxPoints) {
+                $("#pointsOverrideWarning").show();
+            }
+
         }
     };
 
     pointsOverride.on('input', validatePoints);
-    validate();
+    validatePoints();
 });
 </script>
 {/if}
