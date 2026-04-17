@@ -113,6 +113,11 @@ final class TestPresenter extends AuthenticatedPresenter
     private function getSelectedQuestionIndex(array $questions, bool $testFinished): int
     {
         $res = count($questions);
+        $end = (bool)$this->getRequest()->getParameter('end');
+        if ($end && !$this->question && !$testFinished) {
+            return $res; // end-page is explicitly selected
+        }
+
         foreach ($questions as $idx => $question) {
             if ($this->question && $this->question === $question->getId()) {
                 return $idx; // explicit selection by a parameter
@@ -323,6 +328,15 @@ final class TestPresenter extends AuthenticatedPresenter
                         $engine,
                         $this->selectedLocale,
                     );
+                }
+            } else {
+                // extra data for end-page
+                $this->template->allAnswered = true;
+                foreach ($questions as $question) {
+                    if ($question->getLastAnswer() === null) {
+                        $this->template->allAnswered = false;
+                        break;
+                    }
                 }
             }
         }

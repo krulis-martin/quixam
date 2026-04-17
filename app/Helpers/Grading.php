@@ -108,13 +108,14 @@ class Grading implements JsonSerializable, Iterator
     /**
      * Return point range for given mark.
      * @param int|string $mark
-     * @return array [ min, max ], null is returned as max for the best mark
+     * @return array [ min, max ], null is returned as max for the best mark/min for the worst mark
      */
     public function getMarkRange($mark): array
     {
         $upper = null;
         foreach ($this->grading as $m => $limit) {
             if ($m === $mark) {
+                $limit = ($limit > PHP_INT_MIN) ? $limit : null;
                 return [$limit, $upper];
             }
             $upper = $limit - 1;
