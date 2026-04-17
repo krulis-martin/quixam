@@ -65,8 +65,7 @@
             n:href="Test:default $test->getId(), selectedUser: $enrolledUser->getUser()->getId(), question => $question->getId()"
           >
             {$question->getOrdering()}
-            <span n:if="$answer?->getPoints() !== null"
-              class="position-absolute top-0 start-{$answer?->getPoints() !== null ? '50' : '100'} translate-middle p-1 bg-primary text-bg-primary rounded-pill text-smaller"
+            <span class="position-absolute top-0 start-{$answer?->getPoints() !== null ? '50' : '100'} translate-middle p-1 bg-primary text-bg-primary rounded-pill text-smaller"
             >
               {if $answer?->getPoints() !== null}
                  {$answer->getPoints()}/

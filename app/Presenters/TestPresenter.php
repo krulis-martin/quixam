@@ -292,8 +292,8 @@ final class TestPresenter extends AuthenticatedPresenter
                 $questionData = $selectedQuestion->getQuestion($this->questionFactory);
                 $this->template->questionText = $questionData->getText($this->selectedLocale);
                 $this->template->questionItemsCount = $questionData->getItemsCount();
-                //$this->template->minPoints = $selectedQuestion->awardPointsForAnswer($questionData->getItemsCount());
-                //$this->template->maxPoints = $selectedQuestion->awardPointsForAnswer(0);
+                $this->template->minPoints = $selectedQuestion->awardPointsForAnswer($questionData->getItemsCount());
+                $this->template->maxPoints = $selectedQuestion->awardPointsForAnswer(0);
 
                 // render the answer/form
                 $engine = $this->latteFactory->create();
