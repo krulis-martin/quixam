@@ -275,6 +275,10 @@ final class QuestionNumeric extends BaseQuestion
 
     public function evaluateAnswer($answer): int
     {
+        if ($this->isAnswerValid($answer) === false) {
+            return count($this->correct); // all items are mistakes
+        }
+
         $answerNums = array_map(function ($record) {
             return $record['num'];
         }, $answer);

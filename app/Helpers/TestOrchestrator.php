@@ -90,6 +90,8 @@ class TestOrchestrator
 
         // instantiate each question form its template
         $maxScore = 0;
+        $negative = false;
+        $positive = false;
         foreach ($templateQuestions as $idx => $templateQuestion) {
             $ordering = $idx + 1;
             $type = $templateQuestion->getType();
@@ -101,11 +103,20 @@ class TestOrchestrator
                 $ordering,
                 $data,
             );
-            $maxScore += $question->getPoints();
+
+            if ($question->hasNegativeGrading()) {
+                $maxScore += $question->awardPointsForAnswer($question->getItemsCount()); // max mistakes
+                $negative = true;
+            } else {
+                $maxScore += $question->awardPointsForAnswer(0); // no mistakes = max points
+                $positive = true;
+            }
             $this->questions->persist($question);
         }
 
-        $user->setMaxScore($maxScore);
+        if ($negative !== $positive) { // all questions have the same grading (negative or positive)
+            $user->setMaxScore($maxScore);
+        }
         $this->enrolledUsers->persist($user);
     }
 

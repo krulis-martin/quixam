@@ -120,7 +120,7 @@ class EnrolledUser
 
     public function hasScore(): bool
     {
-        return $this->score !== null && $this->maxScore !== null;
+        return $this->score !== null;
     }
 
     public function setScore(?int $score): void

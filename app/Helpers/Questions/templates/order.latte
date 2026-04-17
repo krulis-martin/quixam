@@ -1,4 +1,6 @@
-<input id="orderQuestionAnswer" type="text" name="answer" value="{$selected ? implode(' ', $selected) : ''}" n:attr="readonly: $readonly" class="d-none">
+<input id="orderQuestionAnswer" type="text" name="answer"
+    value="{$selected ? implode(' ', $selected) : ''}" n:attr="readonly: $readonly"
+    class="d-none" autocomplete="off">
 
 <div n:if="!$readonly" class="my-2 p-1 text-muted small">
     <i class="fa-regular fa-lightbulb"></i>

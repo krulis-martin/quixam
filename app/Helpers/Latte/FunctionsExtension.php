@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Helpers;
 
 use App\Model\Entity\Answer;
+use App\Model\Entity\Question;
 use Latte\Extension;
 
 class FunctionsExtension extends Extension
@@ -17,6 +18,7 @@ class FunctionsExtension extends Extension
             'hasAnswerPartialPoints' => $this->hasAnswerPartialPoints(...),
             'hasAnswerNoPoints' => $this->hasAnswerNoPoints(...),
             'answerStyle' => $this->answerStyle(...),
+            'formatPoints' => $this->formatPoints(...)
         ];
     }
 
@@ -61,6 +63,24 @@ class FunctionsExtension extends Extension
             return 'danger';
         } else {
             return 'warning';
+        }
+    }
+
+    public function formatPoints(?Question $question): ?string
+    {
+        if (!$question) {
+            return null;
+        }
+
+        $minPoints = $question->awardPointsForAnswer($question->getItemsCount()); // max mistakes
+        $maxPoints = $question->awardPointsForAnswer(0); // no mistakes
+
+        if ($minPoints === 0) {
+            return (string)$maxPoints;
+        } elseif ($maxPoints === 0) {
+            return (string)$minPoints;
+        } else {
+            return "[$minPoints..$maxPoints]";
         }
     }
 }

@@ -197,6 +197,16 @@ class Question
         return $this->pointsPerItem;
     }
 
+    /**
+     * Determines, whether the question uses negative (subtractive) grading
+     * (i.e. awarding negative points for mistakes).
+     * @return bool true if the question uses negative grading, false otherwise (regular grading)
+     */
+    public function hasNegativeGrading(): bool
+    {
+        return $this->pointsPerItem < 0 || ($this->points < 0 && $this->pointsPerItem === 0);
+    }
+
     public function getType(): string
     {
         return $this->type;

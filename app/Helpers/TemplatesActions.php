@@ -127,6 +127,7 @@ final class TemplatesActions
             && $group->getOrdering() === $ordering
             && $group->getSelectCount() === $count
             && $group->getPoints() === $points
+            && $group->getPointsPerItem() === $pointsPerItem
         ) {
             return true; // no update needed, the group already has the desired values.
         }
