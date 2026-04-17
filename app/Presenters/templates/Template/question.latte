@@ -52,10 +52,10 @@
   <tr>
     <th class="align-baseline pe-3 text-muted">{_locale.templateQuestion.randomSeed}:</th>
     <td class="align-baseline">
-      <form id="seedForm" action="{link this}" method="GET">
+      <form id="seedForm" action="{link this}" method="GET" autocomplete="off">
         <div class="input-group mb-2">
             <button class="btn btn-secondary" type="button" data-action="decrement"><i class="fa-solid fa-angle-left"></i></button>
-            <input type="text" class="form-control" name="seed" id="seed" maxlength="10" pattern="^[0-9]+$" value={$seed}>
+            <input type="text" class="form-control" name="seed" id="seed" maxlength="10" pattern="^[0-9]+$" value={$seed} autocomplete="off">
             <button class="btn btn-secondary" type="button" data-action="increment"><i class="fa-solid fa-angle-right"></i></button>
         </div>
       </form>

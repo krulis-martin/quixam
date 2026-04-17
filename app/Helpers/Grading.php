@@ -61,6 +61,9 @@ class Grading implements JsonSerializable, Iterator
     public function __construct(array $grading = [])
     {
         foreach ($grading as &$limit) {
+            if ($limit === null) {
+                $limit = PHP_INT_MIN;
+            }
             if (!is_numeric($limit)) {
                 throw new Exception("Grading limits must be numeric values only.");
             }

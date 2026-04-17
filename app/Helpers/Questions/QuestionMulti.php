@@ -139,6 +139,10 @@ final class QuestionMulti extends BaseChoiceQuestion
 
     public function evaluateAnswer($answer): int
     {
+        if ($this->isAnswerValid($answer) === false) {
+            return $this->getItemsCount(); // all items are mistakes
+        }
+
         $answerIndex = [];
         $correct = [];
         foreach (array_keys($this->answers) as $key) {
