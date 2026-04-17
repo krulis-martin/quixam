@@ -6,6 +6,41 @@
 </h1>
 
 <div class="my-3 p-3 border border-secondary rounded bg-light">
+  <div class="d-inline float-end">
+    {if $test->getFinishedAt()}
+      <form method="POST" action="{link RevokeFinish! id: $test->getId()}" class="d-inline"
+        data-ajax data-ajax-button="revokeFinishButton" data-ajax-confirm="{_locale.dashboard.table.revokeFinishConfirm}"
+      >
+        <button id="revokeFinishButton" type="submit" class="btn btn-sm btn-danger">
+          <i class="fa-solid fa-rotate-left me-1"></i>
+          {_locale.dashboard.table.revokeFinish}
+        </button>
+      </form>
+    {elseif $test->getStartedAt()}
+      <form method="POST" action="{link RevokeStart! id: $test->getId()}" class="d-inline"
+        data-ajax data-ajax-button="revokeStartButton" data-ajax-confirm="{_locale.dashboard.table.revokeStartConfirm}"
+      >
+        <button id="revokeStartButton" type="submit" class="btn btn-sm btn-warning">
+          <i class="fa-solid fa-rotate-left me-1"></i>
+          {_locale.dashboard.table.revokeStart}
+        </button>
+      </form>
+      <form method="POST" action="{link Finish! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="finishButton">
+        <button id="finishButton" type="submit" class="btn btn-sm {$allEnrolledLocked ? 'btn-success' : 'btn-danger'}">
+          <i class="fa-solid fa-circle-check me-1"></i>
+          {_locale.dashboard.table.finish}
+        </button>
+      </form>
+    {else}
+      <form method="POST" action="{link Start! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="startButton">
+        <button id="startButton" type="submit" class="btn btn-sm btn-success">
+          <i class="fa-solid fa-circle-play me-1"></i>
+          {_locale.dashboard.table.start}
+        </button>
+      </form>
+    {/if}
+  </div>
+
   <h4>
     <i class="fa-solid fa-list-check fa-fw text-muted me-2"></i>
     {$test->getCaption($locale)}, {$test->getScheduledAt()|ldate}
@@ -25,6 +60,11 @@
     {$test->getFinishedAt()|ldate}
   </span>
   {/if}
+</div>
+
+<div n:if="$allEnrolledLocked && !$test->getFinishedAt()" class="alert alert-success">
+  <i class="fa-solid fa-user-lock me-2"></i>
+  {_locale.enrolledUsers.allLockedInfo}
 </div>
 
 {*

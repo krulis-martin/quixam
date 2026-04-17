@@ -85,7 +85,7 @@
       </li>
       {if $test->getFinishedAt() === null}
       <li class="page-item {$selectedQuestionIdx >= count($questions) ? 'active'}">
-        <a class="page-link" n:href="this question => null">{_locale.test.end}</a>
+        <a class="page-link" n:href="this question => null, end => true">{_locale.test.end}</a>
       </li>
       {/if}
       <li class="page-item {$selectedQuestionIdx >= (count($questions) - ($test->getFinishedAt() === null ? 0 : 1)) ? 'disabled'}">
@@ -105,8 +105,12 @@
     {block title}
       {if $selectedQuestionIdx < count($questions)}
         <i class="fa-regular fa-circle-question me-2 opacity-50"></i>{_locale.test.question} #{$selectedQuestion->getOrdering()}
-      {else}
+      {elseif $allAnswered}
+        <i class="fa-solid fa-flag-checkered opacity-75 me-1"></i>
         {_locale.test.completed.title}
+      {else}
+        <i class="fa-solid fa-circle-exclamation text-danger opacity-75 me-1"></i>
+        {_locale.test.notCompleted.title}
       {/if}
     {/block}
     {if $selectedQuestionIdx < count($questions)}
@@ -303,15 +307,19 @@
     <p>
       {if $enrolledUser->isLocked()}
         {_locale.test.completed.message1Locked}
+      {elseif $allAnswered}
+        {_locale.test.completed.message1} {_locale.test.lockMyself.info}
       {else}
-        {_locale.test.completed.message1}
+        {_locale.test.notCompleted.message1} {_locale.test.lockMyself.info}
       {/if}
     </p>
 
     {if !$enrolledUser->isLocked()}
-      <a class="btn btn-warning mb-3" n:href="LockSelf!" data-ajax="POST" data-ajax-confirm="{_locale.test.lockMyselfConfirm}">
-        <i class="fa-solid fa-user-lock fa-fw"></i>
-        {_locale.test.lockMyselfButton}
+      <a class="btn btn-lg shadow mb-3 {$allAnswered ? 'btn-warning' : 'btn-danger'}"
+        n:href="LockSelf!" data-ajax="POST" data-ajax-confirm="{_locale.test.lockMyself.confirm}"
+      >
+        <i class="fa-solid fa-user-lock fa-fw me-1"></i>
+        {_locale.test.lockMyself.button}
       </a>
     {/if}
 
@@ -325,10 +333,10 @@
         <strong>
           {if $range[1] === null}
             {$range[0]} {_locale.test.completed.points.more}
-          {elseif $range[0] === 0 && $range[1] > 0}
+          {elseif $range[0] === null}
             {$range[1]} {_locale.test.completed.points.less}
           {elseif $range[0] !== $range[1]}
-            {$range[0]}-{$range[1]}
+            {$range[0]} &hellip; {$range[1]}
           {else}
             {$range[0]}
           {/if}
