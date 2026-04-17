@@ -42,9 +42,7 @@
         <td class="text-nowrap">{$test->getLocation()}</td>
         <td class="text-nowrap">
           {if $isSupervisor && $relation === 'supervised'}
-            <a n:href="Enrolled:default $test->getId()">
-              {$test->getEnrolledUsers()->count()}{if $test->getRegistrations()->count() > 0} ({$test->getRegistrations()->count()} reg){/if}
-            </a>
+            {$test->getEnrolledUsers()->count()}{if $test->getRegistrations()->count() > 0} ({$test->getRegistrations()->count()} reg){/if}
           {else}
             {if $relation === 'enrolled' && $relationObj->hasScore()}
               <strong>
@@ -61,25 +59,41 @@
         </td>
         <td class="text-nowrap text-end">
           {if $relation === 'supervised'}
+            <a n:if="$isSupervisor" n:href="Enrolled:default $test->getId()" class="btn btn-sm btn-primary">
+              <i class="fa-solid fa-magnifying-glass me-1"></i>
+              {_locale.dashboard.table.students}
+            </a>
 
             {if $test->getFinishedAt()}
               <form method="POST" action="{link RevokeFinish! id: $test->getId()}" class="d-inline"
                 data-ajax data-ajax-button="revokeFinishButton{$tidx}" data-ajax-confirm="{_locale.dashboard.table.revokeFinishConfirm}"
               >
-                <button id="revokeFinishButton{$tidx}" type="submit" class="btn btn-sm btn-danger">{_locale.dashboard.table.revokeFinish}</button>
+                <button id="revokeFinishButton{$tidx}" type="submit" class="btn btn-sm btn-danger">
+                  <i class="fa-solid fa-rotate-left me-1"></i>
+                  {_locale.dashboard.table.revokeFinish}
+                </button>
               </form>
             {elseif $test->getStartedAt()}
               <form method="POST" action="{link RevokeStart! id: $test->getId()}" class="d-inline"
                 data-ajax data-ajax-button="revokeStartButton{$tidx}" data-ajax-confirm="{_locale.dashboard.table.revokeStartConfirm}"
               >
-                <button id="revokeStartButton{$tidx}" type="submit" class="btn btn-sm btn-warning">{_locale.dashboard.table.revokeStart}</button>
+                <button id="revokeStartButton{$tidx}" type="submit" class="btn btn-sm btn-warning">
+                  <i class="fa-solid fa-rotate-left me-1"></i>
+                  {_locale.dashboard.table.revokeStart}
+                </button>
               </form>
               <form method="POST" action="{link Finish! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="finishButton{$tidx}">
-                <button id="finishButton{$tidx}" type="submit" class="btn btn-sm btn-danger">{_locale.dashboard.table.finish}</button>
+                <button id="finishButton{$tidx}" type="submit" class="btn btn-sm btn-danger">
+                  <i class="fa-solid fa-circle-check me-1"></i>
+                  {_locale.dashboard.table.finish}
+                </button>
               </form>
             {else}
               <form method="POST" action="{link Start! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="startButton{$tidx}">
-                <button id="startButton{$tidx}" type="submit" class="btn btn-sm btn-success">{_locale.dashboard.table.start}</button>
+                <button id="startButton{$tidx}" type="submit" class="btn btn-sm btn-success">
+                  <i class="fa-solid fa-circle-play me-1"></i>
+                  {_locale.dashboard.table.start}
+                </button>
               </form>
             {/if}
           
@@ -90,7 +104,8 @@
                 <i class="fa-solid fa-lock fa-fw text-secondary" title="{_locale.dashboard.table.locked}"></i>
               {/if}
               {if !$hasActiveTest || $test->getFinishedAt() === null}
-                <a n:href="Test:default $test->getId()">
+                <a n:href="Test:default $test->getId()" class="btn btn-sm btn-primary">
+                  <i class="fa-solid fa-magnifying-glass me-1"></i>
                   {if $test->getFinishedAt()}
                     {_locale.dashboard.table.results}
                   {elseif $relationObj->isLocked()}
@@ -105,7 +120,10 @@
                 <em>{_locale.dashboard.table.missed}</em>
               {else}
                 <form method="POST" action="{link Enroll! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="enrollButton{$tidx}">
-                  <button id="enrollButton{$tidx}" type="success" class="btn btn-sm btn-primary">{_locale.dashboard.table.enroll}</button>
+                  <button id="enrollButton{$tidx}" type="success" class="btn btn-sm btn-success">
+                    <i class="fa-solid fa-circle-play me-1"></i>
+                    {_locale.dashboard.table.enroll}
+                  </button>
                 </form>
               {/if}
             {else}
