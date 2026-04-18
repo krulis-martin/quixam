@@ -29,7 +29,7 @@ Logout is not implemented, but you can simply delete the token file.
 
 ## Test templates
 
-A test template instance must be created by the administrator beforehand in the database. The administrator will assign the **external ID** of the template and associate it with teachers who are the **owners**. Only owners can modify the template and add terms to it.
+A test template instance must be created by the administrator beforehand in the database. The administrator will assign the **external ID** of the template and associate it with teachers who are the **owners**. Only owners can modify the template and create test terms from it.
 
 The contents of the test template (question groups and questions) are synced using the `upload.php` script. The script takes one argument: the path to the test template `.yaml` file. The YAML file holds the main configuration (groups, points), while the individual questions are stored in individual `.md` files ([with additional custom tags](samples/README.md)) located directly in their respective group directories. The group directories must be placed in the same directory as the `.yaml` file. The question files may have any valid name (ending with `.md` extension), but the _hidden_ files (starting with a dot) are ignored. This can helpful for creating common includes or snippet files (that are included by others, but should not be processed by upload script as questions).
 
@@ -39,12 +39,17 @@ An example of a complete test can be found in the [samples/startrek](samples/sta
 php ./upload.php ./samples/startrek/config.yaml
 ```
 
-(assuming the `startrek` template entity is already created and you are one of its owners).
+(assuming the template entity with `startrek` external ID is already created and you are one of its owners).
 
 The structure of the test template `.yaml` file is as follows:
 
 ```yaml
 id: <template's-external-id>
+
+grading:
+  <grade1>: <minimum-points-for-this-grade>
+  <grade2>: ...
+
 groups:
   <group-name-1>:
     count: <number-of-questions-to-be-selected-from-this-group>
@@ -53,12 +58,23 @@ groups:
   <group-name-2>: ...
 ```
 
+The `id` holds the external ID of the test template, so the user does not have to specify it explicitly as a parameter when uploading the test.
+
+#### `grading` - assigning grades to points
+
+The grading defines marks (grades) and minimal points threshold for each grade. The grades should be sorted from the best to worst (i.e., the thresholds should be sorted from the greatest to the lowest).
+
+- The keys (grades) can be any string, usually something like (`A` to `F` or `1` to `4`).
+- The values (thresholds) must be integers, and they represent the minimum number of points required to achieve the grade (inclusive). The last threshold (for the worst grade) may be `null` instead of an integer, which means "anything below the previous threshold" (that may be particularly useful for negative grading).
+
+#### `groups` - test structure and points
+
 The `<group-name-X>` values are the identifiers of the groups, and they must **match** precisely **the directory names**, which must be located in the same directory as the `.yaml` file. The `count` values specify how many questions from the group will be used in the test (when a test instance is generated from the template). The number should be a positive integer that does not exceed the number of questions (i.e., files) in the group. If the `count` is missing, it defaults to 1.
 
 The `points` and `pointsPerItem` are copied to each instantiated question of the group and they affect the grading as follows:
 
 - If the `pointsPerItem` is missing, null, or zero, the question is graded only as entirely correct or entirely wrong. If the `points` value is positive, the points are awarded for the correct answer. If the `points` value is negative, the points are awarded for the wrong answer (negative grading).
-- If the `pointsPerItem` is a non-zero integer, the question is graded per correct/wrong sub-item of the answer (please note, this is applicable only to some question types, like multi-choice questions). The `points` value is taken as the base/offset, and the `pointsPerItem` value is added to it for each correct item (if positive) or subtracted from it for each mistake (if negative).
+- If the `pointsPerItem` is a non-zero integer, the question is graded per correct/wrong sub-item of the answer (please note, this is applicable only to some question types, like multi-choice questions). The `points` value is taken as the base/offset, and the `pointsPerItem` value is added to it for each correct item (if positive) or subtracted from it for each mistake (if negative). Usually, it makes sense to keep `points` set to zero, if `pointsPerItem` is used.
 
 ## Test terms
 
@@ -71,7 +87,7 @@ Once a test template is properly filled with questions, exam terms can be create
 - `note_en` (string, optional) -- note in English
 - `note_cs` (string, optional) -- note in Czech
 
-The `scheduledAt` column can use anything that can be passed to the PHP `DateTime` constructor. The recommended formats are:
+The `scheduledAt` column can use anything that can be passed to the PHP `DateTime` constructor as a [valid date and time value](https://www.php.net/manual/en/datetime.formats.php). The recommended formats are:
 
 - `2026-03-25 13:42` (almost ISO format, but with space instead of `T` and without seconds)
 - `14.3.2026 15:00` (European format with 24h time notation)
@@ -81,7 +97,7 @@ The supervisors can be identified by their email or by their external ID. If the
 
 Only the `externalId` column is required for the system to work properly, but providing the recommended columns will make the data more readable for users.
 
-An example of the CSV file is provided in [samples/terms.csv](samples/terms.csv). You can use it as a template and upload it as:
+An example of the CSV file is provided in [samples/terms.csv](samples/terms.csv). You can use it as a template and once you modify it, upload it as:
 
 ```bash
 php ./test-terms.php startrek ./samples/terms.csv
@@ -98,21 +114,23 @@ The registration script takes a CSV file which must use commas (`,`) as separato
 - `externalId` (string) -- the external ID of the student, must be unique across all users in the system
 - `email` (string) -- the email of the student (also must be unique)
 
-At least one of the values in these columns must be provided for each student (recommended is both). Any additional columns are ignored. An example of the CSV file is provided in [samples/students.csv](samples/students.csv). You can use it as a template and upload it as:
+At least one of the values in these columns must be provided for each student (recommended is both). Any additional columns are ignored. An example of the CSV file is provided in [samples/students.csv](samples/students.csv). Once you have prepared your list, you may upload it as:
 
 ```bash
 php ./register-students.php startrek t1234 ./samples/students.csv
 ```
 
-Where `startrek` is the external ID of the test template and `t1234` is the external ID of the term (from the sample file [samples/terms.csv](samples/terms.csv)).
+Where `startrek` is the external ID of the test template and `t1234` is the external ID of the term (in this case, from the sample file [samples/terms.csv](samples/terms.csv)).
 
 The script is incremental: it will not delete any existing registrations, but it will add new ones and update existing ones. Registrations may be removed from the UI. Students who are already enrolled in the term will be skipped, so it is safe to run the script during the test (before it finishes).
 
+The mechanism takes into account, that the registration usually takes place before the students sign in to the system for the first time (hence, their accounts do not exist yet). That is why the registration uses external IDs (internal IDs may not exist yet) and emails. The accounts are automatically paired with existing registrations once they are created (existing accounts are paired immediately).
+
 ## Administrators' stuff
 
-AS mentioned at the beginning, the test templates must be created by an administrator beforehand. A template entity must be inserted in `template_test` table and the template owners must be associated via the `template_test_owner` table.
+As mentioned at the beginning, the test templates must be created by an administrator beforehand. A template entity must be inserted in `template_test` table and the template owners must be associated via the `template_test_owner` table.
 
-This can be done easily by CLI interface, namely the `db:fill` command. It takes a yaml file with a list of entities (the format was inspired by [Alice fixtures](https://github.com/nelmio/alice)). An example of such file is provided in [samples/db-startrek-template.yaml](samples/db-startrek-template.yaml). You can modify it as needed and upload it as:
+This can be done easily by CLI interface, namely the `db:fill` command. It takes a yaml file with a list of entities (the format was inspired by [Alice fixtures](https://github.com/nelmio/alice)). An example of such file is provided in [samples/db-startrek-template.yaml](samples/db-startrek-template.yaml). You can modify it as needed and upload it (from the project root) as:
 
 ```bash
 php ./bin/console db:fill ./path/to/modified/db-startrek-template.yaml

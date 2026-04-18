@@ -21,7 +21,7 @@ class Random
     }
 
     /**
-     * Shuffle items in the array (inplace), keys are lost.
+     * Shuffle items in the array (in place), keys are lost.
      * @param array $array
      */
     public static function shuffleArray(array &$array): void
@@ -56,9 +56,11 @@ class Random
             if (!is_array($indices) || count($indices) !== 2) {
                 throw new InvalidArgumentException("Mutually exclusive list is supposed to be a list of index pairs.");
             }
-            [ $key1, $key2 ] = $indices;
+            [$key1, $key2] = $indices;
             if (!array_key_exists($key1, $data) || !array_key_exists($key2, $data)) {
-                throw new InvalidArgumentException("Invalid refrence found in mutually exclusive list [$key1, $key2].");
+                throw new InvalidArgumentException(
+                    "Invalid reference found in mutually exclusive list [$key1, $key2]."
+                );
             }
 
             $index[$key1][$key2] = true;
@@ -70,26 +72,26 @@ class Random
 
     /**
      * Remove a key from mutually exclusive index.
-     * @param array $mutindex a ref. to the index to be updated
+     * @param array $mutIndex a ref. to the index to be updated
      * @param string|int $key to be removed
      */
-    private static function removeMutexKey(array &$mutindex, $key): void
+    private static function removeMutexKey(array &$mutIndex, $key): void
     {
-        if (!empty($mutindex[$key])) {
-            foreach ($mutindex[$key] as $key2) {
-                unset($mutindex[$key2][$key]);
+        if (!empty($mutIndex[$key])) {
+            foreach ($mutIndex[$key] as $key2) {
+                unset($mutIndex[$key2][$key]);
             }
-            unset($mutindex[$key]);
+            unset($mutIndex[$key]);
         }
     }
 
     /**
      * @param array $keys remaining candidates
-     * @param array $mutindex a ref. to the index to be updated if necessary
+     * @param array $mutIndex a ref. to the index to be updated if necessary
      * @param int $required how many items from keys still needs to be selected
      * @return array filtered keys
      */
-    private static function filterBadCandidates(array $keys, array &$mutindex, int $required): array
+    private static function filterBadCandidates(array $keys, array &$mutIndex, int $required): array
     {
         if ($required <= 0) {
             return $keys; // perf. optimization, there is no need to do this anymore
@@ -98,8 +100,8 @@ class Random
         $count = count($keys);
         $result = [];
         foreach ($keys as $key) {
-            if ($count - count($mutindex[$key]) < $required) {
-                self::removeMutexKey($mutindex, $key);
+            if ($count - count($mutIndex[$key]) < $required) {
+                self::removeMutexKey($mutIndex, $key);
                 --$count;
             } else {
                 $result[] = $key;
@@ -133,11 +135,11 @@ class Random
         }
         if ($count < count($preselected)) {
             throw new InvalidArgumentException("Unable to select only $count items, when " . count($preselected)
-            . " are already pre-selected.");
+                . " are already pre-selected.");
         }
 
         $keys = array_keys($data);
-        $mutindex = self::prepareMutexIndex($data, $mutuallyExclusive);
+        $mutIndex = self::prepareMutexIndex($data, $mutuallyExclusive);
         $resultKeys = [];
 
         while (count($resultKeys) < $count) {
@@ -149,29 +151,29 @@ class Random
             if ($preselected) {
                 // we have still preselected keys
                 $key = array_shift($preselected);
-                if (!array_key_exists($key, $mutindex)) {
+                if (!array_key_exists($key, $mutIndex)) {
                     throw new InvalidArgumentException("Invalid key found in preselect argument for random selection.");
                 }
             } else {
                 // no preselected key -> choose randomly
-                $key = $keys[ mt_rand(0, count($keys) - 1) ];
+                $key = $keys[mt_rand(0, count($keys) - 1)];
             }
             $resultKeys[] = $key;
 
             // remove mutually exclusive items from the remaining candidates
-            $keys = array_filter($keys, function ($k) use ($key, $mutindex) {
-                return $key !== $k && empty($mutindex[$key][$k]);
+            $keys = array_filter($keys, function ($k) use ($key, $mutIndex) {
+                return $key !== $k && empty($mutIndex[$key][$k]);
             });
 
             // update the mutually exclusive index
-            self::removeMutexKey($mutindex, $key);
+            self::removeMutexKey($mutIndex, $key);
 
             // remove candidates that would immediately lead to a dead end
-            $keys = self::filterBadCandidates($keys, $mutindex, $count - count($resultKeys));
+            $keys = self::filterBadCandidates($keys, $mutIndex, $count - count($resultKeys));
         }
 
         // assemble the result
-        self::shuffleArray($resultKeys); // extra shuffle is necessare due to preselected keys
+        self::shuffleArray($resultKeys); // extra shuffle is necessary due to preselected keys
         $result = [];
         foreach ($resultKeys as $key) {
             $result[$key] = $data[$key];
@@ -180,7 +182,7 @@ class Random
     }
 
     /**
-     * Helper function for knapsack problem. Takes configuraion [ size => number of items ] and returns string ID.
+     * Helper function for knapsack problem. Takes configuration [ size => number of items ] and returns string ID.
      * For debugging purposes, the string is created as math expression size1 * number1 + size2 * number2 ...
      * @param array $content stats
      * @return string that can be used as key in an array for instance
@@ -207,7 +209,7 @@ class Random
             return [];
         }
 
-        // sortout sizes into categories (assuming theyre discrete and their number is small)
+        // sort out sizes into categories (assuming they are discrete and their number is small)
         $sizeCategories = []; // size => [ item indices ]
         $stats = []; // size => count([ item indices ])
         foreach ($sizes as $idx => $size) {
@@ -224,7 +226,7 @@ class Random
             $knapsack[$s] = [];
             foreach ($stats as $size => $count) {
                 if ($size === $s) {
-                    $content = [ $size => 1 ]; // trivial satisfaction, one item fills the sack
+                    $content = [$size => 1]; // trivial satisfaction, one item fills the sack
                     $knapsack[$s][self::knapsackHash($content)] = $content;
                 }
 
