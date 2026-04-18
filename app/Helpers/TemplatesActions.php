@@ -63,8 +63,6 @@ final class TemplatesActions
         return $groups->last()->getOrdering() + 1;
     }
 
-
-
     /**
      * Retrieves test template by its external ID.
      * @return TemplateTest|null Returns the template test entity or null if it does not exist.
@@ -72,6 +70,17 @@ final class TemplatesActions
     public function getTemplateTest(string $externalId): ?TemplateTest
     {
         return $this->templateTests->findOneBy(['externalId' => $externalId]);
+    }
+
+    /**
+     * Update grading configuration of the given test template.
+     * @param TemplateTest $test The template test entity for which the grading configuration should be updated.
+     * @param array $grading Associative array of grade => point threshold.
+     */
+    public function setGrading(TemplateTest $test, array $grading): void
+    {
+        $test->setGrading(new Grading($grading)); // this may throw, if the format is invalid
+        $this->templateTests->persist($test);
     }
 
     public function getTemplateGroup(TemplateTest $test, string $groupExternalId): ?TemplateQuestionsGroup

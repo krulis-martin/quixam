@@ -21,6 +21,9 @@ class Adapter
     /** @var string|null */
     private $testId = null;
 
+    /** @var array|null */
+    private $grading = null;
+
     /** @var array */
     private $groups = [];
 
@@ -47,6 +50,39 @@ class Adapter
     }
 
     /**
+     * Load and verify grading configuration. The grading must be an associative array mark => threshold.
+     */
+    private function loadGrading(?array $grading): void
+    {
+        if ($grading === null) {
+            $this->grading = null;
+            return;
+        }
+
+        // check the grading types and invariants
+        $last = PHP_INT_MAX;
+        foreach ($grading as $mark => &$threshold) {
+            if ($last === null) {
+                throw new RuntimeException("Only the last mark may have null threshold.");
+            }
+            if (!is_numeric($threshold) && $threshold !== null) {
+                throw new RuntimeException("Grading threshold for mark '$mark' must be a numeric value or null.");
+            }
+
+            if ($threshold !== null) {
+                $threshold = (int)$threshold;
+                if ($threshold > $last) {
+                    throw new RuntimeException("Grading thresholds must be in descending order. "
+                        . "Mark '$mark' has threshold $threshold, but previous threshold is $last.");
+                }
+            }
+            $last = $threshold;
+        }
+
+        $this->grading = $grading;
+    }
+
+    /**
      * Load yaml configuration of the test.
      * It also sets the base path for the question files (base dir of the config file).
      * @param string $config path to the yaml config file
@@ -63,6 +99,12 @@ class Adapter
         }
 
         $this->testId = $yaml['id'];
+
+        if (array_key_exists('grading', $yaml) && !is_array($yaml['grading'])) {
+            throw new RuntimeException("Grading configuration must be an associative array of mark => threshold.");
+        }
+        $this->loadGrading($yaml['grading'] ?? null);
+
         $this->groups = $yaml['groups'];
         foreach ($this->groups as $group => $data) {
             if (array_key_exists('points', $data) && !is_numeric($data['points'])) {
@@ -446,6 +488,11 @@ class Adapter
 
             $this->client->addGroup($this->testId, $group, $points, $pointsPerItem, $count, ++$ordering);
             $this->uploadGroup($group, $questions, $current[$group] ?? []);
+        }
+
+        if ($this->grading !== null) {
+            echo "Setting grading configuration ", json_encode($this->grading, JSON_PRETTY_PRINT), "\n";
+            $this->client->setGrading($this->testId, $this->grading);
         }
     }
 }

@@ -1,4 +1,9 @@
 id: startrek
+grading:   # Grading specifies point thresholds for individual marks (1-4) as follows:
+  1: 14    # 14 and more points (16 should be maximum here) => grade 1
+  2: 11    # 11-13 points => grade 2
+  3: 7     # 7-10 points => grade 3
+  4: null  # 6 points or less => grade 4, null = no lower limit (recommended), 0 can be used in positive grading as well
 groups:
   episodes:
     points: 1

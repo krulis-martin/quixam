@@ -92,6 +92,25 @@ final class RestTemplatesPresenter extends RestPresenter
     }
 
     /**
+     * Get a test template by its external ID.
+     * @param string $id external ID of the test template
+     */
+    public function actionSetGrading(string $id): void
+    {
+        if (!array_key_exists('grading', $this->body) || !is_array($this->body['grading'])) {
+            throw new BadRequestException("The 'grading' parameter must be provided as an associative array.");
+        }
+
+        $test = $this->getTemplateTest($id);
+        try {
+            $this->templatesActions->setGrading($test, $this->body['grading']);
+        } catch (Throwable $e) {
+            throw new BadRequestException("Invalid grading configuration: " . $e->getMessage());
+        }
+        $this->sendSuccessResponse("OK");
+    }
+
+    /**
      * Add a new group to the test template or update an existing one.
      * @param string $id external ID of the test template
      * @param string $groupId external ID of the question group
