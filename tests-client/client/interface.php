@@ -13,6 +13,14 @@ use RuntimeException;
 interface IApiClient
 {
     /**
+     * Sets the grading configuration for a test template. The grading configuration is an associative array
+     * where keys are grades (e.g., 1, 2, 3, 4) and values are point thresholds for achieving those grades.
+     * @param string $testId External ID of the test template.
+     * @param array $grading Associative array of grade => point threshold.
+     */
+    public function setGrading(string $testId, array $grading): void;
+
+    /**
      * Gets the structure of the test template with given ID. Returns null if the test does not exist.
      * The structure is an array of groups, where each group is an array of questions.
      * @param string $testId External ID of the test template.

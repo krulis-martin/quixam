@@ -65,6 +65,14 @@ final class CliApiClient implements IApiClient
         return $file;
     }
 
+    public function setGrading(string $testId, array $grading): void
+    {
+        $res = $this->execQuixamConsole(['templates:setGrading', $testId, json_encode($grading)]);
+        if ($res === false) {
+            throw new RuntimeException("Setting grading configuration failed!");
+        }
+    }
+
     public function getTestStructure(string $testId): ?array
     {
         $content = $this->execQuixamConsole(['templates:showTest', $testId]);

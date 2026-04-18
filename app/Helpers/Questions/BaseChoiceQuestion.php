@@ -20,7 +20,7 @@ abstract class BaseChoiceQuestion extends BaseQuestion
 
     /**
      * Index of the correct answer or array representing map index -> correctness (bool)
-     * @var null|int|array<int, bool>
+     * @var null|int|int[]
      */
     protected $correct = null;
 

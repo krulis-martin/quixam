@@ -149,7 +149,7 @@ class TestOrchestrator
             $mistakes = $questionData->evaluateAnswer($answer->getAnswer());
 
             if ($mistakes !== null) { // null = not graded automatically
-                $answer->setPoints($question->awardPointsForAnswer($mistakes, $questionData->getItemsCount()));
+                $answer->setPoints($question->awardPointsForAnswer($mistakes));
 
                 // update score for the enrolled user, skip if the grading is not complete (null)
                 if ($scores[$enrolledId] !== null) {
