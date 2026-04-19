@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controls;
 
+use App\Helpers\AppConfig;
 use Nette\Application\UI\Control;
-use Nette\Localization\Translator;
+use Contributte\Translation\Translator;
 use Contributte\Translation\LocalesResolvers\Session as TranslatorSessionResolver;
 
 class MenuControl extends Control
@@ -16,10 +17,17 @@ class MenuControl extends Control
     /** @var TranslatorSessionResolver */
     public $translatorSessionResolver;
 
-    public function __construct(Translator $translator, TranslatorSessionResolver $translatorSessionResolver)
-    {
+    /** @var AppConfig */
+    public $appConfig;
+
+    public function __construct(
+        Translator $translator,
+        TranslatorSessionResolver $translatorSessionResolver,
+        AppConfig $appConfig
+    ) {
         $this->translator = $translator;
         $this->translatorSessionResolver = $translatorSessionResolver;
+        $this->appConfig = $appConfig;
     }
 
     public function handleChangeLocale(string $locale): void
@@ -51,7 +59,9 @@ class MenuControl extends Control
             $this->template->userData = null;
         }
 
-        /** @phpstan-ignore-next-line */
+        $this->template->style = $this->appConfig->getStyle() ? ('quixam-' . $this->appConfig->getStyle()) : null;
+        $this->template->quixamTitle = $this->appConfig->getTitle();
+
         $this->template->selectedLocale = $this->translator->getLocale();
         $this->template->setFile(__DIR__ . '/templates/menu.latte');
         $this->template->render();

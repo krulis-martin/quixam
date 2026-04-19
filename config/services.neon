@@ -4,9 +4,10 @@ services:
   authenticator: App\Security\Authenticator
   - App\Security\CasAuthenticator(%casAuthenticator%)
   - App\Security\AccessTokenManager(%accessTokens%)
+  - App\Helpers\AppConfig(%appConfig%)
+  - App\Helpers\FunctionsExtension
   - App\Helpers\LatteDateFilter
   - App\Helpers\MarkdownFilter
-  - App\Helpers\FunctionsExtension
 
   nette.latteFactory:
     setup:
