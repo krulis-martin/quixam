@@ -1,4 +1,8 @@
 parameters:
+  appConfig:
+    title: 'Quixam'
+    style: none  # default
+
   casAuthenticator:
     server: ''
     port: 443

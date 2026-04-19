@@ -6,6 +6,7 @@ namespace App\Presenters;
 
 use App\Controls\MenuControl;
 use App\Security\IExternalAuthenticator;
+use App\Helpers\AppConfig;
 use Nette\Application\UI\Presenter;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\Checkbox;
@@ -26,6 +27,9 @@ class BasePresenter extends Presenter
     /** @var IExternalAuthenticator @inject */
     public $externalAuthenticator;
 
+    /** @var AppConfig @inject */
+    public $appConfig;
+
     /** @var string */
     protected $selectedLocale = 'en';
 
@@ -41,7 +45,7 @@ class BasePresenter extends Presenter
 
     public function createComponentMenu(): MenuControl
     {
-        return new MenuControl($this->translator, $this->translatorSessionResolver);
+        return new MenuControl($this->translator, $this->translatorSessionResolver, $this->appConfig);
     }
 
     /**
