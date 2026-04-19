@@ -121,4 +121,10 @@ class BasePresenter extends Presenter
             }
         }
     }
+
+    public function beforeRender()
+    {
+        parent::beforeRender();
+        $this->template->appTitle = $this->appConfig->getTitle();
+    }
 }
