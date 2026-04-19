@@ -23,7 +23,14 @@
         <code>{$group->getExternalId()}</code>
       </th>
       <td colspan="2" class="text-end text-muted">
-        <span class="me-3">{_locale.template.points}: {$group->getPoints()}</span>
+        <span class="me-3">
+          {_locale.template.points}: {$group->getPoints()}
+          {if $group->getPointsPerItem() > 0}
+            (+{$group->getPointsPerItem()} {_locale.template.pointsPerCorrectAnswer})
+          {elseif $group->getPointsPerItem() < 0}
+            ({$group->getPointsPerItem()} {_locale.template.pointsPerMistake})
+          {/if}
+        </span>
         <span>{_locale.template.count}: {$group->getSelectCount()}</span>
       </td>
     </tr>
