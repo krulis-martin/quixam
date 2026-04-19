@@ -177,7 +177,7 @@ The wrapper class provides the following methods for the code (these are `protec
 
 A recommended way to prepare the text is to use the `@text` block (outside the `@code` block) to create a template with placeholders. You may use any placeholder format you like (e.g., `{{placeholder}}` or `#PLACEHOLDER#`), preferably one that is unlikely to appear in the text itself. Then, in the code block, you can generate the question and replace the placeholders (such as actual numeric values) with the generated content using the `replaceText` method. With the help of regular expressions, you may even remove unwanted parts between two placeholders.
 
-The question parameters and correct answers need to be set via the object provided by the `init` method. For that, you need to study the methods of the aforementioned implementations of the `IQuestion` interface. A simple example of a numeric question is provided in the [samples/startrek/warp/time-calc.md](samples/startrek/warp/time-calc.md) file. The part in the `@code` block that generates the question is as follows:
+The question parameters and correct answers need to be set via the object provided by the `init` method. For that, you need to study the methods of the aforementioned implementations of the `IQuestion` interface. A simple example of a numeric question is provided in the [startrek/warp/time-calc.md](startrek/warp/time-calc.md) file. The part in the `@code` block that generates the question is as follows:
 
 ```php
     $question = $this->init('numeric');   // creates an instance of QuestionNumeric class

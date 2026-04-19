@@ -61,6 +61,7 @@ homepage.text.answer: "Suck, squeeze, bang, blow."
 
 dashboard.title: "Dashboard"
 dashboard.student.noTests: "There are no tests for you yet. If you expect to be enrolled for particular test, contact the teacher."
+dashboard.supervisor.noTests: "There are no tests you supervise yet. Use CLI or tests-client scripts to create new test terms."
 dashboard.activeTestWarning: "You are currently taking a test. You may not start another test and you may not see the results of your previous tests until you finish the active one."
 dashboard.table.test: "Test"
 dashboard.table.scheduledAt: "Scheduled at"

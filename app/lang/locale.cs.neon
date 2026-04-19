@@ -61,6 +61,7 @@ homepage.text.answer: "Sát, zmáčk, bum, fouk."
 
 dashboard.title: "Celkový přehled"
 dashboard.student.noTests: "Nejsou zde pro vás žádné testy. Pokud jste již zapsán(a) na určitý test, kontaktujte vašeho vyučujícího."
+dashboard.supervisor.noTests: "Nejsou zde žádné testy, na které byste dohlížel(a). Použijte CLI nebo skripty v tests-client pro vytvoření nových testovacích termínů."
 dashboard.activeTestWarning: "Právě probíhá test. Nemůžete zahájit další test a nemůžete vidět výsledky předchozích testů, dokud nebude aktivní test ukončen."
 dashboard.table.test: "Test"
 dashboard.table.scheduledAt: "Plánovaný čas"

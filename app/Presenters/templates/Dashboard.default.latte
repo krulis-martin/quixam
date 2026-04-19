@@ -4,11 +4,13 @@
 
 {if !$tests}
 
-  {if !$isSupervisor}
-    <p class="text-muted">
+  <p class="text-muted">
+    {if !$isSupervisor}
       {_locale.dashboard.student.noTests}
-    </p>
-  {/if}
+    {else}
+      {_locale.dashboard.supervisor.noTests}
+    {/if}
+  </p>
 
 {else}
   <div n:if="$hasActiveTest" class="alert alert-warning">
