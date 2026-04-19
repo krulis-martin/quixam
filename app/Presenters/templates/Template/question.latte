@@ -5,21 +5,28 @@
   {block title}{_locale.templateQuestion.title}: {$question->getCaption($locale)}{/block}
 </h1>
 
+{var $group = $question->getQuestionsGroup()}
 <span class="d-inline-block me-4">
   <span class="text-muted">{_locale.templateQuestion.externalId}:</span>
   <code>{$question->getExternalId()}</code>
 </span>
 <span class="d-inline-block me-4">
   <span class="text-muted">{_locale.templateQuestion.groupId}:</span>
-  <code>{$question->getQuestionsGroup()->getExternalId()}</code>
+  <code>{$group->getExternalId()}</code>
 </span>
 <span class="d-inline-block me-4">
   <span class="text-muted">{_locale.templateQuestion.points}:</span>
-  {$question->getQuestionsGroup()->getPoints()}
+  {$group->getPoints()}
+  {if $group->getPointsPerItem() > 0}
+    (+{$group->getPointsPerItem()} {_locale.template.pointsPerCorrectAnswer})
+  {elseif $group->getPointsPerItem() < 0}
+    ({$group->getPointsPerItem()} {_locale.template.pointsPerMistake})
+  {/if}
+
 </span>
 <span class="d-inline-block me-4">
   <span class="text-muted">{_locale.templateQuestion.count}:</span>
-  {$question->getQuestionsGroup()->getSelectCount()}
+  {$group->getSelectCount()}
 </span>
 <span class="d-inline-block me-4">
   <span class="text-muted">{_locale.templateQuestion.createdAt}:</span>
