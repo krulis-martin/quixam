@@ -25,7 +25,8 @@
         <div class="bg-{$graded}-subtle border p-3 my-3 rounded">{$answer|markdown}</div>
     </div>
 {else}
-    <textarea name="answer" class="form-control" rows="5" n:attr="maxlength: $maxLength">{$answer}</textarea>
+    <strong>{_locale.app.Answer}:</strong>
+    <textarea name="answer" class="form-control mt-1" rows="5" n:attr="maxlength: $maxLength">{$answer}</textarea>
 {/if}
 
 
