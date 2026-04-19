@@ -48,8 +48,6 @@ Jaký je původ názvu "Bluetooth", který se vztahuje k bezdrátné technologii
 @/text
 ```
 
-TODO
-
 ### Answer options
 
 There may be several different kinds of answer options, depending on the question type. Each is represented by a block starting with a special tag. The content may use language (translation) variants (see below).
