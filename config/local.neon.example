@@ -1,0 +1,19 @@
+parameters:
+  appConfig:
+    title: 'Quixam'
+    style: none
+
+  casAuthenticator:
+    server: url-of-your-cas-server
+    certificate: ''
+  
+  accessTokens:  # these tokens are used to authenticate via REST API (test-client scripts)
+    verificationKey: "A secret string that is at least 32 characters long and it is used to hash-secure the access token"
+    expiration: 86400  # 24 hours in seconds
+
+# Database connection parameters
+nettrine.dbal:
+  connection:
+    user: "quixam"
+    password: "your-secret-password-for-quixam-db"
+    dbname: "quixam"
