@@ -1,18 +1,15 @@
-<nav class="navbar navbar-expand-sm navbar-light">
+<nav class="navbar navbar-expand-sm navbar-light {$style}">
   <div class="container">
     <a class="navbar-brand" href="{plink Homepage:default}">
       <span class="fa-stack fa-2xs">
         <i class="fa-regular fa-square fa-stack-2x"></i>
         <i class="fa-solid fa-bolt-lightning fa-stack-1x"></i>
       </span>
-      Quixam
+      {$quixamTitle}
     </a>
     
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav">
-        <!--li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="">TODO</a>
-        </li-->
         {if $userData}
           <li class="nav-item">
             <a class="nav-link" href="{plink Dashboard:default}">{_locale.dashboard.title}</a>

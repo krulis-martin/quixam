@@ -65,6 +65,14 @@ final class CliApiClient implements IApiClient
         return $file;
     }
 
+    public function setGrading(string $testId, array $grading): void
+    {
+        $res = $this->execQuixamConsole(['templates:setGrading', $testId, json_encode($grading)]);
+        if ($res === false) {
+            throw new RuntimeException("Setting grading configuration failed!");
+        }
+    }
+
     public function getTestStructure(string $testId): ?array
     {
         $content = $this->execQuixamConsole(['templates:showTest', $testId]);
@@ -78,12 +86,20 @@ final class CliApiClient implements IApiClient
     /**
      * Invokes add group via Quixam CLI.
      */
-    public function addGroup(string $testId, string $groupId, int $points, int $count, int $ordering): void
-    {
+    public function addGroup(
+        string $testId,
+        string $groupId,
+        int $points,
+        int $pointsPerItem,
+        int $count,
+        int $ordering
+    ): void {
         $args = [
             'templates:addGroup',
             '--points',
             $points,
+            '--pointsPerItem',
+            $pointsPerItem,
             '--count',
             $count,
             '--ordering',
@@ -91,6 +107,7 @@ final class CliApiClient implements IApiClient
             $testId,
             $groupId,
         ];
+
         $res = $this->execQuixamConsole($args);
         if ($res === false) {
             throw new RuntimeException("Creation/update of group $groupId failed!");

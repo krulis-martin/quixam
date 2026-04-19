@@ -4,34 +4,19 @@ declare(strict_types=1);
 
 namespace App\Presenters;
 
-use App\Model\Repository\EnrolledUsers;
-use App\Model\Repository\EnrollmentRegistrations;
 use App\Model\Repository\Questions;
-use App\Model\Repository\TestTerms;
-use App\Model\Entity\EnrolledUser;
 use App\Model\Entity\EnrollmentRegistration;
-use App\Model\Entity\Question;
 use App\Model\Entity\User;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
-use Nette;
 use DateTime;
 
 /**
  * Displays users enrolled for particular test.
  */
-final class EnrolledPresenter extends AuthenticatedPresenter
+final class EnrolledPresenter extends TestHandlingPresenter
 {
-    /** @var EnrolledUsers @inject */
-    public $enrolledUsers;
-
-    /** @var EnrollmentRegistrations @inject */
-    public $enrollmentRegistrations;
-
     /** @var Questions @inject */
     public $questions;
-
-    /** @var TestTerms @inject */
-    public $testTerms;
 
     /** @var LatteFactory @inject */
     public $latteFactory;
@@ -144,6 +129,14 @@ final class EnrolledPresenter extends AuthenticatedPresenter
             return $res !== 0 ? $res : strcmp($a->getFirstName(), $b->getFirstName());
         });
         $this->template->enrolledUsers = $enrolledUsers;
+
+        $this->template->allEnrolledLocked = true;
+        foreach ($enrolledUsers as $enrolled) {
+            if (!$enrolled->isLocked()) {
+                $this->template->allEnrolledLocked = false;
+                break;
+            }
+        }
 
         $this->template->questions = $this->questions->getQuestionsOfTestSorted($test);
 

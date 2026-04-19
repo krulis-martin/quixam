@@ -11,7 +11,7 @@
             </div>
         {else}
             <div class="input-group mb-2">
-                <input type="text" class="form-control" name="answer[]" maxlength="34">
+                <input type="text" class="form-control" name="answer[]" maxlength="34" autocomplete="off">
                 {if $maxCount > 1}
                 <button class="btn btn-outline-danger" type="button" data-action="remove"><i class="fa-regular fa-circle-xmark"></i></button>
                 <button class="btn btn-outline-success" type="button" data-action="add"><i class="fa-solid fa-circle-plus"></i></button>

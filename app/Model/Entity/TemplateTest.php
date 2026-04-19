@@ -176,6 +176,12 @@ class TemplateTest
         return $this->gradingObj;
     }
 
+    public function setGrading(Grading $grading): void
+    {
+        $this->gradingObj = $grading;
+        $this->grading = json_encode($grading);
+    }
+
     public function getOwners(): Collection
     {
         return $this->owners;

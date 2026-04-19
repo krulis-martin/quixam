@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use DateTime;
+use InvalidArgumentException;
 
 /**
  * An instance of one question in a particular test for a particular user.
@@ -70,12 +71,24 @@ class Question
     protected $ordering;
 
     /**
-     * Maximal points awarded for this question (copied from the template group).
-     * Negative value means negative grading (counting mistakes instead of successes);
-     * negative grading may be also dependent on the question type.
+     * If points per item are not null, this is the base/offset to/from the points per item are added/subtracted.
+     * Otherwise, this is the total points awarded for the question.
+     * If positive, the points are awarded for the correct answer.
+     * If negative, the points are awarded for the mistakes (negative grading).
+     * Note: this is copied value from template group entity.
      * @ORM\Column(type="integer")
      */
     protected $points;
+
+    /**
+     * Points awarded for each question sub-item. The $points value is taken as the base/offset.
+     * In the case of negative value, points per item are subtracted from the base/offset for each mistake.
+     * In the case of positive value, points per item are added to the base/offset for each correct item.
+     * If zero, the question is graded only as entirely correct or entirely wrong.
+     * Note: this is copied value from template group entity.
+     * @ORM\Column(type="integer")
+     */
+    protected $pointsPerItem;
 
     /**
      * Type identifier (corresponds to the question processor class).
@@ -97,19 +110,24 @@ class Question
     protected $data = '';
 
     /**
+     * Number of independently-graded items in the question (extracted from question data via IQuestion).
+     * @ORM\Column(type="integer")
+     */
+    protected $itemsCount = 1;
+
+    /**
      * @param EnrolledUser $enrolledUser
      * @param TemplateQuestionsGroup $templateGroup
      * @param TemplateQuestion $templateQuestion
      * @param int $ordering
-     * @param mixed $data (that will be serialized in JSON, typically an IQuestion object)
+     * @param IQuestion $questionData (that will be serialized in JSON, typically an IQuestion object)
      */
     public function __construct(
         EnrolledUser $enrolledUser,
         TemplateQuestionsGroup $templateGroup,
         TemplateQuestion $templateQuestion,
         int $ordering,
-        $data,
-        ?string $type = null
+        IQuestion $questionData,
     ) {
         $this->createdAt = new DateTime();
         $this->answers = new ArrayCollection();
@@ -118,9 +136,11 @@ class Question
         $this->templateQuestion = $templateQuestion;
         $this->ordering = $ordering;
         $this->points = $templateGroup->getPoints();
-        $this->type = $type ?? $templateQuestion->getType();
+        $this->pointsPerItem = $templateGroup->getPointsPerItem();
+        $this->type = $questionData->getType();
         $this->caption = $templateQuestion->getCaptionRaw();
-        $this->data = ($data === null) ? '' : json_encode($data);
+        $this->data = json_encode($questionData);
+        $this->itemsCount = $questionData->getItemsCount();
     }
 
     /*
@@ -172,6 +192,21 @@ class Question
         return $this->points;
     }
 
+    public function getPointsPerItem(): int
+    {
+        return $this->pointsPerItem;
+    }
+
+    /**
+     * Determines, whether the question uses negative (subtractive) grading
+     * (i.e. awarding negative points for mistakes).
+     * @return bool true if the question uses negative grading, false otherwise (regular grading)
+     */
+    public function hasNegativeGrading(): bool
+    {
+        return $this->pointsPerItem < 0 || ($this->points < 0 && $this->pointsPerItem === 0);
+    }
+
     public function getType(): string
     {
         return $this->type;
@@ -191,10 +226,47 @@ class Question
         return json_decode($this->data, true);
     }
 
+    public function getItemsCount(): int
+    {
+        return $this->itemsCount;
+    }
+
+    /**
+     * Create an IQuestion object from the question data using the given factory.
+     * The $type property is used to determine which IQuestion implementation to create.
+     * @param QuestionFactory $factory
+     * @return IQuestion
+     */
     public function getQuestion(QuestionFactory $factory): IQuestion
     {
         $question = $factory->create($this->getType());
         $question->load($this->getData());
         return $question;
+    }
+
+    /**
+     * Compute number of points to be awarded for the answer with given number of mistakes and items count
+     * using internal grading parameters (points and pointsPerItem).
+     * @param int $mistakes number of mistakes in the answer (as returned by evaluateAnswer())
+     * @return int number of points to be awarded for the answer (could be negative)
+     */
+    public function awardPointsForAnswer(int $mistakes): int
+    {
+        if ($this->pointsPerItem) {
+            $points = $this->points;
+            if ($this->pointsPerItem > 0) {
+                // positive grading: add points for each correct item
+                $points += $this->pointsPerItem * ($this->itemsCount - $mistakes);
+            } else {
+                // negative grading: subtract points for each mistake
+                $points += $this->pointsPerItem * $mistakes;
+            }
+        } else {
+            // binary grading: all or nothing
+            $points = ($mistakes === 0 && $this->points >= 0) ? $this->points // positive grading
+                : (($mistakes > 0 && $this->points < 0) ? $this->points : 0); // negative grading
+        }
+
+        return $points;
     }
 }

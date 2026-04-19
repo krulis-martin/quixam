@@ -11,7 +11,7 @@ Názvy hvězdných lodí
 @en
 What was the designation of the first starship named "Enterprise" (commanded by captain Jonathan Archer) in the Star Trek universe?
 @cs
-Jaký byl designace první hvězdné lodi nazvané "Enterprise" (pod velením kapitána Jonathana Archera) v univerzu Star Treku?
+Jaká byla designace první hvězdné lodi nazvané "Enterprise" (pod velením kapitána Jonathana Archera) v univerzu Star Treku?
 @/text
 
 @correct

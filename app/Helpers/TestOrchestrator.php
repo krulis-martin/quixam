@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
+use App\Model\Entity\Answer;
 use App\Model\Entity\EnrolledUser;
 use App\Model\Entity\Question;
 use App\Model\Entity\TemplateQuestion;
@@ -46,9 +47,9 @@ class TestOrchestrator
      * @param string|null $type passed by a reference since dynamic questions will change it
      * @param mixed $data parsed JSON data from the question template
      * @param int $seed random initializer
-     * @return mixed structure with instantiated question data
+     * @return IQuestion structure with instantiated question data
      */
-    public function instantiateQuestionData(?string &$type, $data, int $seed)
+    public function instantiateQuestionData(?string &$type, $data, int $seed): IQuestion
     {
         if ($type) {
             // regular (static) question
@@ -89,6 +90,8 @@ class TestOrchestrator
 
         // instantiate each question form its template
         $maxScore = 0;
+        $negative = false;
+        $positive = false;
         foreach ($templateQuestions as $idx => $templateQuestion) {
             $ordering = $idx + 1;
             $type = $templateQuestion->getType();
@@ -99,13 +102,21 @@ class TestOrchestrator
                 $templateQuestion,
                 $ordering,
                 $data,
-                $type
             );
-            $maxScore += $question->getPoints();
+
+            if ($question->hasNegativeGrading()) {
+                $maxScore += $question->awardPointsForAnswer($question->getItemsCount()); // max mistakes
+                $negative = true;
+            } else {
+                $maxScore += $question->awardPointsForAnswer(0); // no mistakes = max points
+                $positive = true;
+            }
             $this->questions->persist($question);
         }
 
-        $user->setMaxScore($maxScore);
+        if ($negative !== $positive) { // all questions have the same grading (negative or positive)
+            $user->setMaxScore($maxScore);
+        }
         $this->enrolledUsers->persist($user);
     }
 
@@ -126,25 +137,32 @@ class TestOrchestrator
         // evaluate individual questions
         $questions = $this->questions->getQuestionsOfTest($test);
         foreach ($questions as $question) {
-            $answer = $question->getLastAnswer();
             $enrolledId = $question->getEnrolledUser()->getId();
-            if ($answer) {
-                // find out whether the answer is correct...
-                $questionData = $question->getQuestion($this->questionFactory);
-                $correct = $questionData->isAnswerCorrect($answer->getAnswer());
+            $answer = $question->getLastAnswer();
+            if (!$answer) {
+                // make sure answer entity exist for every question and enrolled user
+                $answer = new Answer($question, null); // null = empty answer (placeholder)
+            }
 
-                if ($correct !== null) { // null = not graded automatically
-                    $answer->setPoints($correct ? $question->getPoints() : 0);
+            // find out whether the answer is correct...
+            $questionData = $question->getQuestion($this->questionFactory);
+            $mistakes = $questionData->evaluateAnswer($answer->getAnswer());
 
-                    // update score for the enrolled user, skip if the grading is not complete (null)
-                    if ($scores[$enrolledId] !== null) {
-                        $scores[$enrolledId] += $answer->getPoints();
-                    }
-                } else {
-                    $scores[$enrolledId] = null;
+            if ($mistakes !== null) { // null = not graded automatically
+                $answer->setPoints($question->awardPointsForAnswer($mistakes));
+
+                // update score for the enrolled user, skip if the grading is not complete (null)
+                if ($scores[$enrolledId] !== null) {
+                    $scores[$enrolledId] += $answer->getPoints();
                 }
+            } else {
+                $scores[$enrolledId] = null;
+            }
 
-                $this->answers->persist($answer);
+            $this->answers->persist($answer);
+            if ($question->getLastAnswer() === null) {
+                $question->setLastAnswer($answer);
+                $this->questions->persist($question);
             }
         }
 

@@ -11,7 +11,15 @@
   {/if}
 
 {else}
+  <div n:if="$hasActiveTest" class="alert alert-warning">
+    <i class="fa-solid fa-circle-info me-2"></i>
+    {_locale.dashboard.activeTestWarning}
+  </div>
 
+
+  {*
+   * Tests table
+   *}
   <table class="table table-hover align-middle my-3">
     <thead>
       <tr>
@@ -26,8 +34,11 @@
         <th></th>
       </tr>
     </thead>
+
     <tbody>
-      <tr n:foreach="$tests as $tidx => [ $test, $relation, $relationObj ]" class="{$relation === 'enrolled' && !$test->getFinishedAt() ? 'bg-warning bg-opacity-25'}">
+      <tr n:foreach="$tests as $tidx => [ $test, $relation, $relationObj ]"
+        class="{$relation === 'enrolled' && !$test->getFinishedAt() ? 'bg-warning bg-opacity-25'}"
+      >
         <td class="w-100">
           {$test->getCaption($locale)}
           {if !$test->getSupervisors()->isEmpty()}
@@ -40,70 +51,142 @@
         <td class="text-nowrap">{$test->getStartedAt()|ldate}</td>
         <td class="text-nowrap">{$test->getFinishedAt()|ldate}</td>
         <td class="text-nowrap">{$test->getLocation()}</td>
-        <td class="text-nowrap">
+
+        <td class="text-nowrap text-center">
           {if $isSupervisor && $relation === 'supervised'}
-            <a n:href="Enrolled:default $test->getId()">
-              {$test->getEnrolledUsers()->count()}{if $test->getRegistrations()->count() > 0} ({$test->getRegistrations()->count()} reg){/if}
-            </a>
+            {*
+             * Number of enrolled users (for supervisors)
+             *}
+            {$test->getEnrolledUsers()->count()}{if $test->getRegistrations()->count() > 0} ({$test->getRegistrations()->count()} reg){/if}
           {else}
+            {*
+             * Points and grade (for students)
+             *}
             {if $relation === 'enrolled' && $relationObj->hasScore()}
-              <strong>{$relationObj->getScore()} {_locale.test.pointsOf} {$relationObj->getMaxScore()}</strong>
+              <strong>
+                {$relationObj->getScore()}
+                {if $relationObj->getMaxScore() !== null}
+                  &nbsp;{_locale.test.pointsOf}&nbsp;{$relationObj->getMaxScore()}
+                {/if}
+              </strong>
               {var $grade = $relationObj->getGrade()}
-              <span n:if="$grade !== null" class="d-inline-block text-white rounded px-1 ms-1"
+              <span n:if="$grade !== null" class="d-inline-block text-white rounded px-2 ms-1" title="{_locale.test.grade}"
                 style="background-color: {$relationObj->getGradeColor()|noescape}">{$grade}</span>
+            {elseif $relation === 'enrolled' && $test->getFinishedAt() && !$relationObj->hasScore()}
+              <i class="fa-solid fa-user-graduate fa-fw fa-beat text-primary" title="{_locale.test.beingEvaluated}"></i>
             {/if}
           {/if}
         </td>
-        <td class="text-nowrap text-end">
+
+        <td class="text-nowrap text-end ps-4">
           {if $relation === 'supervised'}
+            {*
+             * Supervisor controls (buttons)
+             *}
+            <a n:if="$isSupervisor" n:href="Enrolled:default $test->getId()" class="btn btn-sm btn-primary">
+              <i class="fa-solid fa-magnifying-glass me-1"></i>
+              {_locale.dashboard.table.students}
+            </a>
 
             {if $test->getFinishedAt()}
               <form method="POST" action="{link RevokeFinish! id: $test->getId()}" class="d-inline"
                 data-ajax data-ajax-button="revokeFinishButton{$tidx}" data-ajax-confirm="{_locale.dashboard.table.revokeFinishConfirm}"
               >
-                <button id="revokeFinishButton{$tidx}" type="submit" class="btn btn-sm btn-danger">{_locale.dashboard.table.revokeFinish}</button>
+                <button id="revokeFinishButton{$tidx}" type="submit" class="btn btn-sm btn-danger">
+                  <i class="fa-solid fa-rotate-left me-1"></i>
+                  {_locale.dashboard.table.revokeFinish}
+                </button>
               </form>
             {elseif $test->getStartedAt()}
               <form method="POST" action="{link RevokeStart! id: $test->getId()}" class="d-inline"
                 data-ajax data-ajax-button="revokeStartButton{$tidx}" data-ajax-confirm="{_locale.dashboard.table.revokeStartConfirm}"
               >
-                <button id="revokeStartButton{$tidx}" type="submit" class="btn btn-sm btn-warning">{_locale.dashboard.table.revokeStart}</button>
+                <button id="revokeStartButton{$tidx}" type="submit" class="btn btn-sm btn-warning">
+                  <i class="fa-solid fa-rotate-left me-1"></i>
+                  {_locale.dashboard.table.revokeStart}
+                </button>
               </form>
               <form method="POST" action="{link Finish! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="finishButton{$tidx}">
-                <button id="finishButton{$tidx}" type="submit" class="btn btn-sm btn-danger">{_locale.dashboard.table.finish}</button>
+                <button id="finishButton{$tidx}" type="submit" class="btn btn-sm btn-danger">
+                  <i class="fa-solid fa-circle-check me-1"></i>
+                  {_locale.dashboard.table.finish}
+                </button>
               </form>
             {else}
               <form method="POST" action="{link Start! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="startButton{$tidx}">
-                <button id="startButton{$tidx}" type="submit" class="btn btn-sm btn-success">{_locale.dashboard.table.start}</button>
+                <button id="startButton{$tidx}" type="submit" class="btn btn-sm btn-success">
+                  <i class="fa-solid fa-circle-play me-1"></i>
+                  {_locale.dashboard.table.start}
+                </button>
               </form>
             {/if}
           
           {else}
-            {* student relations *}
-            {if $test->getStartedAt() && $relation === 'enrolled'}
-              {if $relationObj->isLocked() && $test->getFinishedAt() === null}
-                <i class="fa-solid fa-lock fa-fw text-secondary" title="{_locale.dashboard.table.locked}"></i>
-              {/if}
-              {if !$hasActiveTest || $test->getFinishedAt() === null}
-                <a n:href="Test:default $test->getId()">
-                  {if $test->getFinishedAt()}
-                    {_locale.dashboard.table.results}
-                  {elseif $relationObj->isLocked()}
-                    {_locale.dashboard.table.browse}
-                  {else}
-                    {_locale.dashboard.table.continue}
-                  {/if}
-                </a>
-              {/if}
-            {elseif $test->getStartedAt()}
+            {*
+             * Student relations and controls
+             *}
+            {if $test->getStartedAt()}
+              {*
+               * Test has already finished
+               *}
               {if $test->getFinishedAt()}
-                <em>{_locale.dashboard.table.missed}</em>
+                {if $relation === 'enrolled'}
+                  {* student was enrolled => show results unless another test is pending *}
+                  {if $hasActiveTest}
+                    <i class="fa-solid fa-ban me-1 text-danger"></i>
+                    <em>{_locale.dashboard.table.anotherActive}</em>
+                  {else}
+                    <a n:href="Test:default $test->getId()" class="btn btn-sm btn-primary">
+                      <i class="fa-solid fa-magnifying-glass-chart me-1"></i>
+                      {_locale.dashboard.table.results}
+                    </a>
+                  {/if}
+                {else}
+                  {* student was not enrolled => missed the test *}
+                  <em>{_locale.dashboard.table.missed}</em>
+                {/if}
+
               {else}
-                <form method="POST" action="{link Enroll! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="enrollButton{$tidx}">
-                  <button id="enrollButton{$tidx}" type="success" class="btn btn-sm btn-primary">{_locale.dashboard.table.enroll}</button>
-                </form>
+                {*
+                 * Test is open for business (started, not finished)
+                 *}
+                {if $relation === 'enrolled'}
+
+                  {*
+                   * Student is already in (working on the test)
+                   *}
+                  {if $relationObj->isLocked()}
+                    <i class="fa-solid fa-lock fa-fw text-secondary" title="{_locale.dashboard.table.locked}"></i>
+                  {/if}
+
+                  <a n:href="Test:default $test->getId()" class="btn btn-sm btn-primary">
+                    {if $relationObj->isLocked()}
+                      <i class="fa-solid fa-magnifying-glass me-1"></i>
+                      {_locale.dashboard.table.browse}
+                    {else}
+                      <i class="fa-solid fa-forward me-1"></i>
+                      {_locale.dashboard.table.continue}
+                    {/if}
+                  </a>
+
+                {else}
+                  {* student can get enrolled (start working on the test) *}
+                  <form method="POST" action="{link Enroll! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="enrollButton{$tidx}">
+                    <button id="enrollButton{$tidx}" type="success" class="btn btn-sm btn-success" disabled={$hasActiveTest}
+                      title="{if $hasActiveTest}{_locale.dashboard.table.anotherActive}{/if}"
+                    >
+                      <i class="fa-solid fa-circle-play me-1"></i>
+                      {_locale.dashboard.table.enroll}
+                    </button>
+                  </form>
+                {/if}
+
               {/if}
+
             {else}
+              {*
+               * Test has not started yet (by the teacher), just show the relation info
+               *}
               {if $relation === 'enrolled'}
                 <em>{_locale.dashboard.table.waitingEnrolled}</em>
               {else}

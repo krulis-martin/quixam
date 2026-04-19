@@ -20,6 +20,7 @@ final class RouterFactory
         $router[] = new PostRoute('rest/refresh', 'RestLogin:refreshToken');
 
         $router[] = new GetRoute('rest/templates/test/<id>', 'RestTemplates:getTest');
+        $router[] = new PostRoute('rest/templates/test/<id>/grading', 'RestTemplates:setGrading');
         $router[] = new PostRoute('rest/templates/test/<id>/group/<groupId>', 'RestTemplates:addGroup');
         $router[] = new DeleteRoute('rest/templates/test/<id>/group/<groupId>', 'RestTemplates:deleteGroup');
         $router[] = new PostRoute(

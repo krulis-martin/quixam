@@ -15,6 +15,13 @@ use Exception;
  */
 final class QuestionOrder extends BaseQuestion
 {
+    public const TYPE = 'order';
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
     /** @var int|null */
     private $minCount = null;
 
@@ -244,11 +251,11 @@ final class QuestionOrder extends BaseQuestion
         Engine $latte,
         string $locale,
         $answer = null,
-        ?bool $answerIsCorrect = null
+        ?int $mistakes = null
     ): string {
         $params = ['readonly' => true];
-        if ($answerIsCorrect !== null) {
-            $params['correctClass'] = $answerIsCorrect ? 'correct' : 'wrong';
+        if ($mistakes !== null) {
+            $params['correctClass'] = $mistakes === 0 ? 'correct' : 'wrong';
         }
         return $this->renderOrderTemplate($latte, $locale, $answer, $params);
     }
@@ -286,12 +293,16 @@ final class QuestionOrder extends BaseQuestion
         return true;
     }
 
-    public function isAnswerCorrect($answer): bool
+    public function evaluateAnswer($answer): int
     {
         if (!$this->isAnswerValid($answer)) {
-            return false;
+            return 1;
         }
 
+        /*
+         * Current implementation treats the entire answer as either correct or incorrect
+         * This may change in the future if we decide on a good mistake metric for order questions.
+         */
         $items = $this->items;
         $selected = [];
         foreach ($answer as $key) {
@@ -301,19 +312,19 @@ final class QuestionOrder extends BaseQuestion
 
         foreach ($items as $item) {
             if ($item->isCorrect()) {
-                return false; // one of the correct items was not selected
+                return 1; // one of the correct items was not selected
             }
         }
 
         $lastOrder = PHP_INT_MIN;
         foreach ($selected as $item) {
             if (!$item->isCorrect() || $item->getCorrectOrder() < $lastOrder) {
-                return false;
+                return 1;
             }
             $lastOrder = $item->getCorrectOrder();
         }
 
-        return true;
+        return 0;
     }
 
     public function getCorrectAnswer()

@@ -9,14 +9,15 @@
         </div>
     {/if}
 {elseif !empty($graded)}
-    <div id="answerText" class="mt-4">
+    <div id="answerText" class="mt-4 mb-3">
         <span>{_locale.app.Answer}:</span>
-        <button type="button" class="btn btn-outline-primary btn-sm float-end">
+        <em n:if="!$answer" class="text-muted ms-2">{_locale.templateQuestion.text.noAnswerGiven}</em>
+        <button n:if="$answer" type="button" class="btn btn-outline-primary btn-sm float-end">
             <i class="fa-solid fa-toggle-off me-2"></i>{_locale.templateQuestion.text.MarkdownDisabled}
         </button>
-        <pre class="bg-{$graded}-subtle border p-3 my-3 rounded">{$answer}</pre>
+        <pre n:if="$answer" class="bg-{$graded}-subtle border p-3 my-3 rounded">{$answer}</pre>
     </div>
-    <div id="answerMarkdown" class="mt-4" style="display: none;">
+    <div n:if="$answer" id="answerMarkdown" class="mt-4" style="display: none;">
         <span>{_locale.app.Answer}:</span>
         <button type="button" class="btn btn-outline-primary btn-sm float-end">
             <i class="fa-solid fa-toggle-on me-2"></i>{_locale.templateQuestion.text.MarkdownEnabled}

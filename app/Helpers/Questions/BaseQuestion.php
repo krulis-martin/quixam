@@ -14,7 +14,7 @@ use Latte\Engine;
 abstract class BaseQuestion extends LocalizedEntity implements IQuestion
 {
     /*
-     * Implementing the interface
+     * Implementing the interfaces
      */
 
     public function instantiate($templateJson, int $seed): void
@@ -28,19 +28,24 @@ abstract class BaseQuestion extends LocalizedEntity implements IQuestion
         $this->loadText($json, 'Corrupted question data');
     }
 
-    public function jsonSerialize(): mixed
+    public function getItemsCount(): int
     {
-        return ['text' => $this->text];
+        return 1;
     }
 
     public function renderCorrectContent(Engine $latte, string $locale): string
     {
         // the default behavior is to use results rendered with the correct answer provided by the question
-        return $this->renderResultContent($latte, $locale, $this->getCorrectAnswer(), true);
+        return $this->renderResultContent($latte, $locale, $this->getCorrectAnswer(), 0);
     }
 
     public function useRandomSeed(): bool
     {
         return true; // questions are randomized, unless they explicitly override this method
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return ['text' => $this->text];
     }
 }

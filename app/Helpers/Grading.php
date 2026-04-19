@@ -22,7 +22,7 @@ class Grading implements JsonSerializable, Iterator
     private const FAIL_COLOR = '#dc3545';   // bootstrap danger
 
     /**
-     * Return a color formatted in CSS hexa RGB (6 chars - RRGGBB) with # prefix.
+     * Return a color formatted in CSS hex-RGB (6 chars - RRGGBB) with # prefix.
      * @param array $color (as 3-component tuple r,g,b in ints 0-255)
      * @return string '#rrggbb' in hex
      * @phpstan-ignore method.unused
@@ -61,14 +61,26 @@ class Grading implements JsonSerializable, Iterator
     public function __construct(array $grading = [])
     {
         foreach ($grading as &$limit) {
+            if ($limit === null) {
+                $limit = PHP_INT_MIN;
+            }
             if (!is_numeric($limit)) {
                 throw new Exception("Grading limits must be numeric values only.");
             }
             $limit = (int)$limit;
         }
-        arsort($grading, SORT_NUMERIC); // associative, reverse
-        $this->grading = $grading;
+        unset($limit); // break reference
+        arsort($grading, SORT_NUMERIC); // associative, reverse (greatest number first)
 
+        $last = PHP_INT_MAX;
+        foreach ($grading as $limit) {
+            if ($limit === $last) {
+                throw new Exception("Grading limits must be unique, to form strictly decreasing sequence.");
+            }
+            $last = $limit;
+        }
+
+        $this->grading = $grading;
         $this->marks = array_keys($this->grading);
         reset($this->marks);
     }
@@ -105,13 +117,14 @@ class Grading implements JsonSerializable, Iterator
     /**
      * Return point range for given mark.
      * @param int|string $mark
-     * @return array [ min, max ], null is returned as max for the best mark
+     * @return array [ min, max ], null is returned as max for the best mark/min for the worst mark
      */
     public function getMarkRange($mark): array
     {
         $upper = null;
         foreach ($this->grading as $m => $limit) {
             if ($m === $mark) {
+                $limit = ($limit > PHP_INT_MIN) ? $limit : null;
                 return [$limit, $upper];
             }
             $upper = $limit - 1;
@@ -125,7 +138,13 @@ class Grading implements JsonSerializable, Iterator
 
     public function jsonSerialize(): mixed
     {
-        return $this->grading;
+        $grading = $this->grading;  // make a copy
+        foreach ($grading as &$limit) {
+            if ($limit === PHP_INT_MIN) {
+                $limit = null; // translate minimum back to null for better readability in JSON
+            }
+        }
+        return $grading;
     }
 
     public function current(): mixed

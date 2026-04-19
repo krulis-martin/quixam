@@ -10,6 +10,12 @@ use JsonSerializable;
 interface IQuestion extends JsonSerializable
 {
     /**
+     * Return the type identifier of the question.
+     * It is used in the factory and in the question entity to remember, which class to instantiate.
+     */
+    public function getType(): string;
+
+    /**
      * Load question template data and generate an instance of the question using given random seed.
      * @param mixed $templateJson deserialized data from a template
      * @param int $seed used to initialize random generators
@@ -29,6 +35,13 @@ interface IQuestion extends JsonSerializable
     public function getText(string $locale): string;
 
     /**
+     * Return the number of independently-graded items in the question.
+     * Compact questions should return 1. Multi-choice questions should return the number of choices.
+     * This is also maximum that can be returned from evaluateAnswer(), which returns number of mistakes.
+     */
+    public function getItemsCount(): int;
+
+    /**
      * Render internal content of the form where the user selects the answer.
      * @param Engine $latte engine for rendering latte templates (separately from the presenters)
      * @param string $locale selected locale
@@ -44,15 +57,14 @@ interface IQuestion extends JsonSerializable
      * @param string $locale selected locale
      * @param mixed $answer deserialized json structure sent over by the client
      *                      the answer will be used for rendering (null = this question was not answered)
-     * @param bool|null $answerIsCorrect how the answer should be displayed
-     *                                   (null = display it indifferently)
+     * @param int|null $mistakes number of mistakes in the answer (null = not graded, display it indifferently)
      * @return string raw HTML fragment which is pasted without escaping into the output
      */
     public function renderResultContent(
         Engine $latte,
         string $locale,
         $answer = null,
-        ?bool $answerIsCorrect = null
+        ?int $mistakes = null
     ): string;
 
     /**
@@ -81,15 +93,16 @@ interface IQuestion extends JsonSerializable
     public function isAnswerValid($answer): bool;
 
     /**
-     * Check whether given answer is the correct answer for this particular question instance.
+     * Evaluate the answer and return the number of mistakes (0 = fully correct, 1 = one mistake, etc.).
      * @param mixed $answer deserialized json structure sent over by the client
-     * @return bool|null true if the answer is a correct one, null if the answer cannot be evaluated automatically
-     *                   (the question is configured for manual grading by the teacher)
+     * @return int|null [0, N] where N is the number of independently-graded items (returned by getItemsCount());
+     *                 null if the answer cannot be evaluated automatically
+     *                 (the question is configured for manual grading by the teacher)
      */
-    public function isAnswerCorrect($answer): ?bool;
+    public function evaluateAnswer($answer): ?int;
 
     /**
-     * Return a correct answer in the format, that is accepted by isAnswerValid and isAnswerCorrect.
+     * Return a correct answer in the format, that is accepted by isAnswerValid and evaluateAnswer.
      * @return mixed
      */
     public function getCorrectAnswer();

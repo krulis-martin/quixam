@@ -13,6 +13,14 @@ use RuntimeException;
 interface IApiClient
 {
     /**
+     * Sets the grading configuration for a test template. The grading configuration is an associative array
+     * where keys are grades (e.g., 1, 2, 3, 4) and values are point thresholds for achieving those grades.
+     * @param string $testId External ID of the test template.
+     * @param array $grading Associative array of grade => point threshold.
+     */
+    public function setGrading(string $testId, array $grading): void;
+
+    /**
      * Gets the structure of the test template with given ID. Returns null if the test does not exist.
      * The structure is an array of groups, where each group is an array of questions.
      * @param string $testId External ID of the test template.
@@ -25,12 +33,20 @@ interface IApiClient
      * Adds/updates a question group.
      * @param string $testId External ID of the test template.
      * @param string $groupId External ID of the question group.
-     * @param int $points Points assigned to the group.
+     * @param int $points Points assigned to each question in the group.
+     * @param int $pointsPerItem Points-per-item assigned to each question within the group.
      * @param int $count Number of questions to select from the group.
      * @param int $ordering Ordering of the group within the test template.
      * @throws RuntimeException if the group creation/update fails.
      */
-    public function addGroup(string $testId, string $groupId, int $points, int $count, int $ordering): void;
+    public function addGroup(
+        string $testId,
+        string $groupId,
+        int $points,
+        int $pointsPerItem,
+        int $count,
+        int $ordering
+    ): void;
 
     /**
      * Adds/updates a question.

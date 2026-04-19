@@ -272,17 +272,28 @@ final class RestApiClient implements IApiClient
      * Implementation of IApiClient interface
      */
 
+    public function setGrading(string $testId, array $grading): void
+    {
+        $this->post("/rest/templates/test/{$testId}/grading", [], ['grading' => $grading]);
+    }
+
     public function getTestStructure(string $testId): ?array
     {
         return $this->get("/rest/templates/test/{$testId}");
     }
 
-    public function addGroup(string $testId, string $groupId, int $points, int $count, int $ordering): void
-    {
+    public function addGroup(
+        string $testId,
+        string $groupId,
+        int $points,
+        int $pointsPerItem,
+        int $count,
+        int $ordering
+    ): void {
         $this->post(
             "/rest/templates/test/{$testId}/group/{$groupId}",
             [],
-            ['points' => $points, 'count' => $count, 'ordering' => $ordering]
+            ['points' => $points, 'pointsPerItem' => $pointsPerItem, 'count' => $count, 'ordering' => $ordering]
         );
     }
 

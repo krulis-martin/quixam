@@ -63,8 +63,6 @@ final class TemplatesActions
         return $groups->last()->getOrdering() + 1;
     }
 
-
-
     /**
      * Retrieves test template by its external ID.
      * @return TemplateTest|null Returns the template test entity or null if it does not exist.
@@ -72,6 +70,17 @@ final class TemplatesActions
     public function getTemplateTest(string $externalId): ?TemplateTest
     {
         return $this->templateTests->findOneBy(['externalId' => $externalId]);
+    }
+
+    /**
+     * Update grading configuration of the given test template.
+     * @param TemplateTest $test The template test entity for which the grading configuration should be updated.
+     * @param array $grading Associative array of grade => point threshold.
+     */
+    public function setGrading(TemplateTest $test, array $grading): void
+    {
+        $test->setGrading(new Grading($grading)); // this may throw, if the format is invalid
+        $this->templateTests->persist($test);
     }
 
     public function getTemplateGroup(TemplateTest $test, string $groupExternalId): ?TemplateQuestionsGroup
@@ -105,6 +114,7 @@ final class TemplatesActions
      * @param int|null $ordering An index used for sorting the groups when the test is being assembled.
      * @param int|null $count Number of questions selected from this group.
      * @param int|null $points Number of points awarded for each question in this group.
+     * @param int|null $pointsPerItem Points-per-item for each question in this group.
      * @return bool|null null = group needed to be created, false = group was updated, true = no changes made
      */
     public function addGroup(
@@ -112,23 +122,26 @@ final class TemplatesActions
         string $groupId,
         ?int $ordering = null,
         ?int $count = null,
-        ?int $points = null
+        ?int $points = null,
+        ?int $pointsPerItem = null,
     ): ?bool {
         $group = $this->templateQuestionsGroups->findOneBy(['externalId' => $groupId, 'test' => $test->getId()]);
         $ordering = $ordering ?? ($group ? $group->getOrdering() : self::getMaxOrdering($test));
         $count = $count ?? ($group ? $group->getSelectCount() : 1);
         $points = $points ?? ($group ? $group->getPoints() : 1);
+        $pointsPerItem = $pointsPerItem ?? ($group ? $group->getPointsPerItem() : 0);
 
         if (
             $group
             && $group->getOrdering() === $ordering
             && $group->getSelectCount() === $count
             && $group->getPoints() === $points
+            && $group->getPointsPerItem() === $pointsPerItem
         ) {
             return true; // no update needed, the group already has the desired values.
         }
 
-        $newGroup = new TemplateQuestionsGroup($test, $ordering, $count, $points, $groupId, $group);
+        $newGroup = new TemplateQuestionsGroup($test, $ordering, $count, $points, $pointsPerItem, $groupId, $group);
         $this->templateQuestionsGroups->persist($newGroup);
 
         if (!empty($group)) {

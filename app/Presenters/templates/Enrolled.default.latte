@@ -6,6 +6,41 @@
 </h1>
 
 <div class="my-3 p-3 border border-secondary rounded bg-light">
+  <div class="d-inline float-end">
+    {if $test->getFinishedAt()}
+      <form method="POST" action="{link RevokeFinish! id: $test->getId()}" class="d-inline"
+        data-ajax data-ajax-button="revokeFinishButton" data-ajax-confirm="{_locale.dashboard.table.revokeFinishConfirm}"
+      >
+        <button id="revokeFinishButton" type="submit" class="btn btn-sm btn-danger">
+          <i class="fa-solid fa-rotate-left me-1"></i>
+          {_locale.dashboard.table.revokeFinish}
+        </button>
+      </form>
+    {elseif $test->getStartedAt()}
+      <form method="POST" action="{link RevokeStart! id: $test->getId()}" class="d-inline"
+        data-ajax data-ajax-button="revokeStartButton" data-ajax-confirm="{_locale.dashboard.table.revokeStartConfirm}"
+      >
+        <button id="revokeStartButton" type="submit" class="btn btn-sm btn-warning">
+          <i class="fa-solid fa-rotate-left me-1"></i>
+          {_locale.dashboard.table.revokeStart}
+        </button>
+      </form>
+      <form method="POST" action="{link Finish! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="finishButton">
+        <button id="finishButton" type="submit" class="btn btn-sm {$allEnrolledLocked ? 'btn-success' : 'btn-danger'}">
+          <i class="fa-solid fa-circle-check me-1"></i>
+          {_locale.dashboard.table.finish}
+        </button>
+      </form>
+    {else}
+      <form method="POST" action="{link Start! id: $test->getId()}" class="d-inline" data-ajax data-ajax-button="startButton">
+        <button id="startButton" type="submit" class="btn btn-sm btn-success">
+          <i class="fa-solid fa-circle-play me-1"></i>
+          {_locale.dashboard.table.start}
+        </button>
+      </form>
+    {/if}
+  </div>
+
   <h4>
     <i class="fa-solid fa-list-check fa-fw text-muted me-2"></i>
     {$test->getCaption($locale)}, {$test->getScheduledAt()|ldate}
@@ -27,6 +62,14 @@
   {/if}
 </div>
 
+<div n:if="$allEnrolledLocked && !$test->getFinishedAt()" class="alert alert-success">
+  <i class="fa-solid fa-user-lock me-2"></i>
+  {_locale.enrolledUsers.allLockedInfo}
+</div>
+
+{*
+ * Table of enrolled users (and their results)
+ *}
 {if $enrolledUsers}
 <table class="table table-hover align-middle mt-4">
   <thead>
@@ -41,6 +84,7 @@
       <th></th>
     </tr>
   </thead>
+
   <tbody>
     <tr n:foreach="$enrolledUsers as $idx => $enrolledUser">
       <td class="text-nowrap">{$enrolledUser->getUser()->getLastName()}</td>
@@ -50,31 +94,44 @@
         {$enrolledUser->getUser()->getExternalId()}
       </td>
       
+      {*
+       * Status of questions (and answers) for this user
+       *}
       <td class="text-nowrap text-center">
         {foreach $questions[$enrolledUser->getUser()->getId()] ?? [] as $question}
           {var $answer = $question->getLastAnswer()}
-          {var $answerStyle = answerStyle($answer, true)}
-          <a class="badge fs-6 me-1 position-relative text-decoration-none {$answerStyle ? ('text-bg-' . $answerStyle) : 'bg-light'}"
+          {var $answerStyle = $test->getFinishedAt() ? answerStyle($answer, true) : ($answer ? 'warning' : 'secondary')}
+          <a class="badge fs-6 me-1 position-relative text-decoration-none {$answerStyle ? ('text-bg-' . $answerStyle) : 'text-bg-secondary'}"
             n:href="Test:default $test->getId(), selectedUser: $enrolledUser->getUser()->getId(), question => $question->getId()"
           >
             {$question->getOrdering()}
-            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-primary rounded-pill text-smaller">
-              {$question->getPoints()}
+            <span class="position-absolute top-0 start-{$answer?->getPoints() !== null ? '50' : '100'} translate-middle p-1 bg-primary text-bg-primary rounded-pill text-smaller"
+            >
+              {if $answer?->getPoints() !== null}
+                 {$answer->getPoints()}/
+              {/if}
+              {formatPoints($question)}
             </span>
           </a>
         {/foreach}
       </td>
       
+      {*
+       * Total points and grade
+       *}
       <td n:if="$test->getFinishedAt()" class="text-nowrap text-center">
         <strong n:if="$enrolledUser->hasScore()">{$enrolledUser->getScore()}</strong>
         <i n:if="!$enrolledUser->hasScore()" class="fa-solid fa-user-pen text-primary fa-beat" title="{_locale.enrolledUsers.pendingScore}"></i>
         {if $enrolledUser->hasScore()}
           {var $grading = $enrolledUser->getGrade()}
-          <span n:if="$grading !== null" class="d-inline-block text-white rounded px-1 ms-1"
+          <span n:if="$grading !== null" class="d-inline-block text-white rounded px-2 ms-1" title="{_locale.test.grade}"
             style="background-color: {$enrolledUser->getGradeColor()|noescape}">{$grading}</span>
         {/if}
       </td>
 
+      {*
+       * Controls (buttons)
+       *}
       <td class="text-nowrap text-end w-0">
         <a n:href="Test:default $test->getId(), selectedUser: $enrolledUser->getUser()->getId()"
           class="btn btn-sm btn-primary" title="{_locale.enrolledUsers.Detail}"
@@ -111,6 +168,9 @@
 </table>
 {/if}
 
+{*
+ * Table of registrations (users who haven't started the test yet)
+ *}
 {if !$test->getRegistrations()->isEmpty()}
 <h5 class="mt-4">{_locale.enrolledUsers.registrations}</h5>
 <table class="table table-hover align-middle">

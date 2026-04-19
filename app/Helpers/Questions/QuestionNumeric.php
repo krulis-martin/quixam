@@ -14,6 +14,13 @@ use Exception;
  */
 final class QuestionNumeric extends BaseQuestion
 {
+    public const TYPE = 'numeric';
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
     private const FORMAT_DEC = 'dec';
     private const FORMAT_HEX = 'hex';
     private const FORMAT_BIN = 'bin';
@@ -192,11 +199,11 @@ final class QuestionNumeric extends BaseQuestion
         Engine $latte,
         string $locale,
         $answer = null,
-        ?bool $answerIsCorrect = null
+        ?int $mistakes = null
     ): string {
         $params = ['readonly' => true];
-        if ($answerIsCorrect !== null) {
-            $params['inputClass'] = $answerIsCorrect ? 'text-success' : 'text-danger';
+        if ($mistakes !== null) {
+            $params['inputClass'] = $mistakes === 0 ? 'text-success' : 'text-danger';
         }
         return $this->renderNumericTemplate($latte, $answer, $params);
     }
@@ -266,28 +273,50 @@ final class QuestionNumeric extends BaseQuestion
         return true;
     }
 
-    public function isAnswerCorrect($answer): bool
+    public function evaluateAnswer($answer): int
     {
-        if (!$this->isAnswerValid($answer)) {
-            return false;
+        if ($this->isAnswerValid($answer) === false) {
+            return count($this->correct); // all items are mistakes
         }
 
-        $correct = $this->correct;
         $answerNums = array_map(function ($record) {
             return $record['num'];
         }, $answer);
-        if (!$this->correctInOrder) {
-            sort($correct, SORT_NUMERIC);
-            sort($answerNums, SORT_NUMERIC);
-        }
 
-        foreach ($correct as $idx => $value) {
-            if ($answerNums[$idx] !== $value) {
-                return false;
+        $mistakes = 0;
+        if ($this->correctInOrder) {
+            // compare as lists (explicit positions)
+            foreach ($this->correct as $idx => $value) {
+                if (!array_key_exists($idx, $answerNums) || $answerNums[$idx] !== $value) {
+                    ++$mistakes;
+                }
             }
+
+            if (count($answerNums) > count($this->correct)) {
+                $mistakes += count($answerNums) - count($this->correct); // extra answers are mistakes
+            }
+        } else {
+            // compare as sets (positions do not matter)
+            $correctSet = array_count_values($this->correct);
+            $answerSet = array_count_values($answerNums);
+            foreach ($answerSet as $num => $count) {
+                $correctSet[$num] = ($correctSet[$num] ?? 0) - $count;
+            }
+
+            $missing = 0;
+            $superfluous = 0;
+            foreach ($correctSet as $num => $count) {
+                if ($count > 0) {
+                    $missing += $count; // missing correct answers
+                } elseif ($count < 0) {
+                    $superfluous -= $count; // extra incorrect answers
+                }
+            }
+            // missing and superfluous answers pair each other, so the maximum of them is the number of mistakes
+            $mistakes = max($missing, $superfluous);
         }
 
-        return true;
+        return $mistakes;
     }
 
     public function getCorrectAnswer()

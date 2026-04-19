@@ -13,6 +13,13 @@ use Exception;
  */
 final class QuestionMulti extends BaseChoiceQuestion
 {
+    public const TYPE = 'multi';
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
     /**
      * Set the answers and the correct answers manually.
      * @param array $answers
@@ -57,6 +64,11 @@ final class QuestionMulti extends BaseChoiceQuestion
         $this->correct = array_keys($correct);
     }
 
+    public function getItemsCount(): int
+    {
+        return count($this->answers);
+    }
+
     /**
      * Helper wrapper function for rendering multi-choice template. Prepares common parameters.
      * @param Engine $latte engine for rendering latte templates (separately from the presenters)
@@ -83,9 +95,9 @@ final class QuestionMulti extends BaseChoiceQuestion
         Engine $latte,
         string $locale,
         $answer = null,
-        ?bool $answerIsCorrect = null
+        ?int $mistakes = null
     ): string {
-        $params = ['graded' => $answerIsCorrect === null ? 'muted' : ($answerIsCorrect ? 'success' : 'danger')];
+        $params = ['graded' => $mistakes === null ? 'muted' : ($mistakes === 0 ? 'success' : 'danger')];
         return $this->renderMultiChoicesTemplate($latte, $locale, $answer, $params);
     }
 
@@ -125,18 +137,30 @@ final class QuestionMulti extends BaseChoiceQuestion
         return true;
     }
 
-    public function isAnswerCorrect($answer): bool
+    public function evaluateAnswer($answer): int
     {
-        if (!is_array($answer) || count($answer) !== count($this->correct)) {
-            return false;
+        if ($this->isAnswerValid($answer) === false) {
+            return $this->getItemsCount(); // all items are mistakes
         }
 
-        foreach ($this->correct as $correct) {
-            if (!in_array($correct, $answer)) {
-                return false;
-            }
+        $answerIndex = [];
+        $correct = [];
+        foreach (array_keys($this->answers) as $key) {
+            $answerIndex[$key] = false;
+            $correct[$key] = false;
         }
 
-        return true;
+        foreach ($answer as $key) {
+            $answerIndex[$key] = true;
+        }
+        foreach ($this->correct as $key) {
+            $correct[$key] = true;
+        }
+
+        $mistakes = 0;
+        foreach (array_keys($this->answers) as $key) {
+            $mistakes += $answerIndex[$key] === $correct[$key] ? 0 : 1;
+        }
+        return $mistakes;
     }
 }

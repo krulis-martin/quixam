@@ -47,11 +47,16 @@
 {if $canSeeResults && $enrolledUser->hasScore()}
   <strong class="d-inline-block float-lg-end">
     <span class="text-muted">{_locale.test.awardedPoints}:</span>
-    {$enrolledUser->getScore()} {_locale.test.pointsOf} {$enrolledUser->getMaxScore()}
+    {$enrolledUser->getScore()}
+    {if $enrolledUser->getMaxScore() !== null}
+      &nbsp;{_locale.test.pointsOf}&nbsp;{$enrolledUser->getMaxScore()}
+    {/if}
 
     {var $grade = $enrolledUser->getGrade()}
-    <span n:if="$grade !== null" class="d-inline-block text-white rounded px-1 ms-2"
-      style="background-color: {$enrolledUser->getGradeColor()|noescape}">{$grade}</span>
+    <span n:if="$grade !== null" class="d-inline-block text-white rounded px-2 ms-2"
+      style="background-color: {$enrolledUser->getGradeColor()|noescape}"
+      title="{_locale.test.grade}"
+    >{$grade}</span>
   </strong>
 {/if}
 
@@ -80,7 +85,7 @@
       </li>
       {if $test->getFinishedAt() === null}
       <li class="page-item {$selectedQuestionIdx >= count($questions) ? 'active'}">
-        <a class="page-link" n:href="this question => null">{_locale.test.end}</a>
+        <a class="page-link" n:href="this question => null, end => true">{_locale.test.end}</a>
       </li>
       {/if}
       <li class="page-item {$selectedQuestionIdx >= (count($questions) - ($test->getFinishedAt() === null ? 0 : 1)) ? 'disabled'}">
@@ -100,21 +105,35 @@
     {block title}
       {if $selectedQuestionIdx < count($questions)}
         <i class="fa-regular fa-circle-question me-2 opacity-50"></i>{_locale.test.question} #{$selectedQuestion->getOrdering()}
-      {else}
+      {elseif $allAnswered}
+        <i class="fa-solid fa-flag-checkered opacity-75 me-1"></i>
         {_locale.test.completed.title}
+      {else}
+        <i class="fa-solid fa-circle-exclamation text-danger opacity-75 me-1"></i>
+        {_locale.test.notCompleted.title}
       {/if}
     {/block}
     {if $selectedQuestionIdx < count($questions)}
       &ndash; {$selectedQuestion->getCaption($locale)}
 
-      {if $canSeeResults && $answer}
-        {var $answerStyle = answerStyle($answer, true)}
-        <span class="badge bg-{$answerStyle} float-sm-end mt-1 ms-3 fs-6">
-          {_locale.test.points}: {(int)$answer?->getPoints()} {_locale.test.pointsOf} {$selectedQuestion->getPoints()}
-        </span>
-      {else}
-        <span class="badge bg-secondary float-sm-end mt-1 ms-3 fs-6">{_locale.test.points}: {$selectedQuestion->getPoints()}</span>
-      {/if}
+      {*
+       * Question points/awarded points for answer
+       *}
+      {var $pointsStyle = $canSeeResults && $answer ? answerStyle($answer, true) : 'secondary'}
+      <span class="badge bg-{$pointsStyle} float-sm-end mt-1 ms-3 fs-6"
+        title="{if $selectedQuestion->hasNegativeGrading()}{_locale.test.pointsTitle.negative}{else}{_locale.test.pointsTitle.positive}{/if}"
+      >
+        {_locale.test.points}:&nbsp;
+        {if $canSeeResults && $answer}
+          {(int)$answer->getPoints()}&nbsp;{_locale.test.pointsOf}&nbsp;
+        {/if}
+        {formatPoints($selectedQuestion)}
+        {if $selectedQuestion->getPointsPerItem() > 0 && $selectedQuestion->getItemsCount() > 1}
+          &nbsp;({$selectedQuestion->getPointsPerItem()}&nbsp;/&nbsp;{_locale.test.pointsPerCorrectItem})
+        {elseif $selectedQuestion->getPointsPerItem() < 0 && $selectedQuestion->getItemsCount() > 1}
+          &nbsp;({$selectedQuestion->getPointsPerItem()}&nbsp;/&nbsp;{_locale.test.pointsPerMistake})
+        {/if}
+      </span>
     {/if}
   </h3>
 
@@ -166,7 +185,7 @@
       {*
        * Question form (rendered separately, injected) with submit button
        *}
-      <form action="{link Save! question: $selectedQuestion->getId()}" method="POST" data-ajax data-ajax-button="saveButton">
+      <form action="{link Save! question: $selectedQuestion->getId()}" method="POST" data-ajax data-ajax-button="saveButton" autocomplete="off">
         <input type="hidden" name="nextQuestion" value="{$nextQuestion?->getId()}">
 
         {$questionForm|noescape}
@@ -218,7 +237,7 @@
      * Grading comments and points override
      *}
     <div n:if="$test->getFinishedAt() !== null && $answer && $isSupervisor" class="card card-body mt-2">
-      <form action="{link PointsOverride! question: $selectedQuestion->getId()}" method="POST" data-ajax data-ajax-button="gradingButton">
+      <form action="{link PointsOverride! question: $selectedQuestion->getId()}" method="POST" data-ajax data-ajax-button="gradingButton" autocomplete="off">
 
       <div class="container mb-3">
         <div class="row">
@@ -227,14 +246,14 @@
               {_locale.test.studentFeedbackText}:
               <i class="fa-brands fa-markdown ms-2 opacity-50" title="Markdown"></i>
             </label>
-            <textarea name="publicComment" class="form-control" rows="4">{$answer->getPublicComment() ?? ''}</textarea>
+            <textarea name="publicComment" class="form-control" rows="4" style="resize: none;">{$answer->getPublicComment() ?? ''}</textarea>
           </div>
           <div class="col">
             <label class="form-label mt-2">
               {_locale.test.hiddenTeachersNote}:
               <i class="fa-brands fa-markdown ms-2 opacity-50" title="Markdown"></i>
             </label>
-            <textarea name="privateComment" class="form-control" rows="4">{$answer->getPrivateComment() ?? ''}</textarea>
+            <textarea name="privateComment" class="form-control" rows="4" style="resize: none;">{$answer->getPrivateComment() ?? ''}</textarea>
           </div>
         </div>
 
@@ -247,9 +266,25 @@
                 {_locale.test.manualGrading.title}:
               {/if}
             </label>
-            <input type="text" class="form-control" id="pointsOverride" name="pointsOverride" maxlength="10"
-              value="{$answer->getPoints() !== null ? (int)$answer->getPoints() : ''}"
-            >
+            <div class="input-group">
+              <input type="text" class="form-control" id="pointsOverride" name="pointsOverride" maxlength="10" autocomplete="off"
+                value="{$answer->getPoints() !== null ? (int)$answer->getPoints() : ''}"
+              >
+              <span class="input-group-text text-muted bg-warning-subtle" id="pointsOverrideWarning" style="display: none;">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                {_locale.test.manualGrading.range} [{$minPoints}..{$maxPoints}]
+              </span>
+
+              <button n:if="$answer->getAutoPoints()" class="btn btn-outline-primary" type="button" id="pointsOverrideReset" title="Reset">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+              <button class="btn btn-outline-primary" type="button" id="pointsOverrideSetMax" title="Maximum">
+                <i class="fa-solid fa-arrows-up-to-line"></i>
+              </button>
+              <button class="btn btn-outline-primary" type="button" id="pointsOverrideSetMin" title="Minimum">
+                <i class="fa-solid fa-arrows-down-to-line"></i>
+              </button>
+            </div>
           </div>
 
           <div class="col text-end">
@@ -272,15 +307,19 @@
     <p>
       {if $enrolledUser->isLocked()}
         {_locale.test.completed.message1Locked}
+      {elseif $allAnswered}
+        {_locale.test.completed.message1} {_locale.test.lockMyself.info}
       {else}
-        {_locale.test.completed.message1}
+        {_locale.test.notCompleted.message1} {_locale.test.lockMyself.info}
       {/if}
     </p>
 
     {if !$enrolledUser->isLocked()}
-      <a class="btn btn-warning mb-3" n:href="LockSelf!" data-ajax="POST" data-ajax-confirm="{_locale.test.lockMyselfConfirm}">
-        <i class="fa-solid fa-user-lock fa-fw"></i>
-        {_locale.test.lockMyselfButton}
+      <a class="btn btn-lg shadow mb-3 {$allAnswered ? 'btn-warning' : 'btn-danger'}"
+        n:href="LockSelf!" data-ajax="POST" data-ajax-confirm="{_locale.test.lockMyself.confirm}"
+      >
+        <i class="fa-solid fa-user-lock fa-fw me-1"></i>
+        {_locale.test.lockMyself.button}
       </a>
     {/if}
 
@@ -294,10 +333,10 @@
         <strong>
           {if $range[1] === null}
             {$range[0]} {_locale.test.completed.points.more}
-          {elseif $range[0] === 0 && $range[1] > 0}
+          {elseif $range[0] === null}
             {$range[1]} {_locale.test.completed.points.less}
           {elseif $range[0] !== $range[1]}
-            {$range[0]}-{$range[1]}
+            {$range[0]} &hellip; {$range[1]}
           {else}
             {$range[0]}
           {/if}
@@ -326,19 +365,42 @@
 <script type="text/javascript">
 $(() => {
     const pointsOverride = $("#pointsOverride");
+
+    $("#pointsOverrideReset").click(() => {
+        pointsOverride.val({$answer->getAutoPoints() !== null ? (int)$answer->getAutoPoints() : ''});
+        validatePoints();
+    });
+    $("#pointsOverrideSetMax").click(() => {
+        pointsOverride.val({$maxPoints});
+        validatePoints();
+    });
+    $("#pointsOverrideSetMin").click(() => {
+        pointsOverride.val({$minPoints});
+        validatePoints();
+    });
+
     const validatePoints = () => {
         pointsOverride.removeClass('is-valid').removeClass('is-invalid');
         $("#gradingButton").prop('disabled', false);
+        $("#pointsOverrideWarning").hide();
 
         const value = pointsOverride.val();
         if (value !== '' && !value.trim().match(/^(-?[0-9]+)$/)) {
             pointsOverride.addClass('is-invalid');
             $("#gradingButton").prop('disabled', true);
+        } else {
+            const minPoints = {$minPoints};
+            const maxPoints = {$maxPoints};
+            const intValue = parseInt(value.trim());
+            if (intValue < minPoints || intValue > maxPoints) {
+                $("#pointsOverrideWarning").show();
+            }
+
         }
     };
 
     pointsOverride.on('input', validatePoints);
-    validate();
+    validatePoints();
 });
 </script>
 {/if}

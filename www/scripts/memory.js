@@ -106,7 +106,9 @@ $(() => {
     table.append(_tr(headCells));
 
     const inputTh = _th("0x", "text-end");
-    inputTh.append($('<input type="text" maxlength="3" value="000">'));
+    inputTh.append(
+      $('<input type="text" maxlength="3" value="000" autocomplete="off">'),
+    );
     inputTh.append("0");
 
     for (let i = 0; i < 4; ++i) {

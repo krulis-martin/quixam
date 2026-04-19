@@ -92,6 +92,25 @@ final class RestTemplatesPresenter extends RestPresenter
     }
 
     /**
+     * Get a test template by its external ID.
+     * @param string $id external ID of the test template
+     */
+    public function actionSetGrading(string $id): void
+    {
+        if (!array_key_exists('grading', $this->body) || !is_array($this->body['grading'])) {
+            throw new BadRequestException("The 'grading' parameter must be provided as an associative array.");
+        }
+
+        $test = $this->getTemplateTest($id);
+        try {
+            $this->templatesActions->setGrading($test, $this->body['grading']);
+        } catch (Throwable $e) {
+            throw new BadRequestException("Invalid grading configuration: " . $e->getMessage());
+        }
+        $this->sendSuccessResponse("OK");
+    }
+
+    /**
      * Add a new group to the test template or update an existing one.
      * @param string $id external ID of the test template
      * @param string $groupId external ID of the question group
@@ -99,6 +118,7 @@ final class RestTemplatesPresenter extends RestPresenter
      * - points: number of points awarded for each question in this group (optional)
      * - count: number of questions selected from this group (optional)
      * - ordering: an index used for sorting the groups when the test is being assembled (optional)
+     * - pointsPerItem: number of points awarded for each item in this group (optional)
      */
     public function actionAddGroup(string $id, string $groupId): void
     {
@@ -106,8 +126,9 @@ final class RestTemplatesPresenter extends RestPresenter
         $ordering = $this->getIntParam('ordering', true);
         $count = $this->getIntParam('count', true);
         $points = $this->getIntParam('points');
+        $pointsPerItem = $this->getIntParam('pointsPerItem');
 
-        $res = $this->templatesActions->addGroup($test, $groupId, $ordering, $count, $points);
+        $res = $this->templatesActions->addGroup($test, $groupId, $ordering, $count, $points, $pointsPerItem);
         $this->sendSuccessResponse([
             'created' => $res === null,
             'updated' => $res === false,

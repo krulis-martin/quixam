@@ -7,7 +7,7 @@ namespace Parser;
 /**
  * This is a structure that holds all question data.
  */
-class Question
+class ParsedQuestion
 {
     private $type = null;
     private $parameters = [];
