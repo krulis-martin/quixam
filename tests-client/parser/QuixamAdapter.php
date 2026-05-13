@@ -477,8 +477,8 @@ class Adapter
         $ordering = 0;
         foreach ($structure as $group => $questions) {
             echo "Uploading questions of $group ...\n";
-            $points = $this->groups[$group]['points'] ?? 1;
             $pointsPerItem = (int)($this->groups[$group]['pointsPerItem'] ?? 0);
+            $points = $this->groups[$group]['points'] ?? ($pointsPerItem ? 0 : 1);
             $count = $this->groups[$group]['count'] ?? 1;
             if ($count > count($questions)) {
                 echo "Warning: group $group selects $count questions, but only " . count($questions)

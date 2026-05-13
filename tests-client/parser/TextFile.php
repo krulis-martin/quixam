@@ -81,7 +81,7 @@ class TextFile extends TextBlock
      * Loads data from given file, resolves includes, and return instance of a raw file.
      * Uses internal cache to avoid repetitive loading (and to detect loop dependencies).
      * @param string $origPath of the file to be loaded
-     * @param TextFile|null reference to a root file (if nested include is being loaded)
+     * @param TextFile|null $rootFile reference to a root file (if nested include is being loaded)
      * @return TextFile
      */
     public static function load(string $origPath, ?TextFile $rootFile = null): TextFile
