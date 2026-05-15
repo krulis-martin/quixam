@@ -15,8 +15,8 @@ $(() => {
     }
     msg.append(
       $(
-        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
-      )
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+      ),
     );
     $("#flashes").append(msg);
     msg[0].scrollIntoView();
