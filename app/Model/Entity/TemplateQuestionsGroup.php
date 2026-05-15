@@ -47,6 +47,7 @@ class TemplateQuestionsGroup
 
     /**
      * @ORM\OneToMany(targetEntity="TemplateQuestion", mappedBy="questionsGroup")
+     * @ORM\OrderBy({"externalId" = "ASC"})
      */
     protected $questions;
 
