@@ -278,10 +278,10 @@
               <button n:if="$answer->getAutoPoints()" class="btn btn-outline-primary" type="button" id="pointsOverrideReset" title="Reset">
                 <i class="fa-solid fa-rotate-left"></i>
               </button>
-              <button class="btn btn-outline-primary" type="button" id="pointsOverrideSetMax" title="Maximum">
+              <button class="btn btn-outline-success" type="button" id="pointsOverrideSetMax" title="Maximum">
                 <i class="fa-solid fa-arrows-up-to-line"></i>
               </button>
-              <button class="btn btn-outline-primary" type="button" id="pointsOverrideSetMin" title="Minimum">
+              <button class="btn btn-outline-danger" type="button" id="pointsOverrideSetMin" title="Minimum">
                 <i class="fa-solid fa-arrows-down-to-line"></i>
               </button>
             </div>
@@ -290,7 +290,7 @@
           <div class="col text-end">
             <button class="btn btn-success mt-4" id="gradingButton" type="submit">
               <i class="fa-solid fa-diagram-next fa-fw me-1"></i>
-              {_locale.test.manualGrading.SaveGrading}:
+              {_locale.test.manualGrading.SaveGrading}
             </button>
           </div>
         </div>
@@ -372,11 +372,15 @@ $(() => {
     });
     $("#pointsOverrideSetMax").click(() => {
         pointsOverride.val({$maxPoints});
-        validatePoints();
+        if (validatePoints()) {
+          $("#gradingButton").click();
+        }
     });
     $("#pointsOverrideSetMin").click(() => {
         pointsOverride.val({$minPoints});
-        validatePoints();
+        if (validatePoints()) {
+          $("#gradingButton").click();
+        }
     });
 
     const validatePoints = () => {
@@ -388,6 +392,7 @@ $(() => {
         if (value !== '' && !value.trim().match(/^(-?[0-9]+)$/)) {
             pointsOverride.addClass('is-invalid');
             $("#gradingButton").prop('disabled', true);
+            return false;
         } else {
             const minPoints = {$minPoints};
             const maxPoints = {$maxPoints};
@@ -395,7 +400,7 @@ $(() => {
             if (intValue < minPoints || intValue > maxPoints) {
                 $("#pointsOverrideWarning").show();
             }
-
+            return true;
         }
     };
 
