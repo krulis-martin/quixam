@@ -196,6 +196,7 @@ enrolledUsers.lock: "Lock"
 enrolledUsers.unlock: "Unlock"
 enrolledUsers.pendingScore: "Some answers has not been evaluated by the teacher yet."
 enrolledUsers.allLockedInfo: "All enrolled students have locked themselves. You can now safely finish the test to evaluate the results."
+enrolledUsers.noStudents: "There are no enrolled or registered students for this test term yet."
 
 template.title: "Test templates"
 template.noTestTemplates: "There are no test templates that you have access to. The templates can be created only by the administrators."

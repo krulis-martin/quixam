@@ -70,10 +70,9 @@
 {*
  * Table of enrolled users (and their results)
  *}
-{if $enrolledUsers}
-<table class="table table-hover align-middle mt-4">
+<table class="table table-hover align-middle mt-4" n:if="$enrolledUsers">
   <thead>
-    </tr>
+    <tr>
       <th class="text-nowrap">{_locale.enrolledUsers.lastName}</th>
       <th class="text-nowrap">{_locale.enrolledUsers.firstName}</th>
       <th class="text-nowrap"></th>
@@ -166,12 +165,17 @@
     </tr>
   </tbody>
 </table>
-{/if}
 
 {*
  * Table of registrations (users who haven't started the test yet)
  *}
-{if !$test->getRegistrations()->isEmpty()}
+{if $test->getRegistrations()->isEmpty()}
+<div class="alert alert-secondary" n:if="!$enrolledUsers">
+  <i class="fa-solid fa-person-circle-exclamation opacity-50 me-2"></i>
+  {_locale.enrolledUsers.noStudents}
+</div>
+
+{else}
 <h5 class="mt-4">{_locale.enrolledUsers.registrations}</h5>
 <table class="table table-hover align-middle">
   <thead>

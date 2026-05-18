@@ -130,7 +130,7 @@ final class EnrolledPresenter extends TestHandlingPresenter
         });
         $this->template->enrolledUsers = $enrolledUsers;
 
-        $this->template->allEnrolledLocked = true;
+        $this->template->allEnrolledLocked = count($enrolledUsers) > 0;
         foreach ($enrolledUsers as $enrolled) {
             if (!$enrolled->isLocked()) {
                 $this->template->allEnrolledLocked = false;

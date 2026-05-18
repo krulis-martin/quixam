@@ -196,6 +196,7 @@ enrolledUsers.lock: "Zamknout"
 enrolledUsers.unlock: "Odemknout"
 enrolledUsers.pendingScore: "Některé odpovědi ještě nebyly vyhodnoceny vyučujícím."
 enrolledUsers.allLockedInfo: "Všichni zapsaní studenti se uzamkli. Nyní můžete bezpečně ukončit test a vyhodnotit výsledky."
+enrolledUsers.noStudents: "V tomto termínu zatím nejsou žádní zapsaní nebo registrovaní studenti."
 
 template.title: "Předlohy testů"
 template.noTestTemplates: "Zatím zde nejsou žádné vám přístupné předlohy testů. Předlohy mohou být vytvořeny pouze administrátory."
