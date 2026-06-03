@@ -22,7 +22,7 @@ class MarkdownFilter
         if (!$this->converter) {
             // lazy initialization
             $this->converter = new CommonMarkConverter([
-                'html_input' => 'escape',
+                'html_input' => 'allow',
                 'allow_unsafe_links' => true,
             ]);
         }
