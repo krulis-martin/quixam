@@ -12,7 +12,13 @@ class MarkdownFilter
 {
     use Nette\SmartObject;
 
-    private $converter = null;
+    private ?CommonMarkConverter $converter = null;
+    private bool $allowHtml = false;
+
+    public function __construct(bool $allowHtml = false)
+    {
+        $this->allowHtml = $allowHtml;
+    }
 
     /**
      * A filter extension for latte: Markdown-to-HTML rendering filter.
@@ -22,7 +28,7 @@ class MarkdownFilter
         if (!$this->converter) {
             // lazy initialization
             $this->converter = new CommonMarkConverter([
-                'html_input' => 'allow',
+                'html_input' => $this->allowHtml ? 'allow' : 'escape',
                 'allow_unsafe_links' => true,
             ]);
         }

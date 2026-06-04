@@ -2,17 +2,19 @@ services:
   router: App\Router\RouterFactory::createRouter
   security.passwords: Nette\Security\Passwords(::PASSWORD_BCRYPT, [cost: 12])
   authenticator: App\Security\Authenticator
+  markdownFilter: App\Helpers\MarkdownFilter(true)
+  markdownFilterSafe: App\Helpers\MarkdownFilter(false) 
   - App\Security\CasAuthenticator(%casAuthenticator%)
   - App\Security\AccessTokenManager(%accessTokens%)
   - App\Helpers\AppConfig(%appConfig%)
   - App\Helpers\FunctionsExtension
   - App\Helpers\LatteDateFilter
-  - App\Helpers\MarkdownFilter
 
   nette.latteFactory:
     setup:
       - addFilter(ldate, @App\Helpers\LatteDateFilter)
-      - addFilter(markdown, @App\Helpers\MarkdownFilter)
+      - addFilter(markdown, @markdownFilter)
+      - addFilter(markdownSafe, @markdownFilterSafe)
       - addExtension(@App\Helpers\FunctionsExtension)
 
   - App\Helpers\TestOrchestrator

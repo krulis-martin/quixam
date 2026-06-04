@@ -1,7 +1,7 @@
 {if !empty($correctSample)}
     {if $answer}
         <h5>{_locale.templateQuestion.text.correctAnswerExample}:</h5>
-        <div class="bg-success-subtle border p-3 my-2 rounded">{$answer|markdown}</div>
+        <div class="bg-success-subtle border p-3 my-2 rounded">{$answer|markdownSafe}</div>
     {else}
         <div class="border p-3 mt-4 rounded text-secondary opacity-50">
             <i class="fa-solid fa-ban me-2"></i>
@@ -30,7 +30,7 @@
         <button type="button" class="btn btn-outline-primary btn-sm float-end">
             <i class="fa-solid fa-toggle-on me-2"></i>{_locale.templateQuestion.text.MarkdownEnabled}
         </button>
-        <div class="bg-{$graded}-subtle border p-3 my-3 rounded">{$answer|markdown}</div>
+        <div class="bg-{$graded}-subtle border p-3 my-3 rounded">{$answer|markdownSafe}</div>
     </div>
 {else}
     <strong>{_locale.app.Answer}:</strong>
