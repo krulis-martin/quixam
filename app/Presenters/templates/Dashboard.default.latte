@@ -26,6 +26,7 @@
     <thead>
       <tr>
         <th>{_locale.dashboard.table.test}</th>
+        <th class="text-nowrap" n:if="$isSupervisor">{_locale.dashboard.table.externalId}</th>
         <th class="text-nowrap">{_locale.dashboard.table.scheduledAt}</th>
         <th class="text-nowrap">{_locale.dashboard.table.startedAt}</th>
         <th class="text-nowrap">{_locale.dashboard.table.finishedAt}</th>
@@ -49,6 +50,7 @@
             </small>
           {/if}
         </td>
+        <td class="text-nowrap" n:if="$isSupervisor"><code>{$test->getExternalId()}</code></td>
         <td class="text-nowrap">{$test->getScheduledAt()|ldate}</td>
         <td class="text-nowrap">{$test->getStartedAt()|ldate}</td>
         <td class="text-nowrap">{$test->getFinishedAt()|ldate}</td>

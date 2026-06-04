@@ -51,6 +51,10 @@
     {foreach $test->getSupervisors() as $supervisor}{$supervisor->getFirstName()} {$supervisor->getLastName()}{sep}, {/sep}{/foreach}
   </span>
   <span class="d-inline-block me-4">
+    <span class="text-muted">{_locale.test.externalId}:</span>
+    <code>{$test->getExternalId()}</code>
+  </span>
+  <span class="d-inline-block me-4">
     <span class="text-muted">{_locale.test.startedAt}:</span>
     {$test->getStartedAt()|ldate}
   </span>
