@@ -126,8 +126,13 @@ final class LoginPresenter extends BasePresenter
     {
         try {
             $this->externalAuthenticator->initialize();
-
             $user = $this->externalAuthenticator->authenticate() ? $this->findMatchingUser() : null;
+
+            if (!$this->getSession()->isStarted() && session_status() === PHP_SESSION_ACTIVE) {
+                // there is an open session, but it is not ours (probably from the external authenticator)
+                session_write_close();
+            }
+
             if ($user) {
                 $user->updateLastAuthenticationAt();
                 $this->users->persist($user);

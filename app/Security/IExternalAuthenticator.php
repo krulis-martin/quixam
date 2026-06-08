@@ -14,48 +14,48 @@ interface IExternalAuthenticator
 
     /**
      * Perform the authentication.
-     * @return bool true if the authentication was successfull
+     * @return bool true if the authentication was successful
      */
     public function authenticate(): bool;
 
     /**
      * Check whether a new authentication was performed.
-     * This function may be called only after successfull authentication.
+     * This function may be called only after successful authentication.
      * @return bool If false, the authentication was accepted based on long-lasting tokens (e.g., cookie).
      */
     public function isFresh(): bool;
 
     /**
      * Get the external identifier of the user.
-     * This function may be called only after successfull authentication.
+     * This function may be called only after successful authentication.
      * @return string|null
      */
     public function getUserId(): ?string;
 
     /**
      * Get the first name of the user.
-     * This function may be called only after successfull authentication.
+     * This function may be called only after successful authentication.
      * @return string|null
      */
     public function getUserFirstName(): ?string;
 
     /**
      * Get the last name of the user.
-     * This function may be called only after successfull authentication.
+     * This function may be called only after successful authentication.
      * @return string|null
      */
     public function getUserLastName(): ?string;
 
     /**
      * Get all email addresses of the user (the first address should be the primary one).
-     * This function may be called only after successfull authentication.
+     * This function may be called only after successful authentication.
      * @return string[] list of addresses
      */
     public function getUserEmails(): array;
 
     /**
      * Suggests a role based on users additional attributes
-     * This function may be called only after successfull authentication.
+     * This function may be called only after successful authentication.
      * @return string a role identifier or an empty string if the suggestion cannot be made
      */
     public function getUserSuggestedRole(): string;
