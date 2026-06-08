@@ -35,23 +35,29 @@
       </td>
     </tr>
     <tr n:foreach="$group->getQuestions() as $question">
+      {var $type = $questionTypes[$question->getId()] ?? null}
       <td></td>
-      <td>
-        {if $question->getType() === 'single'}
+      <td class="text-nowrap">
+        {if ($type ?? $question->getType()) === 'single'}
           <i class="fa-regular fa-circle-dot fa-fw text-muted" title="{_locale.template.type.single}"></i>
-        {elseif $question->getType() === 'multi'}
+        {elseif ($type ?? $question->getType()) === 'multi'}
           <i class="fa-regular fa-square-check fa-fw text-muted" title="{_locale.template.type.multi}"></i>
-        {elseif $question->getType() === 'numeric'}
+        {elseif ($type ?? $question->getType()) === 'numeric'}
           <i class="fa-solid fa-hashtag fa-fw text-muted" title="{_locale.template.type.numeric}"></i>
-        {elseif $question->getType() === 'order'}
+        {elseif ($type ?? $question->getType()) === 'order'}
           <i class="fa-solid fa-arrow-down-short-wide fa-fw text-muted" title="{_locale.template.type.order}"></i>
-        {elseif $question->getType() === 'text'}
+        {elseif ($type ?? $question->getType()) === 'text'}
           <i class="fa-solid fa-font fa-fw text-muted" title="{_locale.template.type.text}"></i>
-        {elseif $question->getType() === ''}
-          <i class="fa-solid fa-gears fa-fw text-muted" title="{_locale.template.type.generated}"></i>
         {else}
           <i class="fa-regular fa-circle-question fa-fw text-muted" title="{_locale.template.type.unknown}"></i>
         {/if}
+        {if $question->getType() === ''}
+          <i class="fa-solid fa-gears fa-fw text-warning ms-1" title="{_locale.template.type.generated}"></i>
+        {/if}
+      <span n:if="$questionData[$question->getId()]?->getItemsCount() > 1"
+        class="px-1 bg-secondary text-bg-secondary rounded-pill">
+        {$questionData[$question->getId()]?->getItemsCount()}
+      </span>
       </td>
       <td class="text-nowrap"><code>{$question->getExternalId()}</code></td>
       <td class="w-100 {$question->isDisabled() ? 'text-muted'}">

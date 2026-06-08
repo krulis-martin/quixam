@@ -66,7 +66,26 @@ final class TemplatePresenter extends AuthenticatedPresenter
     public function renderTest(string $id): void
     {
         $this->template->locale = $this->selectedLocale;
-        $this->template->test = $this->templateTests->get($id);
+
+        $test = $this->templateTests->get($id);
+        $this->template->test = $test;
+
+        $data = [];
+        $types = [];
+        foreach ($test->getQuestionGroups() as $group) {
+            foreach ($group->getQuestions() as $question) {
+                $type = $question->getType();
+                $data[$question->getId()] = $this->testOrchestrator->instantiateQuestionData(
+                    $type,
+                    $question->getData(),
+                    0
+                );
+                $types[$question->getId()] = $type;
+            }
+        }
+
+        $this->template->questionData = $data;
+        $this->template->questionTypes = $types;
     }
 
     public function checkQuestion(string $id): bool
