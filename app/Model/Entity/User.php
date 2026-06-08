@@ -59,12 +59,12 @@ class User
     protected $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", options={"collation":"utf8mb4_czech_ci"})
      */
     protected $firstName;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", options={"collation":"utf8mb4_czech_ci"})
      */
     protected $lastName;
 
