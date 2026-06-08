@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Security;
 
 use App\Model\Repository\Users;
-use Nette;
 use Nette\Security\Authenticator as SecurityAuthenticator;
 use Nette\Security\IdentityHandler;
 use Nette\Security\IIdentity;

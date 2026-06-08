@@ -17,3 +17,10 @@ nettrine.dbal:
     user: "quixam"
     password: "your-secret-password-for-quixam-db"
     dbname: "quixam"
+
+
+# uncomment the following lines if you need to alter session settings (e.g., when running multiple instances on the same domain)
+#session:
+#  expiration: 14 days
+#  name: QuixamSessionID
+#  savePath: "%tempDir%"

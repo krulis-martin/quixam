@@ -28,8 +28,8 @@ application:
 
 session:
   expiration: 14 days
+  name: QuixamSessionID
   savePath: "%tempDir%"
-
 
 tracy:
   bar:
