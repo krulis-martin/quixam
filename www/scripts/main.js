@@ -78,10 +78,13 @@ $(() => {
 
       // block and animate submit button
       if (form.dataset.ajaxButton) {
-        var button = $("#" + form.dataset.ajaxButton);
-        var waitingIcon = createWaitingIcon();
-        button.append(waitingIcon);
-        button.attr("disabled", "disabled");
+        const buttonIds = form.dataset.ajaxButton.split(" ");
+        buttonIds.forEach((buttonId) => {
+          var button = $("#" + buttonId);
+          var waitingIcon = createWaitingIcon();
+          button.append(waitingIcon);
+          button.attr("disabled", "disabled");
+        });
       }
 
       fetch(form.action, {
@@ -92,10 +95,11 @@ $(() => {
         .then(postProcessAjax)
         .finally(() => {
           globalAjaxLock = false;
-          if (button) {
+          buttonIds.forEach((buttonId) => {
+            var button = $("#" + buttonId);
             button.removeAttr("disabled");
             waitingIcon.remove();
-          }
+          });
         });
     }
   });

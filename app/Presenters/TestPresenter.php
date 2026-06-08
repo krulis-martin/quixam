@@ -255,7 +255,8 @@ final class TestPresenter extends AuthenticatedPresenter
 
         $this->testOrchestrator->updateScore($enrolledUser);
 
-        $this->finalizePost($this->link('default', ['id' => $id, 'question' => $this->question]));
+        $next = $req->getPost('nextQuestion');
+        $this->finalizePost($this->link('default', ['id' => $id, 'question' => $next ? $next : $this->question]));
     }
 
     public function renderDefault(string $id)

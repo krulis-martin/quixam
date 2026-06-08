@@ -237,7 +237,7 @@
      * Grading comments and points override
      *}
     <div n:if="$test->getFinishedAt() !== null && $answer && $isSupervisor" class="card card-body mt-2">
-      <form action="{link PointsOverride! question: $selectedQuestion->getId()}" method="POST" data-ajax data-ajax-button="gradingButton" autocomplete="off">
+      <form action="{link PointsOverride! question: $selectedQuestion->getId()}" method="POST" data-ajax data-ajax-button="gradingButton gradingNextButton" autocomplete="off">
 
       <div class="container mb-3">
         <div class="row">
@@ -287,10 +287,14 @@
             </div>
           </div>
 
-          <div class="col text-end">
+          <div class="col text-end">          
             <button class="btn btn-success mt-4" id="gradingButton" type="submit">
               <i class="fa-solid fa-diagram-next fa-fw me-1"></i>
               {_locale.test.manualGrading.SaveGrading}
+            </button>
+            <button n:if="$nextQuestion" class="btn btn-success mt-4" id="gradingNextButton" type="button">
+              <i class="fa-solid fa-forward fa-fw me-1"></i>
+              {_locale.test.manualGrading.SaveAndNext}
             </button>
           </div>
         </div>
@@ -382,6 +386,13 @@ $(() => {
           $("#gradingButton").click();
         }
     });
+
+    {if $nextQuestion}
+    $("#gradingNextButton").click(() => {
+        $("#gradingNextButton").closest("form").append('<input type="hidden" name="nextQuestion" value={$nextQuestion->getId()}>');
+        $("#gradingButton").click();
+    });
+    {/if}
 
     const validatePoints = () => {
         pointsOverride.removeClass('is-valid').removeClass('is-invalid');
