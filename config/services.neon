@@ -31,6 +31,7 @@ services:
   - App\Model\Repository\Answers
   - App\Model\Repository\EnrolledUsers
   - App\Model\Repository\EnrollmentRegistrations
+  - App\Model\Repository\IpAddresses
   - App\Model\Repository\Questions
   - App\Model\Repository\TemplateQuestions
   - App\Model\Repository\TemplateQuestionsGroups

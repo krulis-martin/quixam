@@ -6,7 +6,6 @@ namespace App\Model\Repository;
 
 use App\Model\Entity\Question;
 use App\Model\Entity\TestTerm;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**

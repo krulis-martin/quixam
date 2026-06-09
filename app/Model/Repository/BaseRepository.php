@@ -183,7 +183,7 @@ class BaseRepository
      * @param string|null $indexBy
      * @return QueryBuilder
      */
-    protected function createQueryBuilder(string $alias, string $indexBy = null): QueryBuilder
+    protected function createQueryBuilder(string $alias, ?string $indexBy = null): QueryBuilder
     {
         return $this->repository->createQueryBuilder($alias, $indexBy);
     }
