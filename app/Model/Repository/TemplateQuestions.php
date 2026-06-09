@@ -6,7 +6,6 @@ namespace App\Model\Repository;
 
 use App\Model\Entity\TemplateQuestion;
 use App\Model\Entity\TemplateQuestionsGroup;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
