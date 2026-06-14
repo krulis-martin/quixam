@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Presenters;
 
 use App\Model\Repository\Questions;
+use App\Model\Repository\IpAddresses;
 use App\Model\Entity\EnrollmentRegistration;
 use App\Model\Entity\User;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
@@ -17,6 +18,9 @@ final class EnrolledPresenter extends TestHandlingPresenter
 {
     /** @var Questions @inject */
     public $questions;
+
+    /** @var IpAddresses @inject */
+    public $ipAddresses;
 
     /** @var LatteFactory @inject */
     public $latteFactory;
@@ -141,5 +145,7 @@ final class EnrolledPresenter extends TestHandlingPresenter
         $this->template->questions = $this->questions->getQuestionsOfTestSorted($test);
 
         $this->template->onlineDateThreshold = new DateTime("15 minutes ago");
+
+        $this->template->ipAddresses = $this->ipAddresses->getIpAddressesUsedInTerm($test);
     }
 }
