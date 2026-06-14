@@ -108,7 +108,7 @@
           {if $ipAddressEntity === null}
             <i class="fa-solid fa-triangle-exclamation text-danger"></i>
           {elseif $ipAddressEntity->hasSeating()}
-            <img n:if="$ipAddressEntity?->hasSeating()" src="{$basePath}/images/{$ipAddressEntity->getSeatingType()}-{$ipAddressEntity->getRow()}-{$ipAddressEntity->getColumn()}.svg" style="height: 2em;">
+            <img src="{$basePath}/images/{$ipAddressEntity->getSeatingType()}-{$ipAddressEntity->getRow()}-{$ipAddressEntity->getColumn()}.svg" style="height: 2em;">
           {elseif $ipAddressEntity->getLocation()}
             <span class="badge text-bg-secondary">{$ipAddressEntity->getLocation()}</span>
           {/if}
