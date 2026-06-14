@@ -84,6 +84,7 @@
       <th class="text-nowrap">{_locale.enrolledUsers.lastName}</th>
       <th class="text-nowrap">{_locale.enrolledUsers.firstName}</th>
       <th class="text-nowrap"></th>
+      <th class="text-nowrap"></th>
       <th class="text-nowrap text-center">{_locale.enrolledUsers.answers}</th>
       {if $test->getFinishedAt()}
         <th class="text-center">{_locale.enrolledUsers.points}</th>
@@ -99,6 +100,20 @@
       <td class="text-nowrap text-smaller">
         <a href="mailto:{$enrolledUser->getUser()->getEmail()}">{$enrolledUser->getUser()->getEmail()}</a><br>
         {$enrolledUser->getUser()->getExternalId()}
+      </td>
+      <td class="w-0 text-nowrap text-end">
+        {var $ips = $ipAddresses[$enrolledUser->getId()] ?? []}
+        {foreach $ips as $ip => $ipAddressEntity}
+          <span title="{$ipAddressEntity == null ? 'Unknown ' : ''}IP: {$ip}{if $ipAddressEntity?->getLocation()} ({$ipAddressEntity->getLocation()}) {$ipAddressEntity?->getHostname()}{/if}">
+          {if $ipAddressEntity === null}
+            <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+          {elseif $ipAddressEntity->hasSeating()}
+            <img n:if="$ipAddressEntity?->hasSeating()" src="{$basePath}/images/{$ipAddressEntity->getSeatingType()}-{$ipAddressEntity->getRow()}-{$ipAddressEntity->getColumn()}.svg" style="height: 2em;">
+          {elseif $ipAddressEntity->getLocation()}
+            <span class="badge text-bg-secondary">{$ipAddressEntity->getLocation()}</span>
+          {/if}
+          </span>
+        {/foreach}
       </td>
       
       {*
