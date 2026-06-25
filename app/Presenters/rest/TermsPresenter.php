@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Presenters;
 
-use App\Model\Entity\EnrollmentRegistration;
+use App\Model\Entity\EnrolledUser;
+use App\Model\Entity\Question;
 use App\Model\Entity\TemplateTest;
 use App\Model\Entity\TestTerm;
 use App\Model\Entity\User;
@@ -12,6 +13,8 @@ use App\Model\Repository\EnrollmentRegistrations;
 use App\Model\Repository\TestTerms;
 use App\Model\Repository\TemplateTests;
 use App\Model\Repository\Users;
+use App\Helpers\Questions\QuestionText;
+use App\Helpers\QuestionFactory;
 use App\Exceptions\BadRequestException;
 use App\Exceptions\ForbiddenRequestException;
 use App\Exceptions\NotFoundException;
@@ -35,6 +38,9 @@ final class RestTermsPresenter extends RestPresenter
 
     /** @var Users @inject */
     public $users;
+
+    /** @var QuestionFactory @inject */
+    public $questionFactory;
 
     protected function startup()
     {
@@ -254,5 +260,45 @@ final class RestTermsPresenter extends RestPresenter
         }
         $this->enrollmentRegistrations->flush();
         $this->sendSuccessResponse("OK");
+    }
+
+    public function checkAnswers(string $id): void
+    {
+        $term = $this->terms->findOrThrow($id);
+        if ($term->getFinishedAt() === null) {
+            throw new BadRequestException("The term has not finished yet.");
+        }
+        if (!$term->getTemplate()->isOwner($this->user)) {
+            throw new ForbiddenRequestException("You are not an owner of the test template of term $id.");
+        }
+    }
+
+    /**
+     * Fetch all text answers (and corresponding questions) for a finished term.
+     * @param string $id internal ID of the term
+     * This might be extended in the future to support filtering and more question types!
+     */
+    public function actionAnswers(string $id): void
+    {
+        $term = $this->terms->findOrThrow($id);
+        $result = [];
+        /** @var EnrolledUser $enrolled  */
+        foreach ($term->getEnrolledUsers() as $enrolled) {
+            /** @var Question $question  */
+            foreach ($enrolled->getQuestions() as $question) {
+                if ($question->getType() === QuestionText::TYPE && $question->getLastAnswer() !== null) {
+                    $questionData = $question->getQuestion($this->questionFactory);
+                    $result[] = [
+                        'id' => $question->getId(),
+                        'userId' => $enrolled->getUser()->getExternalId(),
+                        'questionTemplateId' => $question->getTemplateQuestion()->getExternalId(),
+                        'questionCs' => $questionData->getText('cs'),
+                        'questionEn' => $questionData->getText('en'),
+                        'answer' => $question->getLastAnswer()->getAnswer(),
+                    ];
+                }
+            }
+        }
+        $this->sendSuccessResponse($result);
     }
 }

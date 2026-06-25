@@ -37,6 +37,8 @@ final class RouterFactory
         $router[] = new DeleteRoute('rest/term/<id>', 'RestTerms:removeTerm');
         $router[] = new PostRoute('rest/term/<id>/users', 'RestTerms:registerUsers');
 
+        $router[] = new GetRoute('rest/term/<id>/answers', 'RestTerms:answers');
+
         // routes for app presenters
         $router->addRoute('<presenter>/<action>[/<id>]', [
             'presenter' => 'Homepage',

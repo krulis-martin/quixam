@@ -397,4 +397,9 @@ final class RestApiClient implements IApiClient
     {
         $this->post("/rest/term/{$termId}/users", [], ['users' => $users]);
     }
+
+    public function getTermAnswers(string $termId): array
+    {
+        return $this->get("/rest/term/{$termId}/answers");
+    }
 }
