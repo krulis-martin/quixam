@@ -38,6 +38,7 @@ final class RouterFactory
         $router[] = new PostRoute('rest/term/<id>/users', 'RestTerms:registerUsers');
 
         $router[] = new GetRoute('rest/term/<id>/answers', 'RestTerms:answers');
+        $router[] = new PostRoute('rest/grade-answer/<id>', 'RestTerms:gradeAnswer');
 
         // routes for app presenters
         $router->addRoute('<presenter>/<action>[/<id>]', [

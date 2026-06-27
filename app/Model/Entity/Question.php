@@ -10,7 +10,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use DateTime;
-use InvalidArgumentException;
 
 /**
  * An instance of one question in a particular test for a particular user.
@@ -34,23 +33,27 @@ class Question
     /**
      * @ORM\ManyToOne(targetEntity="EnrolledUser", inversedBy="questions")
      * @ORM\JoinColumn(onDelete="CASCADE")
+     * @var EnrolledUser|null
      */
     protected $enrolledUser;
 
     /**
      * Reference to template questions group that was actual at the time of creation.
      * @ORM\ManyToOne(targetEntity="TemplateQuestionsGroup")
+     * @var TemplateQuestionsGroup|null
      */
     protected $templateQuestionsGroup;
 
     /**
      * Reference to template question which was actual at the time of creation.
      * @ORM\ManyToOne(targetEntity="TemplateQuestion")
+     * @var TemplateQuestion|null
      */
     protected $templateQuestion;
 
     /**
      * @ORM\OneToMany(targetEntity="Answer", mappedBy="question", cascade={"persist", "remove"})
+     * @var Collection<Answer>
      */
     protected $answers;
 
@@ -67,6 +70,7 @@ class Question
      * An index by which the questions are ordered when shown to the user.
      * This should form a continuous sequence (1..N) within one test.
      * @ORM\Column(type="integer")
+     * @var int
      */
     protected $ordering;
 
@@ -77,6 +81,7 @@ class Question
      * If negative, the points are awarded for the mistakes (negative grading).
      * Note: this is copied value from template group entity.
      * @ORM\Column(type="integer")
+     * @var int
      */
     protected $points;
 
@@ -87,12 +92,14 @@ class Question
      * If zero, the question is graded only as entirely correct or entirely wrong.
      * Note: this is copied value from template group entity.
      * @ORM\Column(type="integer")
+     * @var int
      */
     protected $pointsPerItem;
 
     /**
      * Type identifier (corresponds to the question processor class).
      * @ORM\Column(type="string")
+     * @var string
      */
     protected $type;
 
@@ -100,18 +107,21 @@ class Question
      * Localized caption (topic) of the question for making listings more memorable
      * (copied from question template).
      * @ORM\Column(type="string")
+     * @var string
      */
     protected $caption;
 
     /**
      * JSON-encoded data of the question (data are type-specific).
      * @ORM\Column(type="text", length=65535)
+     * @var string
      */
     protected $data = '';
 
     /**
      * Number of independently-graded items in the question (extracted from question data via IQuestion).
      * @ORM\Column(type="integer")
+     * @var int
      */
     protected $itemsCount = 1;
 

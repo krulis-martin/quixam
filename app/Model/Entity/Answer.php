@@ -30,30 +30,35 @@ class Answer
     /**
      * @ORM\ManyToOne(targetEntity="Question", inversedBy="answers")
      * @ORM\JoinColumn(onDelete="CASCADE")
+     * @var Question|null
      */
     protected $question;
 
     /**
      * The answer is JSON encoded and question-type specific.
      * @ORM\Column(type="text", length=65535, nullable=true)
+     * @var string|null
      */
     protected $answer;
 
     /**
      * Time when the answer was evaluated.
      * @ORM\Column(type="datetime", nullable=true)
+     * @var DateTime|null
      */
     protected $evaluatedAt = null;
 
     /**
      * Last time the evaluation was updates (e.g., teacher changed the points or comment).
      * @ORM\Column(type="datetime", nullable=true)
+     * @var DateTime|null
      */
     protected $evaluationUpdatedAt = null;
 
     /**
      * Points awarded for this answer.
      * @ORM\Column(type="integer", nullable=true)
+     * @var int|null
      */
     protected $points = null;
 
@@ -62,6 +67,7 @@ class Answer
      * This may be identical as points; different if the teacher manually changed the points,
      * or null if the system did not assign any points (the question is manually graded).
      * @ORM\Column(type="integer", nullable=true)
+     * @var int|null
      */
     protected $autoPoints = null;
 
@@ -69,28 +75,32 @@ class Answer
      * Correctness (0.0-1.0) assigned by the system for this answer.
      * This is only applicable for some answers (like open questions), and is null for the others.
      * @ORM\Column(type="float", nullable=true)
+     * @var float|null
      */
     protected $correctness = null;
 
     /**
      * Comment assigned by the teacher to this answer, visible to the student.
      * @ORM\Column(type="text", length=65535)
+     * @var string
      */
     protected $publicComment = "";
 
     /**
      * Comment assigned by the teacher to this answer, visible only to the teachers.
      * @ORM\Column(type="text", length=65535)
+     * @var string
      */
     protected $privateComment = "";
 
     /**
      * IP address of the client who submitted this answer (as perceived by the server).
      * @ORM\Column(type="string")
+     * @var string
      */
     protected $ipAddress = "";
 
-    public function __construct(Question $question, $answer, string $ipAddress = "")
+    public function __construct(Question $question, mixed $answer, string $ipAddress = "")
     {
         $this->createdAt = new DateTime();
         $this->question = $question;

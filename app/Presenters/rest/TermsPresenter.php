@@ -9,7 +9,9 @@ use App\Model\Entity\Question;
 use App\Model\Entity\TemplateTest;
 use App\Model\Entity\TestTerm;
 use App\Model\Entity\User;
+use App\Model\Repository\Answers;
 use App\Model\Repository\EnrollmentRegistrations;
+use App\Model\Repository\Questions;
 use App\Model\Repository\TestTerms;
 use App\Model\Repository\TemplateTests;
 use App\Model\Repository\Users;
@@ -38,6 +40,12 @@ final class RestTermsPresenter extends RestPresenter
 
     /** @var Users @inject */
     public $users;
+
+    /** @var Questions @inject */
+    public $questions;
+
+    /** @var Answers @inject */
+    public $answers;
 
     /** @var QuestionFactory @inject */
     public $questionFactory;
@@ -186,12 +194,6 @@ final class RestTermsPresenter extends RestPresenter
     public function checkRegisterUsers(string $id): void
     {
         $term = $this->terms->findOrThrow($id);
-        if ($term->getArchivedAt() !== null) {
-            throw new BadRequestException("Cannot register users for an archived term.");
-        }
-        if ($term->getFinishedAt() !== null) {
-            throw new BadRequestException("Cannot register users for a term that has already finished.");
-        }
         if (!$term->getTemplate()->isOwner($this->user)) {
             throw new ForbiddenRequestException("You are not an owner of the test template of term $id.");
         }
@@ -208,6 +210,12 @@ final class RestTermsPresenter extends RestPresenter
     public function actionRegisterUsers(string $id): void
     {
         $term = $this->terms->findOrThrow($id);
+        if ($term->getArchivedAt() !== null) {
+            throw new BadRequestException("Cannot register users for an archived term.");
+        }
+        if ($term->getFinishedAt() !== null) {
+            throw new BadRequestException("Cannot register users for a term that has already finished.");
+        }
 
         // prepare registration entities from the data in the body
         $registrations = [];
@@ -265,15 +273,13 @@ final class RestTermsPresenter extends RestPresenter
     public function checkAnswers(string $id): void
     {
         $term = $this->terms->findOrThrow($id);
-        if ($term->getFinishedAt() === null) {
-            throw new BadRequestException("The term has not finished yet.");
-        }
         if (!$term->getTemplate()->isOwner($this->user)) {
             throw new ForbiddenRequestException("You are not an owner of the test template of term $id.");
         }
     }
 
     /**
+     * @GET
      * Fetch all text answers (and corresponding questions) for a finished term.
      * @param string $id internal ID of the term
      * This might be extended in the future to support filtering and more question types!
@@ -281,6 +287,10 @@ final class RestTermsPresenter extends RestPresenter
     public function actionAnswers(string $id): void
     {
         $term = $this->terms->findOrThrow($id);
+        if ($term->getFinishedAt() === null) {
+            throw new BadRequestException("The term has not finished yet.");
+        }
+
         $result = [];
         /** @var EnrolledUser $enrolled  */
         foreach ($term->getEnrolledUsers() as $enrolled) {
@@ -300,5 +310,66 @@ final class RestTermsPresenter extends RestPresenter
             }
         }
         $this->sendSuccessResponse($result);
+    }
+
+    public function checkGradeAnswer(string $id): void
+    {
+        $question = $this->questions->findOrThrow($id);
+        if (!$question->getTemplateQuestionsGroup()->getTest()->isOwner($this->user)) {
+            throw new ForbiddenRequestException("You are not an owner of the test template of question $id.");
+        }
+    }
+
+    /**
+     * @param string $id internal ID of the question to be graded
+     * @POST parameters:
+     * - publicComment (string|null): public comment for the answer
+     * - privateComment (string|null): private comment for the answer
+     * - points (int|null): points assigned to the last answer
+     * - correctness (float|null): correctness assigned to the last answer
+     * Items that are not provided (null) will not be changed.
+     */
+    public function actionGradeAnswer(string $id)
+    {
+        $question = $this->questions->findOrThrow($id);
+        if ($question->getLastAnswer() === null) {
+            throw new BadRequestException("The question has no answer to grade.");
+        }
+
+        $lastAnswer = $question->getLastAnswer();
+        $changed = false;
+
+        if (array_key_exists('publicComment', $this->body) && $this->body['publicComment'] !== null) {
+            $publicComment = (string)$this->body['publicComment'];
+            /** @phpstan-ignore booleanOr.leftAlwaysFalse */
+            $changed = $changed || $lastAnswer->getPublicComment() !== $publicComment;
+            $lastAnswer->setPublicComment($publicComment);
+        }
+
+        if (array_key_exists('privateComment', $this->body) && $this->body['privateComment'] !== null) {
+            $privateComment = (string)$this->body['privateComment'];
+            $changed = $changed || $lastAnswer->getPrivateComment() !== $privateComment;
+            $lastAnswer->setPrivateComment($privateComment);
+        }
+
+        if (array_key_exists('points', $this->body) && $this->body['points'] !== null) {
+            $points = (int)$this->body['points'];
+            $changed = $changed || $lastAnswer->getPoints() !== $points;
+            $lastAnswer->setPoints($points);
+        }
+
+        if (array_key_exists('correctness', $this->body) && $this->body['correctness'] !== null) {
+            $correctness = (float)$this->body['correctness'];
+            $changed = $changed || $lastAnswer->getCorrectness() !== $correctness;
+            $lastAnswer->setCorrectness($correctness);
+        }
+
+        if ($changed) {
+            $this->answers->persist($lastAnswer);
+        }
+
+        $this->sendSuccessResponse([
+            'changed' => $changed
+        ]);
     }
 }
