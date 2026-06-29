@@ -265,6 +265,10 @@
               {else}
                 {_locale.test.manualGrading.title}:
               {/if}
+
+              <strong n:if="$answer->getCorrectness() !== null" class="ms-3 text-muted">
+                [{_locale.test.manualGrading.correctness}: {($answer->getCorrectness()*100)|number:1}%]
+              </strong>
             </label>
             <div class="input-group">
               <input type="text" class="form-control" id="pointsOverride" name="pointsOverride" maxlength="10" autocomplete="off"
