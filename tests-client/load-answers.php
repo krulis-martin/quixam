@@ -3,10 +3,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/helpers/csv.php';
-
-use Helpers\Csv;
-
 if (PHP_SAPI !== 'cli' || realpath($_SERVER['SCRIPT_FILENAME'] ?? '') !== __FILE__) {
     die("This script must be run from the command line.");
 }

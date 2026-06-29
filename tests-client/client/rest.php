@@ -402,4 +402,32 @@ final class RestApiClient implements IApiClient
     {
         return $this->get("/rest/term/{$termId}/answers");
     }
+
+    public function gradeAnswer(
+        string $questionId,
+        ?string $publicComment = null,
+        ?string $privateComment = null,
+        ?int $points = null,
+        ?float $correctness = null
+    ): bool {
+        $body = [];
+        if ($privateComment !== null) {
+            $body['privateComment'] = $privateComment;
+        }
+        if ($publicComment !== null) {
+            $body['publicComment'] = $publicComment;
+        }
+        if ($points !== null) {
+            $body['points'] = $points;
+        }
+        if ($correctness !== null) {
+            $body['correctness'] = $correctness;
+        }
+
+        if ($body) {
+            $res = $this->post("/rest/grade-answer/{$questionId}", [], $body);
+            return $res['changed'] ?? false;
+        }
+        return false;
+    }
 }
