@@ -27,8 +27,10 @@ try {
     $quixam = new Quixam\Adapter($api);
     $quixam->loadConfig($argv[1]);
     $quixam->upload();
-    echo "Done.\n";
+    echo "\e[32mDone.\e[0m\n";
 } catch (Throwable $e) {
-    fwrite(STDERR, $e->getMessage() . "\n");
+    fwrite(STDERR, "\e[1;31mError: \e[0m" . $e->getMessage() . "\n");
+    echo "-----\n";
+    echo "\e[31mUpload terminated with errors! The test template may be only partially uploaded!\e[0m\n";
     exit(1);
 }
