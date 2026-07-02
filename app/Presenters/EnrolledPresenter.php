@@ -10,6 +10,7 @@ use App\Model\Entity\EnrollmentRegistration;
 use App\Model\Entity\User;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
 use DateTime;
+use Collator;
 
 /**
  * Displays users enrolled for particular test.
@@ -126,11 +127,12 @@ final class EnrolledPresenter extends TestHandlingPresenter
         $this->template->test = $test;
 
         $enrolledUsers = $test->getEnrolledUsers()->toArray();
-        usort($enrolledUsers, function ($a, $b) {
+        $collator = new Collator('cs_CZ'); // temporary solution, this should be configurable
+        usort($enrolledUsers, function ($a, $b) use ($collator) {
             $a = $a->getUser();
             $b = $b->getUser();
-            $res = strcmp($a->getLastName(), $b->getLastName());
-            return $res !== 0 ? $res : strcmp($a->getFirstName(), $b->getFirstName());
+            $res = $collator->compare($a->getLastName(), $b->getLastName());
+            return $res !== 0 ? $res : $collator->compare($a->getFirstName(), $b->getFirstName());
         });
         $this->template->enrolledUsers = $enrolledUsers;
 

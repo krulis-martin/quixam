@@ -79,13 +79,13 @@ nettrine.dbal:
       uuid: Ramsey\Uuid\Doctrine\UuidType
     defaultTableOptions:
       charset: utf8mb4
-      collate: utf8mb4_unicode_ci
+      collate: utf8mb4_czech_ci
 
 nettrine.orm:
   configuration:
     autoGenerateProxyClasses: true
-#    customStringFunctions:
-#      coalesce_sub: DoctrineExtensions\Query\Functions\CoalesceSubselectsFunction
+    customStringFunctions:
+      coalesce_sub: DoctrineExtensions\Query\Functions\CoalesceSubselectsFunction
 #      type: DoctrineExtensions\Query\Functions\TypeFunction
 
 nettrine.orm.annotations:
