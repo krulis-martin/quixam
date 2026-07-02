@@ -305,6 +305,8 @@ final class RestTermsPresenter extends RestPresenter
                         'questionCs' => $questionData->getText('cs'),
                         'questionEn' => $questionData->getText('en'),
                         'answer' => $question->getLastAnswer()->getAnswer(),
+                        'referenceAnswerCs' => $questionData->getCorrectAnswer('cs'),
+                        'referenceAnswerEn' => $questionData->getCorrectAnswer('en'),
                     ];
                 }
             }

@@ -103,9 +103,10 @@ interface IQuestion extends JsonSerializable
 
     /**
      * Return a correct answer in the format, that is accepted by isAnswerValid and evaluateAnswer.
+     * @param string $locale selected locale (may be irrelevant for some question types)
      * @return mixed
      */
-    public function getCorrectAnswer();
+    public function getCorrectAnswer(string $locale);
 
     /**
      * Indicates whether the question uses random seed to generate its content.

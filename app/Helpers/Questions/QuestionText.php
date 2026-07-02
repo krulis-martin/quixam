@@ -181,9 +181,9 @@ final class QuestionText extends BaseQuestion
     }
 
 
-    public function getCorrectAnswer()
+    public function getCorrectAnswer(string $locale)
     {
-        return '';
+        return self::getLocalizedText($this->correct, $locale, true);
     }
 
     public function useRandomSeed(): bool

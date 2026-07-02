@@ -327,7 +327,7 @@ final class QuestionOrder extends BaseQuestion
         return 0;
     }
 
-    public function getCorrectAnswer()
+    public function getCorrectAnswer(string $locale)
     {
         $items = [];
         foreach ($this->items as $idx => $item) {

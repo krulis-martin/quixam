@@ -319,7 +319,7 @@ final class QuestionNumeric extends BaseQuestion
         return $mistakes;
     }
 
-    public function getCorrectAnswer()
+    public function getCorrectAnswer(string $locale)
     {
         return array_map(function ($num) {
             if ($this->bestFormat === self::FORMAT_HEX) {

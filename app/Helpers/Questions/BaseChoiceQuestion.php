@@ -156,7 +156,7 @@ abstract class BaseChoiceQuestion extends BaseQuestion
         return $json;
     }
 
-    public function getCorrectAnswer()
+    public function getCorrectAnswer(string $locale)
     {
         return $this->correct;
     }
