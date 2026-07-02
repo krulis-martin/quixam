@@ -206,9 +206,8 @@ final class RestApiClient implements IApiClient
         }
 
         if ($httpCode < 200 || $httpCode >= 300) {
-            $message = $data['message'] ?? $data['error'] ?? null;
-            $payload = $data['payload'] ?? null;
-            $details = $message ?? (is_scalar($payload) ? (string)$payload : json_encode($payload));
+            $message = $data['message'] ?? $data['error'] ?? $data['payload'] ?? null;
+            $details =  is_scalar($message) ? (string)$message : json_encode($message);
             throw new RuntimeException("Request failed ({$method} {$url}, HTTP {$httpCode})"
                 . ($details ? ": {$details}" : '.'));
         }

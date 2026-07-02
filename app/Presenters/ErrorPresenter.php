@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Presenters;
 
+use App\Exceptions\BaseException;
 use Nette;
 use Nette\Application\Responses;
+use Nette\Application\BadRequestException;
+use Nette\Application\Helpers;
 use Nette\Http;
 use Tracy\ILogger;
 
@@ -26,9 +29,21 @@ final class ErrorPresenter implements Nette\Application\IPresenter
     public function run(Nette\Application\Request $request): Nette\Application\Response
     {
         $exception = $request->getParameter('exception');
+        $previousPresenter = $request->getParameter('previousPresenter');
+        if ($previousPresenter && $previousPresenter instanceof RestPresenter) {
+            if ($exception instanceof BaseException) {
+                $previousPresenter->getHttpResponse()->setCode($exception->getHttpCode());
+                return new Responses\JsonResponse([
+                    'error' => [
+                        'message' => $exception->getMessage(),
+                        'code' => $exception->getCode(),
+                    ],
+                ]);
+            }
+        }
 
-        if ($exception instanceof Nette\Application\BadRequestException) {
-            [$module, , $sep] = Nette\Application\Helpers::splitName($request->getPresenterName());
+        if ($exception instanceof BadRequestException) {
+            [$module,, $sep] = Helpers::splitName($request->getPresenterName());
             return new Responses\ForwardResponse($request->setPresenterName($module . $sep . 'Error4xx'));
         }
 

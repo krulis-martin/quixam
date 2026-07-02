@@ -15,16 +15,24 @@ use Nette\Http\IResponse;
  */
 class BaseException extends Exception
 {
+    protected int $httpCode = IResponse::S500_InternalServerError;
+
     /**
      * @param string $msg Error message
      * @param int $code Error code
      * @param Exception $previous Previous exception
      */
     public function __construct(
-        $msg = "Unexpected internal error",
-        $code = IResponse::S500_InternalServerError,
-        $previous = null
+        string $msg = "Unexpected internal error",
+        int $code = IResponse::S500_InternalServerError,
+        ?Exception $previous = null
     ) {
         parent::__construct($msg, $code, $previous);
+        $this->httpCode = $code;
+    }
+
+    public function getHttpCode(): int
+    {
+        return $this->httpCode;
     }
 }

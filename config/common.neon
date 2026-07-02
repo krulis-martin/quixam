@@ -21,7 +21,7 @@ php:
 
 application:
   errorPresenter: Error
-  catchExceptions: false # will be set to true for release
+  catchExceptions: true  # will be set to true for release
   mapping:
     *: App\Presenters\*Presenter
 
