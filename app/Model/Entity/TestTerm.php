@@ -16,10 +16,9 @@ use JsonSerializable;
  * An instance of a test which is taken at given time and place.
  * The states of the test are determined by scheduledAt, startedAt, and finishedAt timestamps
  * (more precisely, whether they are still null or not).
- *
- * @ORM\Entity
- * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  */
+#[ORM\Entity]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false)]
 class TestTerm implements JsonSerializable
 {
     use CreatableEntity;
@@ -27,82 +26,74 @@ class TestTerm implements JsonSerializable
     use LocalizableEntity;
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=\Ramsey\Uuid\Doctrine\UuidGenerator::class)
      * @var \Ramsey\Uuid\UuidInterface
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: \Ramsey\Uuid\Doctrine\UuidGenerator::class)]
     protected $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="TemplateTest")
-     */
+    #[ORM\ManyToOne(targetEntity: TemplateTest::class)]
     protected $template;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="User")
-     * @ORM\JoinTable(name="test_term_supervisor")
-     */
+    #[ORM\JoinTable(name: 'test_term_supervisor')]
+    #[ORM\ManyToMany(targetEntity: User::class)]
     protected $supervisors;
 
-    /**
-     * @ORM\OneToMany(targetEntity="EnrolledUser", mappedBy="test")
-     */
+    #[ORM\OneToMany(targetEntity: EnrolledUser::class, mappedBy: 'test')]
     protected $enrolledUsers;
 
-    /**
-     * @ORM\OneToMany(targetEntity="EnrollmentRegistration", mappedBy="test")
-     */
+    #[ORM\OneToMany(targetEntity: EnrollmentRegistration::class, mappedBy: 'test')]
     protected $registrations;
 
     /**
      * Time when the test is supposed to start.
-     * @ORM\Column(type="datetime", nullable=true)
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     protected $scheduledAt = null;
 
     /**
      * Time when the test was actually started.
-     * @ORM\Column(type="datetime", nullable=true)
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     protected $startedAt = null;
 
     /**
      * Time when the test was finished.
-     * @ORM\Column(type="datetime", nullable=true)
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     protected $finishedAt = null;
 
     /**
      * Time when the test was move to archive (students no longer see the results).
-     * @ORM\Column(type="datetime", nullable=true)
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     protected $archivedAt = null;
 
     /**
      * Address or room number that specifies location where the test is taken.
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     protected $location;
 
     /**
      * Optional external identification.
-     * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: 'string', nullable: true)]
     protected $externalId;
 
     /**
      * Additional localized note from the supervisor to the students.
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     protected $note;
 
     /**
      * This is a copy of grading column from TemplateTest entity
      * (so that grading does not change with time if the template is updated).
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     protected $grading;
 
     /**

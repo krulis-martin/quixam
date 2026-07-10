@@ -11,41 +11,33 @@ use DateTime;
  * A registration of an user for enrollment.
  * Registration is handled separately since it may be done by supervisors before the user actually registers.
  * ExternalIDs and emails can be used to identify users (beside the actual user IDs).
- *
- * @ORM\Entity
- * @ORM\Table(uniqueConstraints={@ORM\UniqueConstraint(columns={"test_id", "user_id"})})
  */
+#[ORM\Table]
+#[ORM\UniqueConstraint(columns: ['test_id', 'user_id'])]
+#[ORM\Entity]
 class EnrollmentRegistration
 {
     use CreatableEntity;
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=\Ramsey\Uuid\Doctrine\UuidGenerator::class)
      * @var \Ramsey\Uuid\UuidInterface
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: \Ramsey\Uuid\Doctrine\UuidGenerator::class)]
     protected $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="TestTerm", inversedBy="registrations")
-     */
+    #[ORM\ManyToOne(targetEntity: TestTerm::class, inversedBy: 'registrations')]
     protected $test;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="User")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class)]
     protected $user = null;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
     protected $email = null;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
     protected $externalId = null;
 
     /**

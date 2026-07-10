@@ -14,13 +14,11 @@ use DateTime;
 /**
  * Represents a template from which one type of tests is generated.
  * This entity roughly corresponds to a course.
- *
- * @ORM\Entity
- * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
- * @ORM\Table(indexes={
- *   @ORM\Index(name="external_id", columns={"external_id"})
- * })
  */
+#[ORM\Table]
+#[ORM\Index(name: 'external_id', columns: ['external_id'])]
+#[ORM\Entity]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false)]
 class TemplateTest
 {
     use CreatableEntity;
@@ -28,44 +26,42 @@ class TemplateTest
     use LocalizableEntity;
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=\Ramsey\Uuid\Doctrine\UuidGenerator::class)
      * @var \Ramsey\Uuid\UuidInterface
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: \Ramsey\Uuid\Doctrine\UuidGenerator::class)]
     protected $id;
 
-    /**
-     * @ORM\OneToMany(targetEntity="TemplateQuestionsGroup", mappedBy="test")
-     * @ORM\OrderBy({"ordering" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: TemplateQuestionsGroup::class, mappedBy: 'test')]
+    #[ORM\OrderBy(['ordering' => 'ASC'])]
     protected $questionsGroups;
 
     /**
      * Localized caption of the test displayed to the users.
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     protected $caption;
 
     /**
      * Optional external identification of this type of tests.
-     * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: 'string', nullable: true)]
     protected $externalId;
 
     /**
      * Optional external identification of the course to which this test template belongs to.
-     * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: 'string', nullable: true)]
     protected $courseId;
 
     /**
      * Optional JSON structure with grading limits. Must be an associative array (collection), where keys are marks
      * and values are point limits (integers). The point limits are lower bounds, the nearest one determines the mark.
      * E.g., [ 1 => 17, 2 => 14, 3 => 11, 4 => 0 ]: 17+ => mark 1, 14-16 => mark 2, 11-13 => mark 3, else => 4
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     protected $grading;
 
     /**
@@ -74,10 +70,8 @@ class TemplateTest
      */
     private $gradingObj = null;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="User")
-     * @ORM\JoinTable(name="template_test_owner")
-     */
+    #[ORM\JoinTable(name: 'template_test_owner')]
+    #[ORM\ManyToMany(targetEntity: User::class)]
     protected $owners;
 
     /**

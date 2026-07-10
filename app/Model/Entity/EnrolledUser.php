@@ -12,63 +12,57 @@ use DateTime;
 /**
  * Represents one enrolled user for a particular test instance.
  * This entity also holds total points that have been scored to the user.
- *
- * @ORM\Entity
- * @ORM\Table(uniqueConstraints={@ORM\UniqueConstraint(columns={"test_id", "user_id"})})
  */
+#[ORM\Table]
+#[ORM\UniqueConstraint(columns: ['test_id', 'user_id'])]
+#[ORM\Entity]
 class EnrolledUser
 {
     use CreatableEntity;
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=\Ramsey\Uuid\Doctrine\UuidGenerator::class)
      * @var \Ramsey\Uuid\UuidInterface
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: \Ramsey\Uuid\Doctrine\UuidGenerator::class)]
     protected $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="TestTerm")
-     */
+    #[ORM\ManyToOne(targetEntity: TestTerm::class)]
     protected $test;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="User", fetch="EAGER")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, fetch: 'EAGER')]
     protected $user;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Question", mappedBy="enrolledUser", cascade={"persist", "remove"})
-     * @ORM\OrderBy({"ordering" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'enrolledUser', cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['ordering' => 'ASC'])]
     protected $questions;
 
     /**
      * A random seed used for the MT generator when the questions were instantiated.
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: 'integer')]
     protected $seed;
 
     /**
      * Total points scored in this test.
      * Null = not graded yet (may be used to withhold the results from the user in manual grading).
-     * @ORM\Column(type="integer", nullable=true)
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
     protected $score = null;
 
     /**
      * Maximal possible number of points that can be scored in this test.
      * This is valid only for regular scoring, negative scoring has no explicit maximum.
-     * @ORM\Column(type="integer", nullable=true)
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
     protected $maxScore = null;
 
     /**
      * When the enrolled user gets locked, no additional answers can be submitted by the corresponding user.
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: 'boolean')]
     protected $locked = false;
 
     /**

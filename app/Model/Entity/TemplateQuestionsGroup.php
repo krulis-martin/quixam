@@ -13,55 +13,47 @@ use DateTime;
 /**
  * A group of question templates from which a certain amount of questions is selected.
  * This roughly corresponds to one topic or type of questions being tested.
- *
- * @ORM\Entity
- * @ORM\Table(indexes={
- *   @ORM\Index(name="external_id", columns={"external_id"})
- * })
- * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
  */
+#[ORM\Table]
+#[ORM\Index(name: 'external_id', columns: ['external_id'])]
+#[ORM\Entity]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false)]
 class TemplateQuestionsGroup
 {
     use CreatableEntity;
     use DeletableEntity;
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=\Ramsey\Uuid\Doctrine\UuidGenerator::class)
      * @var \Ramsey\Uuid\UuidInterface
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: \Ramsey\Uuid\Doctrine\UuidGenerator::class)]
     protected $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="TemplateQuestionsGroup")
-     * @ORM\JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[ORM\ManyToOne(targetEntity: TemplateQuestionsGroup::class)]
     protected $createdFrom;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="TemplateTest", inversedBy="questionsGroups")
-     */
+    #[ORM\ManyToOne(targetEntity: TemplateTest::class, inversedBy: 'questionsGroups')]
     protected $test;
 
-    /**
-     * @ORM\OneToMany(targetEntity="TemplateQuestion", mappedBy="questionsGroup")
-     * @ORM\OrderBy({"externalId" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: TemplateQuestion::class, mappedBy: 'questionsGroup')]
+    #[ORM\OrderBy(['externalId' => 'ASC'])]
     protected $questions;
 
     /**
      * An index by which the question groups are ordered when a test is instantiated.
      * (the lower ordering value, the sooner the questions will appear).
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: 'integer')]
     protected $ordering;
 
     /**
      * How many questions should be selected from this group.
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: 'integer')]
     protected $selectCount;
 
     /**
@@ -70,8 +62,8 @@ class TemplateQuestionsGroup
      * Otherwise, this is the total points awarded for the question.
      * If positive, the points are awarded for the correct answer.
      * If negative, the points are awarded for the mistakes (negative grading).
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: 'integer')]
     protected $points;
 
     /**
@@ -81,14 +73,14 @@ class TemplateQuestionsGroup
      * In the case of positive value, points per item are added to the base/offset for each correct item.
      * If zero, the question is graded only as entirely correct or entirely wrong.
      * Note: this is copied value from template group entity.
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: 'integer')]
     protected $pointsPerItem;
 
     /**
      * External identification of this questions group.
-     * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: 'string', nullable: true)]
     protected $externalId;
 
     /**
