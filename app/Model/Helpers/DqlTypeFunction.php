@@ -45,10 +45,10 @@ class TypeFunction extends FunctionNode
      * @param SqlWalker $sqlWalker
      * @return string
      */
-    public function getSql(SqlWalker $sqlWalker)
+    public function getSql(SqlWalker $sqlWalker): string
     {
         $qComp      = $sqlWalker->getQueryComponent($this->dqlAlias);
-        /** @var \Doctrine\ORM\Mapping\ClassMetadataInfo $class */
+        /** @var \Doctrine\ORM\Mapping\ClassMetadata $class */
         $class      = $qComp['metadata'];
         $tableAlias = $sqlWalker->getSQLTableAlias($class->getTableName(), $this->dqlAlias);
 
@@ -64,7 +64,7 @@ class TypeFunction extends FunctionNode
     /**
      * @param Parser $parser
      */
-    public function parse(Parser $parser)
+    public function parse(Parser $parser): void
     {
         $parser->match(TokenType::T_IDENTIFIER);
         $parser->match(TokenType::T_OPEN_PARENTHESIS);

@@ -25,7 +25,7 @@ class TemplateTests extends BaseSoftDeleteRepository
             ->orderBy('tt.courseId')
             ->addOrderBy('tt.externalId')
             ->addOrderBy('tt.createdAt');
-        $qb->setParameters(['uid' => $user->getId()]);
+        $qb->setParameter('uid', $user->getId());
         return $qb->getQuery()->getResult();
     }
 }
