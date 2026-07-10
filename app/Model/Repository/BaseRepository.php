@@ -73,7 +73,7 @@ class BaseRepository
     /**
      * @return T[]
      */
-    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null): array
+    public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
     {
         return $this->repository->findBy($criteria, $orderBy, $limit, $offset);
     }
@@ -194,7 +194,7 @@ class BaseRepository
      * @param string|null $search
      * @return T[]
      */
-    protected function search(array $columns, string $search = null): array
+    protected function search(array $columns, ?string $search = null): array
     {
         $filter = Criteria::create();
 
@@ -213,7 +213,7 @@ class BaseRepository
      * @param null|string $search
      * @return T[]
      */
-    protected function searchBy(array $columns, string $search = null): array
+    protected function searchBy(array $columns, ?string $search = null): array
     {
         return $this->searchHelper(
             $search,
