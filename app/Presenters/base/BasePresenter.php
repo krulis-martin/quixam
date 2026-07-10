@@ -10,6 +10,9 @@ use App\Helpers\AppConfig;
 use Nette\Application\UI\Presenter;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\Checkbox;
+use Nette\Forms\Controls\CheckboxList;
+use Nette\Forms\Controls\RadioList;
+use Nette\Forms\Controls\BaseControl;
 use Contributte\Translation\Translator;
 use Contributte\Translation\LocalesResolvers\Session as TranslatorSessionResolver;
 
@@ -100,6 +103,10 @@ class BasePresenter extends Presenter
         $renderer->wrappers['control']['.error'] = 'is-invalid';
 
         foreach ($form->getControls() as $control) {
+            if (!($control instanceof BaseControl)) {
+                continue;
+            }
+
             $type = $control->getOption('type');
             if ($type === 'button') {
                 $control->getControlPrototype()->addClass(
@@ -111,13 +118,14 @@ class BasePresenter extends Presenter
             } elseif ($type === 'file') {
                 $control->getControlPrototype()->addClass('form-control-file');
             } elseif (in_array($type, ['checkbox', 'radio'], true)) {
+                /** @var Checkbox|CheckboxList|RadioList $control */
                 if ($control instanceof Checkbox) {
                     $control->getLabelPrototype()->addClass('form-check-label');
                 } else {
                     $control->getItemLabelPrototype()->addClass('form-check-label');
                 }
                 $control->getControlPrototype()->addClass('form-check-input');
-                $control->getSeparatorPrototype()->setName('div')->addClass('form-check');
+                $control->getContainerPrototype()->setName('div')->addClass('form-check');
             }
         }
     }
