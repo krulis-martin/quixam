@@ -8,52 +8,52 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Known IP address and related information about it (location of its computer).
- * @ORM\Entity
  */
+#[ORM\Entity]
 class IpAddress
 {
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=\Ramsey\Uuid\Doctrine\UuidGenerator::class)
      * @var \Ramsey\Uuid\UuidInterface
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: \Ramsey\Uuid\Doctrine\UuidGenerator::class)]
     protected $id;
 
     /**
      * The IP address.
-     * @ORM\Column(type="string", unique=true)
      */
+    #[ORM\Column(type: 'string', unique: true)]
     protected string $ipAddress;
 
     /**
      * The hostname (or domain) associated with this IP address.
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     protected string $hostname;
 
     /**
      * Physical location of the computer with this IP address (e.g., room name).
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     protected string $location;
 
     /**
      * The type of seating arrangement in the room (e.g., "5x3" for 5 rows and 3 columns).
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     protected string $seatingType;
     /**
      * Index of the row in the room (seating arrangement in labs), zero = unknown.
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: 'integer')]
     protected int $row = 0;
 
     /**
      * Index of the column in the room (seating arrangement in labs), zero = unknown.
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: 'integer')]
     protected int $column = 0;
 
     public function __construct(

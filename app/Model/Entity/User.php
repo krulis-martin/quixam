@@ -10,10 +10,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Nette\Security\Passwords;
 use InvalidArgumentException;
 
-/**
- * @ORM\Entity
- * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
- */
+#[ORM\Entity]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false)]
 class User
 {
     use CreatableEntity;
@@ -50,22 +48,18 @@ class User
     }
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=\Ramsey\Uuid\Doctrine\UuidGenerator::class)
      * @var \Ramsey\Uuid\UuidInterface
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: \Ramsey\Uuid\Doctrine\UuidGenerator::class)]
     protected $id;
 
-    /**
-     * @ORM\Column(type="string", options={"collation":"utf8mb4_czech_ci"})
-     */
+    #[ORM\Column(type: 'string', options: ['collation' => 'utf8mb4_czech_ci'])]
     protected $firstName;
 
-    /**
-     * @ORM\Column(type="string", options={"collation":"utf8mb4_czech_ci"})
-     */
+    #[ORM\Column(type: 'string', options: ['collation' => 'utf8mb4_czech_ci'])]
     protected $lastName;
 
     public function getName()
@@ -73,14 +67,10 @@ class User
         return trim("{$this->firstName} {$this->lastName}");
     }
 
-    /**
-     * @ORM\Column(type="string", unique=true)
-     */
+    #[ORM\Column(type: 'string', unique: true)]
     protected $email;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     protected $isVerified = false;
 
     public function isVerified()
@@ -93,27 +83,21 @@ class User
         $this->isVerified = $verified;
     }
 
-    /**
-     * @ORM\Column(type="string")
-     */
+    #[ORM\Column(type: 'string')]
     protected $role;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
     protected $passwordHash = null;
 
-    /**
-     * @ORM\Column(type="string", nullable=true, unique=true)
-     */
+    #[ORM\Column(type: 'string', nullable: true, unique: true)]
     protected $externalId = null;
 
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
      * @var DateTime
      * When the last authentication or token renewal occurred.
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     protected $lastAuthenticationAt = null;
 
     /**

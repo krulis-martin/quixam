@@ -13,65 +13,64 @@ use DateTime;
 
 /**
  * An instance of one question in a particular test for a particular user.
- *
- * @ORM\Entity
  */
+#[ORM\Entity]
 class Question
 {
     use CreatableEntity;
     use LocalizableEntity;
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=\Ramsey\Uuid\Doctrine\UuidGenerator::class)
      * @var \Ramsey\Uuid\UuidInterface
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: \Ramsey\Uuid\Doctrine\UuidGenerator::class)]
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="EnrolledUser", inversedBy="questions")
-     * @ORM\JoinColumn(onDelete="CASCADE")
      * @var EnrolledUser|null
      */
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\ManyToOne(targetEntity: EnrolledUser::class, inversedBy: 'questions')]
     protected $enrolledUser;
 
     /**
      * Reference to template questions group that was actual at the time of creation.
-     * @ORM\ManyToOne(targetEntity="TemplateQuestionsGroup")
      * @var TemplateQuestionsGroup|null
      */
+    #[ORM\ManyToOne(targetEntity: TemplateQuestionsGroup::class)]
     protected $templateQuestionsGroup;
 
     /**
      * Reference to template question which was actual at the time of creation.
-     * @ORM\ManyToOne(targetEntity="TemplateQuestion")
      * @var TemplateQuestion|null
      */
+    #[ORM\ManyToOne(targetEntity: TemplateQuestion::class)]
     protected $templateQuestion;
 
     /**
-     * @ORM\OneToMany(targetEntity="Answer", mappedBy="question", cascade={"persist", "remove"})
      * @var Collection<Answer>
      */
+    #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question', cascade: ['persist', 'remove'])]
     protected $answers;
 
     /**
      * This is a reference to the last (by createdAt) answer to this question.
      * This is an optimization to speed up displaying of the results.
      *
-     * @ORM\OneToOne(targetEntity="Answer", fetch="EAGER", cascade={"persist", "detach"})
      * @var Answer|null
      */
+    #[ORM\OneToOne(targetEntity: Answer::class, fetch: 'EAGER', cascade: ['persist', 'detach'])]
     protected $lastAnswer = null;
 
     /**
      * An index by which the questions are ordered when shown to the user.
      * This should form a continuous sequence (1..N) within one test.
-     * @ORM\Column(type="integer")
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     protected $ordering;
 
     /**
@@ -80,9 +79,9 @@ class Question
      * If positive, the points are awarded for the correct answer.
      * If negative, the points are awarded for the mistakes (negative grading).
      * Note: this is copied value from template group entity.
-     * @ORM\Column(type="integer")
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     protected $points;
 
     /**
@@ -91,38 +90,38 @@ class Question
      * In the case of positive value, points per item are added to the base/offset for each correct item.
      * If zero, the question is graded only as entirely correct or entirely wrong.
      * Note: this is copied value from template group entity.
-     * @ORM\Column(type="integer")
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     protected $pointsPerItem;
 
     /**
      * Type identifier (corresponds to the question processor class).
-     * @ORM\Column(type="string")
      * @var string
      */
+    #[ORM\Column(type: 'string')]
     protected $type;
 
     /**
      * Localized caption (topic) of the question for making listings more memorable
      * (copied from question template).
-     * @ORM\Column(type="string")
      * @var string
      */
+    #[ORM\Column(type: 'string')]
     protected $caption;
 
     /**
      * JSON-encoded data of the question (data are type-specific).
-     * @ORM\Column(type="text", length=65535)
      * @var string
      */
+    #[ORM\Column(type: 'text', length: 65535)]
     protected $data = '';
 
     /**
      * Number of independently-graded items in the question (extracted from question data via IQuestion).
-     * @ORM\Column(type="integer")
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     protected $itemsCount = 1;
 
     /**

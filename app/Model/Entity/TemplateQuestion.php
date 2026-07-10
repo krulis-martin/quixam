@@ -8,13 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use DateTime;
 
-/**
- * @ORM\Entity
- * @ORM\Table(indexes={
- *   @ORM\Index(name="external_id", columns={"external_id"})
- * })
- * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
- */
+#[ORM\Table]
+#[ORM\Index(name: 'external_id', columns: ['external_id'])]
+#[ORM\Entity]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt', timeAware: false)]
 class TemplateQuestion
 {
     use CreatableEntity;
@@ -22,59 +19,53 @@ class TemplateQuestion
     use LocalizableEntity;
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=\Ramsey\Uuid\Doctrine\UuidGenerator::class)
      * @var \Ramsey\Uuid\UuidInterface
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: \Ramsey\Uuid\Doctrine\UuidGenerator::class)]
     protected $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="TemplateQuestion")
-     * @ORM\JoinColumn(onDelete="SET NULL")
-     */
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[ORM\ManyToOne(targetEntity: TemplateQuestion::class)]
     protected $createdFrom;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="TemplateTest")
-     */
+    #[ORM\ManyToOne(targetEntity: TemplateTest::class)]
     protected $test;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="TemplateQuestionsGroup", inversedBy="questions")
-     */
+    #[ORM\ManyToOne(targetEntity: TemplateQuestionsGroup::class, inversedBy: 'questions')]
     protected $questionsGroup;
 
     /**
      * External identification of this questions (must be unique within the whole test template).
-     * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: 'string', nullable: true)]
     protected $externalId;
 
     /**
      * Type identifier (corresponds to the question processor class).
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     protected $type;
 
     /**
      * Localized caption (topic) of the question for making listings more memorable.
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     protected $caption;
 
     /**
      * JSON-encoded data of the question (data are type-specific).
-     * @ORM\Column(type="text", length=65535)
      */
+    #[ORM\Column(type: 'text', length: 65535)]
     protected $data = '';
 
     /**
      * Allows temporarily disabling the question, so it will be visible in listings,
      * but it cannot be selected when a test is being instantiated.
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: 'boolean')]
     protected $disabled = false;
 
     /**
