@@ -35,7 +35,7 @@ class DbFill extends BaseCommand
         }
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('file', InputArgument::REQUIRED, 'Yaml file with data to load.');
     }

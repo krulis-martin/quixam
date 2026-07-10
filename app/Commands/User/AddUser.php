@@ -35,7 +35,7 @@ class AddUser extends BaseCommand
         $this->registrations = $registrations;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('email', InputArgument::REQUIRED, 'Email (which is also used as local login name)');
         $this->addOption('firstName', null, InputOption::VALUE_OPTIONAL, 'First name of the user.');

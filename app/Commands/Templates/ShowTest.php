@@ -30,7 +30,7 @@ class ShowTemplateTest extends BaseCommand
         $this->templatesActions = $templatesActions;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('externalId', InputArgument::REQUIRED, 'External ID of the test template.');
     }

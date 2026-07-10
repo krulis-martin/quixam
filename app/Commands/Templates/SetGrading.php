@@ -30,7 +30,7 @@ class SetGradingTemplate extends BaseCommand
         $this->templatesActions = $templatesActions;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('test', InputArgument::REQUIRED, 'External ID of the test template.');
         $this->addArgument('grading', InputArgument::REQUIRED, 'Grading configuration as JSON object.');
