@@ -31,7 +31,7 @@ class TestTerms extends BaseSoftDeleteRepository
             ->where($qb->expr()->eq("eu.user", ":user"))
             ->andWhere($qb->expr()->isNull("tt.archivedAt"))
             ->orderBy('tt.scheduledAt');
-        $qb->setParameters(['user' => $user->getId()]);
+        $qb->setParameter('user', $user->getId());
 
         if ($onlyActive) {
             $qb->andWhere($qb->expr()->isNull("tt.finishedAt"));
@@ -51,7 +51,7 @@ class TestTerms extends BaseSoftDeleteRepository
             ->where($qb->expr()->eq("er.user", ":user"))
             ->andWhere($qb->expr()->isNull("tt.archivedAt"))
             ->orderBy('tt.scheduledAt');
-        $qb->setParameters(['user' => $user->getId()]);
+        $qb->setParameter('user', $user->getId());
         return $qb->getQuery()->getResult();
     }
 
@@ -66,7 +66,7 @@ class TestTerms extends BaseSoftDeleteRepository
         $qb->where(':uid MEMBER OF tt.supervisors')
             ->andWhere($qb->expr()->isNull("tt.archivedAt"))
             ->orderBy('tt.scheduledAt');
-        $qb->setParameters(['uid' => $user->getId()]);
+        $qb->setParameter('uid', $user->getId());
         return $qb->getQuery()->getResult();
     }
 
@@ -83,7 +83,7 @@ class TestTerms extends BaseSoftDeleteRepository
             ->where($qb->expr()->isMemberOf(':uid', 't.owners'))
             ->andWhere($qb->expr()->isNull("tt.archivedAt"))
             ->orderBy('tt.scheduledAt');
-        $qb->setParameters(['uid' => $user->getId()]);
+        $qb->setParameter('uid', $user->getId());
         return $qb->getQuery()->getResult();
     }
 

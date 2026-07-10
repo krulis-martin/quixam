@@ -21,7 +21,7 @@ class UTCDateTimeType extends DateTimeType
         return self::$utc ? self::$utc : self::$utc = new DateTimeZone('UTC');
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
         if ($value instanceof DateTime) {
             $value->setTimezone(self::getUtc());
@@ -30,7 +30,7 @@ class UTCDateTimeType extends DateTimeType
         return parent::convertToDatabaseValue($value, $platform);
     }
 
-    public function convertToPHPValue(mixed $value, AbstractPlatform $platform)
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?DateTime
     {
         if (null === $value || $value instanceof DateTime) {
             return $value;
@@ -43,10 +43,10 @@ class UTCDateTimeType extends DateTimeType
         );
 
         if (!$converted) {
-            throw ConversionException::conversionFailedFormat(
-                $value,
-                $this->getName(),
-                $platform->getDateTimeFormatString()
+            $value = strlen($value) > 32 ? substr($value, 0, 20) . '...' : $value;
+            throw new ConversionException(
+                'Could not convert database value "' . $value . '" to Doctrine Type datetime. Expected format: '
+                    . $platform->getDateTimeFormatString(),
             );
         }
 
