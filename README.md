@@ -32,7 +32,7 @@ cd quixam
 composer install --no-dev --optimize-autoloader
 ```
 
-The application requires PHP 8.2 or newer (tested on PHP 8.2 and 8.3).
+The application requires PHP 8.4 or newer (tested on PHP 8.4 and 8.5).
 
 ### 3. Prepare local configuration
 

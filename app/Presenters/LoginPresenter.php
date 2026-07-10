@@ -10,6 +10,7 @@ use App\Model\Entity\User;
 use App\Security\Identity;
 use Nette\Security\Passwords;
 use Nette\Security\AuthenticationException;
+use Nette\Application\Attributes\Persistent;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -27,7 +28,7 @@ final class LoginPresenter extends BasePresenter
     /** @var LoggerInterface @inject **/
     public $logger;
 
-    /** @persistent */
+    #[Persistent]
     public $previousLink = null;
 
     private function getRedirectUrl(): string

@@ -17,6 +17,7 @@ use App\Model\Entity\User;
 use App\Helpers\QuestionFactory;
 use App\Helpers\TestOrchestrator;
 use Nette\Bridges\ApplicationLatte\LatteFactory;
+use Nette\Application\Attributes\Persistent;
 
 final class TestPresenter extends AuthenticatedPresenter
 {
@@ -44,10 +45,10 @@ final class TestPresenter extends AuthenticatedPresenter
     /** @var TestOrchestrator @inject */
     public $testOrchestrator;
 
-    /** @persistent */
+    #[Persistent]
     public $question = null;
 
-    /** @persistent */
+    #[Persistent]
     public $selectedUser = null;
 
     /**
