@@ -31,7 +31,7 @@ class DeleteQuestionTemplate extends BaseCommand
         $this->templatesActions = $templatesActions;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('test', InputArgument::REQUIRED, 'External ID of the test template.');
         $this->addArgument('group', InputArgument::REQUIRED, 'External ID of the template questions group.');

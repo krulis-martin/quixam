@@ -33,7 +33,7 @@ class SetPassword extends BaseCommand
         $this->passwordsService = $passwordsService;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument(
             'email',

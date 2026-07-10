@@ -42,7 +42,7 @@ class RegisterUsers extends BaseCommand
         $this->users = $users;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument(
             'file',
