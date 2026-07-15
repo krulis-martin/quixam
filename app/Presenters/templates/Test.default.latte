@@ -246,14 +246,14 @@
               {_locale.test.studentFeedbackText}:
               <i class="fa-brands fa-markdown ms-2 opacity-50" title="Markdown"></i>
             </label>
-            <textarea name="publicComment" class="form-control" rows="4" style="resize: none;">{$answer->getPublicComment() ?? ''}</textarea>
+            <textarea name="publicComment" class="form-control" rows="8" style="resize: none;">{$answer->getPublicComment() ?? ''}</textarea>
           </div>
           <div class="col">
             <label class="form-label mt-2">
               {_locale.test.hiddenTeachersNote}:
               <i class="fa-brands fa-markdown ms-2 opacity-50" title="Markdown"></i>
             </label>
-            <textarea name="privateComment" class="form-control" rows="4" style="resize: none;">{$answer->getPrivateComment() ?? ''}</textarea>
+            <textarea name="privateComment" class="form-control" rows="8" style="resize: none;">{$answer->getPrivateComment() ?? ''}</textarea>
           </div>
         </div>
 
@@ -267,7 +267,8 @@
               {/if}
 
               <strong n:if="$answer->getCorrectness() !== null" class="ms-3 text-muted">
-                [{_locale.test.manualGrading.correctness}: {($answer->getCorrectness()*100)|number:1}%]
+                [{_locale.test.manualGrading.correctness}: {($answer->getCorrectness()*100)|number:1}%
+                (= {correctnessToPoints($answer->getCorrectness(), $minPoints, $maxPoints)} {_locale.test.points})]
               </strong>
             </label>
             <div class="input-group">

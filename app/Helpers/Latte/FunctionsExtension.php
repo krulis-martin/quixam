@@ -25,7 +25,8 @@ class FunctionsExtension extends Extension
             'hasAnswerPartialPoints' => $this->hasAnswerPartialPoints(...),
             'hasAnswerNoPoints' => $this->hasAnswerNoPoints(...),
             'answerStyle' => $this->answerStyle(...),
-            'formatPoints' => $this->formatPoints(...)
+            'formatPoints' => $this->formatPoints(...),
+            'correctnessToPoints' => $this->correctnessToPoints(...),
         ];
     }
 
@@ -116,5 +117,17 @@ class FunctionsExtension extends Extension
         } else {
             return "[$minPoints..$maxPoints]";
         }
+    }
+
+    /**
+     * Convert correctness (a value between 0 and 1) to points based on the minimum and maximum points for a question.
+     * @param float $correctness the correctness value (between 0 and 1)
+     * @param int $minPoints the minimum points for the question
+     * @param int $maxPoints the maximum points for the question
+     * @return int the calculated rounded points based on correctness
+     */
+    public function correctnessToPoints(float $correctness, int $minPoints, int $maxPoints): int
+    {
+        return (int)round($minPoints + ($maxPoints - $minPoints) * $correctness);
     }
 }
